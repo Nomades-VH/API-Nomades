@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Optional, Iterator
+from typing import Optional, Iterator
 from uuid import UUID
 from app.band.entities import Band
 from ports.repository import AbstractRepository

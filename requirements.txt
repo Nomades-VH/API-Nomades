@@ -10,3 +10,5 @@ uvicorn~=0.15.0
 app~=0.0.1
 SQLAlchemy~=1.4.25
 python-dotenv~=0.19.1
+requests~=2.27.1
+pydantic~=1.9.0
