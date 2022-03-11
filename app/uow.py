@@ -5,6 +5,7 @@ from ports.uow import AbstractUow
 class SqlAlchemyUow(AbstractUow):
     def __init__(self) -> None:
         super().__init__(session_factory=session_maker)
+        self.band = None
 
     def _open_session(self) -> None:
         self._session = self.session_factory()

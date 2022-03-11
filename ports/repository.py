@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Iterator
+from typing import TypeVar, Generic, Iterator, Optional
 from uuid import UUID
 
 from ports.entity import Entity
 
 _T = TypeVar("_T", bound=Entity)
+
 
 class AbstractRepository(Generic[_T], ABC):
     def __init__(self, session) -> None:
@@ -15,11 +16,11 @@ class AbstractRepository(Generic[_T], ABC):
         pass
 
     @abstractmethod
-    def get(self, id: UUID) -> _T | None:
+    def get(self, id: UUID) -> Optional[_T]:
         pass
 
     @abstractmethod
-    def remove(self, entity: _T) -> None:
+    def remove(self, id: UUID) -> Optional[_T]:
         pass
 
     @abstractmethod

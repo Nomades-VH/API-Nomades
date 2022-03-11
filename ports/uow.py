@@ -2,8 +2,26 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
+from app.band.repositories import AbstractBandRepository
+from app.breakdown.repositories import AbstractBreakdownRepository
+from app.kibon_donjak.repositories import AbstractKibonDonjakRepository
+from app.kick.repositories import AbstractKickRepository
+from app.poomsae.repositories import AbstractPoomsaeRepository
+from app.stretching.repositories import AbstractStretchingRepository
+from app.theory.repositories import AbstractTheoryRepository
+from app.user.repositories import AbstractUserRepository
+
 
 class AbstractUow(ABC):
+    band: AbstractBandRepository
+    breakdown: AbstractBreakdownRepository
+    kibondonjak: AbstractKibonDonjakRepository
+    kick: AbstractKickRepository
+    poomsae: AbstractPoomsaeRepository
+    stretching: AbstractStretchingRepository
+    theory: AbstractTheoryRepository
+    user: AbstractUserRepository
+
     def __init__(self, session_factory: Callable[[], Any]):
         self.session_factory = session_factory
 
