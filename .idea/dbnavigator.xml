@@ -29,7 +29,7 @@
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="ef29c66d-0028-407a-acca-19aa001949f0">
       <console name="Connection" type="STANDARD" schema="information_schema" session="Main" />
-      <console name="Connection 1" type="STANDARD" schema="public" session="Main"><![CDATA[SELECT * FROM theory;]]></console>
+      <console name="Connection 1" type="STANDARD" schema="public" session="Main"><![CDATA[SELECT * FROM band_breakdown;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
