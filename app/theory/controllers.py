@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 
 from app.theory.models import Theory as ModelTheory
-from app.theory.services import get_all_theories, make_theory, add_theory, get_theory_by_id
+from app.theory.services import get_all_theories, add_theory, get_theory_by_id
 from app.uow import SqlAlchemyUow
 from ports.uow import AbstractUow
 
@@ -18,9 +18,8 @@ async def get_theories(uow: AbstractUow = Depends(SqlAlchemyUow)) -> List[dict]:
 
 
 @router.post("/")
-def add_theory(model: ModelTheory, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
-    theory = make_theory(model)
-    add_theory(uow, theory)
+def post_theory(model: ModelTheory, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
+    add_theory(uow, model)
 
 
 @router.get("/{theory_id}")

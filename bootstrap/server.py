@@ -10,7 +10,7 @@ from app.theory.controllers import router as theory_router
 from app.user.controllers import router as user_router
 
 app = FastAPI(
-    title="Band API",
+    title="Nômades",
 )
 
 app.include_router(router=band_router)
