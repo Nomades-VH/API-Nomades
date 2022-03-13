@@ -24,7 +24,7 @@ class AbstractRepository(Generic[_T], ABC):
         pass
 
     @abstractmethod
-    def update(self, entity: _T) -> None:
+    def update(self, entity: dict) -> None:
         pass
 
     @abstractmethod

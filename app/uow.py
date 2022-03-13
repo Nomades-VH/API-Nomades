@@ -1,5 +1,5 @@
 from app.band.repositories import BandRepository
-from app.breakdown.repositories import BreakdownRepository
+from app.breakdown.repositories import BreakdownRepository, BandBreakdownRepository
 from app.kibon_donjak.repositories import KibonDonjakRepository
 from app.kick.repositories import KickRepository
 from app.poomsae.repositories import PoomsaeRepository
@@ -18,6 +18,7 @@ class SqlAlchemyUow(AbstractUow):
     def _open_session(self) -> None:
         self._session = self.session_factory()
         self.band = BandRepository(self._session)
+        self.band_breakdown = BandBreakdownRepository(self._session)
         self.breakdown = BreakdownRepository(self._session)
         self.kibondonjak = KibonDonjakRepository(self._session)
         self.kick = KickRepository(self._session)
