@@ -16,13 +16,7 @@ router = APIRouter(prefix="/user")
 @router.post("/")
 def create_user(user: UserModel, uow: AbstractUow = Depends(SqlAlchemyUow)):
     try:
-        user = create_new_user(
-            uow,
-            user.username,
-            user.email,
-            user.password,
-            user.fk_band
-        )
+        user = create_new_user(uow, user)
     except EmailAlreadyExists:
         raise EmailAlreadyExists(user.email)
 

@@ -3,6 +3,8 @@ if __name__ == "__main__":
 
     load_dotenv(".env")
 
+    # TODO: Algumas urls ainda permitem acesso sem o token de acesso
+
     from bootstrap.database import ensure_all_entities
 
     ensure_all_entities()

@@ -1,14 +1,9 @@
 from uuid import UUID
-
 from fastapi import HTTPException
 from passlib.context import CryptContext
-
 from app.auth.hasher import hash_password
 from app.user.entities import User
 from app.user.models import User as UserModel
-
-
-# TODO: Method GET Itens abaixo
 from ports.uow import AbstractUow
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -24,30 +19,34 @@ def get_user_by_email(uow: AbstractUow, email: str) -> User:
         return uow.user.get_by_email(email)
 
 
-def create_new_user(uow: AbstractUow, username: str, email: str, password: str, fk_band: UUID) -> UserModel:
-    user = get_user_by_email(uow, email)
+def create_new_user(uow: AbstractUow, user: UserModel) -> UserModel:
+    aux = get_user_by_email(uow, user.email)
 
-    if user is not None:
+    if aux is not None:
         raise HTTPException(status_code=400, detail="User already registered")
 
     with uow:
-        user = User(
-            username=username,
-            email=email,
-            password=hash_password(password),
-            fk_band=fk_band,
-        )
-
+        user = change_model_user(user)
+        user.password = hash_password(user.password)
         uow.user.add(user)
 
-        user = make_user_model(user)
+        user = change_model_user(user)
         return user
 
 
-def make_user_model(user: User) -> UserModel:
-    return UserModel(
+def change_model_user(user: User | UserModel) -> UserModel | User:
+    if type(user) == User:
+        return UserModel(
+            username=user.username,
+            email=user.email,
+            password=user.password,
+            permission=user.permission,
+            fk_band=user.fk_band,
+        )
+    return User(
         username=user.username,
         email=user.email,
         password=user.password,
+        permission=user.permission.value,
         fk_band=user.fk_band,
     )

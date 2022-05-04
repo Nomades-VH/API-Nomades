@@ -11,3 +11,7 @@ class InvalidCredentials(AuthException):
 
 class InvalidToken(AuthException):
     """Raised when token is invalid."""
+
+
+class NotAuthorized(AuthException):
+    """Raised when user is not authorized."""

@@ -35,7 +35,16 @@ SELECT * FROM breakdowns;
 
 SELECT * FROM bands;
 
-SELECT * FROM theory;]]></console>
+SELECT * FROM theory;
+
+SELECT * FROM users;
+
+SELECT * FROM users;
+
+DELETE FROM users
+  WHERE username IN (SELECT username FROM users WHERE username = 'Felipe');
+
+INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4a47-4d31-b8a0-20f7aa127771', 'Felipe', 'felipesampaio.contato@gmail.com', '$2b$12$B/ooiLbiHFI1ovMWtkZ0ae6gFEi4Gm6M.xqgOgkUftw6oGve2fo/a', 'Vice-Presidente');]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">

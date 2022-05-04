@@ -1,15 +1,17 @@
 from dataclasses import dataclass
+from typing import Optional
 from uuid import UUID
 
+from general_enum.permissions import Permissions
 from ports.entity import Entity
-
 
 @dataclass
 class User(Entity):
     username: str
     email: str
     password: str
-    fk_band: UUID
+    permission: Permissions
+    fk_band: Optional[UUID] = None
 
 
 @dataclass

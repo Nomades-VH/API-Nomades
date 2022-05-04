@@ -2,16 +2,15 @@ import os
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 from app.auth.exceptions import InvalidCredentials, InvalidToken
 from app.auth.hasher import verify_password
 from app.uow import SqlAlchemyUow
-from app.user.models import User as UserModel
 from app.user.entities import User
-from app.user.services import make_user_model
+from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth.value_object import Token
 
@@ -49,19 +48,32 @@ def generate_token(email: str, password: str, uow: AbstractUow) -> Token:
 
 
 def get_current_user(uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)) -> User:
+    from app.user.services import get_user_by_id
+
     try:
         payload = jwt.decode(auth, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
         user_id = payload.get("sub")
     except JWTError:
-        raise InvalidToken()
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     if not user_id:
-        raise InvalidToken()
-
-    from app.user.services import get_user_by_id
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     user = get_user_by_id(uow, user_id)
     if user is None:
-        raise InvalidToken()
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     return user
+
+
+def get_current_user_with_permission(permissao: Permissions):
+
+    def _dependencia(uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)):
+        user = get_current_user(uow, auth)
+
+        if user.permission < permissao.value:
+            raise HTTPException(status_code=401, detail=f"You are not authorized to access this resource: expected {permissao.name}, but got {Permissions(user.permission).name}")
+
+        return user
+
+    return _dependencia

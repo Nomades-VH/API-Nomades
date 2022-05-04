@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Float
+from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Float, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -16,12 +16,11 @@ users = Table(
     Column("username", String(50), nullable=False),
     Column("email", String(50), nullable=False, unique=True),
     Column("password", String(100), nullable=False),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id") ),
+    Column("permission", Integer, nullable=False),
+    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id")),
     Column("created_at", DateTime, default=datetime.utcnow),
     Column("updated_at", DateTime, onupdate=datetime.utcnow)
 )
-
-#mapper_registry.map_imperatively(User, users)
 
 exame = Table(
     'exame',
