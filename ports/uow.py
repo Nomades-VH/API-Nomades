@@ -52,4 +52,3 @@ class AbstractUow(ABC):
     @abstractmethod
     def rollback(self) -> None:
         pass
-

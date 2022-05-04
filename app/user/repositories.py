@@ -7,7 +7,9 @@ from ports.repository import AbstractRepository
 
 
 class AbstractUserRepository(AbstractRepository[User], ABC):
-    pass
+
+    def get_by_email(self, username: str) -> Optional[User]:
+        pass
 
 
 class UserRepository(AbstractUserRepository):
@@ -26,3 +28,8 @@ class UserRepository(AbstractUserRepository):
 
     def iter(self) -> Iterator[User]:
         return self.session.query(User).all()
+
+    def get_by_email(self, email: str) -> Optional[User]:
+        return self.session.query(User).filter(User.email == email).first()
+
+
