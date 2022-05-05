@@ -11,7 +11,6 @@ class AbstractStretchingRepository(AbstractRepository[Stretching], ABC):
 
 
 class StretchingRepository(AbstractStretchingRepository):
-
     def get(self, uuid: UUID) -> Optional[Stretching]:
         return self.session.query(Stretching).filter(Stretching.id == uuid).first()
 
@@ -19,7 +18,9 @@ class StretchingRepository(AbstractStretchingRepository):
         self.session.add(stretching)
 
     def update(self, stretching: Stretching) -> None:
-        self.session.query(Stretching).filter(Stretching.id == stretching.id).update(stretching)
+        self.session.query(Stretching).filter(Stretching.id == stretching.id).update(
+            stretching
+        )
 
     def remove(self, uuid: UUID) -> Optional[Stretching]:
         return self.session.query(Stretching).filter(Stretching.id == uuid).delete()

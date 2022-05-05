@@ -6,13 +6,25 @@ from ports.repository import AbstractRepository
 
 
 class AbstractBandRepository(AbstractRepository[Band], ABC):
-    pass
+    def get_by_gub(self, gub: int) -> Optional[Band]:
+        pass
+
+    def get_by_name(self, name: str) -> Optional[Band]:
+        pass
+
+    def remove_by_name(self, name: str) -> Optional[Band]:
+        pass
 
 
 class BandRepository(AbstractBandRepository):
-
     def get(self, id: UUID) -> Optional[Band]:
         return self.session.query(Band).filter(Band.id == id).first()
+
+    def get_by_gub(self, gub: int) -> Optional[Band]:
+        return self.session.query(Band).filter(Band.gub == gub).first()
+
+    def get_by_name(self, name: str) -> Optional[Band]:
+        return self.session.query(Band).filter(Band.name == name).first()
 
     def add(self, band: Band) -> None:
         self.session.add(band)
@@ -25,3 +37,7 @@ class BandRepository(AbstractBandRepository):
 
     def iter(self) -> Iterator[Band]:
         yield from self.session.query(Band).all()
+
+    # TODO: Create a method to remove band with name
+    def remove_by_name(self, name: str) -> Optional[Band]:
+        pass

@@ -3,7 +3,10 @@ from collections.abc import Callable
 from typing import Any
 
 from app.band.repositories import AbstractBandRepository
-from app.breakdown.repositories import AbstractBreakdownRepository, AbstractBandBreakdownRepository
+from app.breakdown.repositories import (
+    AbstractBreakdownRepository,
+    AbstractBandBreakdownRepository,
+)
 from app.kibon_donjak.repositories import AbstractKibonDonjakRepository
 from app.kick.repositories import AbstractKickRepository
 from app.poomsae.repositories import AbstractPoomsaeRepository

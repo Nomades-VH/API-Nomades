@@ -7,13 +7,11 @@ from ports.repository import AbstractRepository
 
 
 class AbstractUserRepository(AbstractRepository[User], ABC):
-
     def get_by_email(self, username: str) -> Optional[User]:
         pass
 
 
 class UserRepository(AbstractUserRepository):
-
     def get(self, uuid: UUID) -> Optional[User]:
         return self.session.query(User).filter(User.id == uuid).first()
 
@@ -31,5 +29,3 @@ class UserRepository(AbstractUserRepository):
 
     def get_by_email(self, email: str) -> Optional[User]:
         return self.session.query(User).filter(User.email == email).first()
-
-

@@ -5,8 +5,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.breakdown.models import Breakdown as BreakdownModel
-from app.breakdown.services import get_all_breakdowns, get_breakdown_by_id, add_breakdown, add_band_breakdown, \
-    update_breakdown, remove_breakdown
+from app.breakdown.services import (
+    get_all_breakdowns,
+    get_breakdown_by_id,
+    add_breakdown,
+    add_band_breakdown,
+    update_breakdown,
+    remove_breakdown,
+)
 from app.uow import SqlAlchemyUow
 from ports.uow import AbstractUow
 
@@ -14,7 +20,9 @@ router = APIRouter(prefix="/breakdown")
 
 
 @router.get("/")
-async def get_breakdowns(uow: AbstractUow = Depends(SqlAlchemyUow)) -> List[BreakdownModel]:
+async def get_breakdowns(
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+) -> List[BreakdownModel]:
     try:
         return list(map(asdict, get_all_breakdowns(uow)))
     except Exception:
@@ -22,7 +30,9 @@ async def get_breakdowns(uow: AbstractUow = Depends(SqlAlchemyUow)) -> List[Brea
 
 
 @router.post("/{band_id}")
-async def post_breakdown(band_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
+async def post_breakdown(
+    band_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow)
+) -> None:
     try:
         breakdown_id = add_breakdown(model, uow)
         add_band_breakdown(band_id, breakdown_id, uow)
@@ -31,7 +41,9 @@ async def post_breakdown(band_id: UUID, model: BreakdownModel, uow: AbstractUow 
 
 
 @router.get("/{id}")
-async def get_breakdown(id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)) -> Optional[dict] | HTTPException:
+async def get_breakdown(
+    id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)
+) -> Optional[dict] | HTTPException:
     try:
         return asdict(get_breakdown_by_id(id, uow))
 
@@ -41,7 +53,9 @@ async def get_breakdown(id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)) -> 
 
 
 @router.put("/{id}")
-async def put_breakdown(breakdown_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
+async def put_breakdown(
+    breakdown_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow)
+) -> None:
     try:
         update_breakdown(breakdown_id, model, uow)
     except Exception:
@@ -49,7 +63,9 @@ async def put_breakdown(breakdown_id: UUID, model: BreakdownModel, uow: Abstract
 
 
 @router.delete("/{band_id}/{breakdown_id}")
-async def delete_breakdown(band_id: UUID, breakdown_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
+async def delete_breakdown(
+    band_id: UUID, breakdown_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)
+) -> None:
     try:
         remove_breakdown(band_id, breakdown_id, uow)
     except Exception:

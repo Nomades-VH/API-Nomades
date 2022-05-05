@@ -8,7 +8,7 @@ class TestController(TestCase):
         "gub": 1,
         "meaning": "Primeira faixa",
         "name": "Faixa branca",
-        "fk_theory": "73f35408-be7e-4a24-b93d-9942e74b8515"
+        "fk_theory": "73f35408-be7e-4a24-b93d-9942e74b8515",
     }
 
     def test_get_all(self):
@@ -25,5 +25,5 @@ class TestController(TestCase):
         self.assertEqual(r.status_code, 200)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -8,14 +8,14 @@ from app.kibon_donjak.entities import KibonDonjak
 from bootstrap.database import mapper_registry
 
 kibon_donjak = Table(
-    'kibon_donjaks',
+    "kibon_donjaks",
     mapper_registry.metadata,
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("name", String(50), nullable=False, unique=True),
     Column("description", String(255), nullable=False),
     Column("difficulty", SmallInteger, nullable=False),
     Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow)
+    Column("updated_at", DateTime, onupdate=datetime.utcnow),
 )
 
 mapper_registry.map_imperatively(KibonDonjak, kibon_donjak)

@@ -12,7 +12,6 @@ class AbstractTheoryRepository(AbstractRepository[Theory], ABC):
 
 
 class TheoryRepository(AbstractTheoryRepository):
-
     def get(self, uuid: UUID) -> Optional[Theory]:
         return self.session.query(Theory).filter(Theory.id == uuid).first()
 

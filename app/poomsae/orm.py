@@ -8,7 +8,7 @@ from app.poomsae.entities import Poomsae
 from bootstrap.database import mapper_registry
 
 poomsaes = Table(
-    'poomsaes',
+    "poomsaes",
     mapper_registry.metadata,
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("name", String[50], nullable=False, unique=True),
@@ -16,7 +16,7 @@ poomsaes = Table(
     Column("difficulty", SmallInteger, nullable=False),
     Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id"), default=uuid4),
     Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow)
+    Column("updated_at", DateTime, onupdate=datetime.utcnow),
 )
 
 mapper_registry.map_imperatively(Poomsae, poomsaes)

@@ -27,7 +27,9 @@ def add_breakdown(model: BreakdownModel, uow: AbstractUow) -> UUID:
         return breakdown.id
 
 
-def update_breakdown(breakdown_id: UUID, model_new: BreakdownModel, uow: AbstractUow) -> None:
+def update_breakdown(
+    breakdown_id: UUID, model_new: BreakdownModel, uow: AbstractUow
+) -> None:
     with uow:
         breakdown = get_breakdown_by_id(breakdown_id, uow)
         if breakdown is not None:
@@ -51,12 +53,16 @@ def make_breakdown(model: BreakdownModel) -> Breakdown:
     )
 
 
-def make_breakdown_update(id: UUID, model_breakdown_new: BreakdownModel, created_at: datetime) -> dict:
-    breakdown_new = asdict(Breakdown(
-        id=id,
-        name=model_breakdown_new.name,
-        description=model_breakdown_new.description,
-    ))
+def make_breakdown_update(
+    id: UUID, model_breakdown_new: BreakdownModel, created_at: datetime
+) -> dict:
+    breakdown_new = asdict(
+        Breakdown(
+            id=id,
+            name=model_breakdown_new.name,
+            description=model_breakdown_new.description,
+        )
+    )
     breakdown_new.update(updated_at=datetime.now(), created_at=created_at)
     return breakdown_new
 

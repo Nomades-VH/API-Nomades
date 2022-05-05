@@ -10,7 +10,7 @@ from app.user.entities import User, Exame
 from bootstrap.database import mapper_registry
 
 users = Table(
-    'users',
+    "users",
     mapper_registry.metadata,
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("username", String(50), nullable=False),
@@ -19,22 +19,22 @@ users = Table(
     Column("permission", Integer, nullable=False),
     Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id")),
     Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow)
+    Column("updated_at", DateTime, onupdate=datetime.utcnow),
 )
 
 exame = Table(
-    'exame',
+    "exame",
     mapper_registry.metadata,
-    Column("fk_user", UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey('bands.id'), primary_key=True),
-    Column('note_poomsae', Float),
-    Column('note_kibondonjak', Float),
-    Column('note_kick', Float),
-    Column('note_stretching', Float),
-    Column('note_breakdown', Float),
-    Column('note_theory', Float),
+    Column("fk_user", UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True),
+    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id"), primary_key=True),
+    Column("note_poomsae", Float),
+    Column("note_kibondonjak", Float),
+    Column("note_kick", Float),
+    Column("note_stretching", Float),
+    Column("note_breakdown", Float),
+    Column("note_theory", Float),
     Column("created_at", DateTime, default=datetime.utcnow),
-    Column("exame_date_at", DateTime, onupdate=datetime.utcnow)
+    Column("exame_date_at", DateTime, onupdate=datetime.utcnow),
 )
 
 mapper_registry.map_imperatively(Exame, exame)
@@ -42,9 +42,9 @@ mapper_registry.map_imperatively(
     User,
     users,
     properties={
-        'bands': relationship(
+        "bands": relationship(
             Band,
             secondary=exame,
         )
-    }
+    },
 )

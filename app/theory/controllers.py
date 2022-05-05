@@ -23,5 +23,7 @@ def post_theory(model: ModelTheory, uow: AbstractUow = Depends(SqlAlchemyUow)) -
 
 
 @router.get("/{theory_id}")
-async def get_theory(theory_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)) -> Optional[dict]:
+async def get_theory(
+    theory_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)
+) -> Optional[dict]:
     return asdict(get_theory_by_id(uow, theory_id))

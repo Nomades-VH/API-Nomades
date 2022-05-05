@@ -11,7 +11,6 @@ class AbstractPoomsaeRepository(AbstractRepository[Poomsae], ABC):
 
 
 class PoomsaeRepository(AbstractPoomsaeRepository):
-
     def get(self, uuid: UUID) -> Optional[Poomsae]:
         return self.session.query(Poomsae).filter(Poomsae.id == uuid).first()
 

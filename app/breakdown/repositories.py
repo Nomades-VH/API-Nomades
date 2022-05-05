@@ -11,8 +11,9 @@ class AbstractBreakdownRepository(AbstractRepository[Breakdown], ABC):
 
 
 class AbstractBandBreakdownRepository(AbstractRepository[BandBreakdown], ABC):
-
-    def get_band_breakdown(self, band_breakdown: BandBreakdown) -> Optional[BandBreakdown]:
+    def get_band_breakdown(
+        self, band_breakdown: BandBreakdown
+    ) -> Optional[BandBreakdown]:
         pass
 
     def remove_band_breakdown(self, band_breakdown: BandBreakdown) -> None:
@@ -20,7 +21,6 @@ class AbstractBandBreakdownRepository(AbstractRepository[BandBreakdown], ABC):
 
 
 class BreakdownRepository(AbstractBreakdownRepository):
-
     def get(self, id: UUID) -> Optional[Breakdown]:
         return self.session.query(Breakdown).filter(Breakdown.id == id).first()
 
@@ -31,14 +31,15 @@ class BreakdownRepository(AbstractBreakdownRepository):
         return self.session.query(Breakdown).filter(Breakdown.id == uuid).delete()
 
     def update(self, breakdown: dict) -> None:
-        self.session.query(Breakdown).filter(Breakdown.id == breakdown["id"]).update(breakdown)
+        self.session.query(Breakdown).filter(Breakdown.id == breakdown["id"]).update(
+            breakdown
+        )
 
     def iter(self) -> Iterator[Breakdown]:
         return self.session.query(Breakdown).all()
 
 
 class BandBreakdownRepository(AbstractBandBreakdownRepository):
-
     def get(self, id: UUID) -> Optional[BandBreakdown]:
         pass
 
@@ -54,14 +55,20 @@ class BandBreakdownRepository(AbstractBandBreakdownRepository):
     def iter(self) -> Iterator[BandBreakdown]:
         pass
 
-    def get_band_breakdown(self, band_breakdown: BandBreakdown) -> Optional[BandBreakdown]:
-        return self.session.query(BandBreakdown).filter(
-                BandBreakdown.fk_band == band_breakdown.fk_band and
-                BandBreakdown.fk_breakdown == band_breakdown.fk_breakdown
-            ).first()
+    def get_band_breakdown(
+        self, band_breakdown: BandBreakdown
+    ) -> Optional[BandBreakdown]:
+        return (
+            self.session.query(BandBreakdown)
+            .filter(
+                BandBreakdown.fk_band == band_breakdown.fk_band
+                and BandBreakdown.fk_breakdown == band_breakdown.fk_breakdown
+            )
+            .first()
+        )
 
     def remove_band_breakdown(self, band_breakdown: BandBreakdown) -> None:
         self.session.query(BandBreakdown).filter(
-                BandBreakdown.fk_band == band_breakdown.fk_band and
-                BandBreakdown.fk_breakdown == band_breakdown.fk_breakdown
-            ).delete()
+            BandBreakdown.fk_band == band_breakdown.fk_band
+            and BandBreakdown.fk_breakdown == band_breakdown.fk_breakdown
+        ).delete()

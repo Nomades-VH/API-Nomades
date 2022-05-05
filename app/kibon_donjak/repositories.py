@@ -11,7 +11,6 @@ class AbstractKibonDonjakRepository(AbstractRepository[KibonDonjak], ABC):
 
 
 class KibonDonjakRepository(AbstractKibonDonjakRepository):
-
     def get(self, uuid: UUID) -> Optional[KibonDonjak]:
         return self.session.query(KibonDonjak).filter(KibonDonjak.id == uuid).first()
 
@@ -22,7 +21,9 @@ class KibonDonjakRepository(AbstractKibonDonjakRepository):
         return self.session.query(KibonDonjak).filter(KibonDonjak.id == uuid).delete()
 
     def update(self, kibon_donjak: KibonDonjak) -> None:
-        self.session.query(KibonDonjak).filter(KibonDonjak.id == kibon_donjak.id).update(kibon_donjak)
+        self.session.query(KibonDonjak).filter(
+            KibonDonjak.id == kibon_donjak.id
+        ).update(kibon_donjak)
 
     def iter(self) -> Iterator[KibonDonjak]:
         return self.session.query(KibonDonjak).all()

@@ -11,7 +11,6 @@ class AbstractKickRepository(AbstractRepository[Kick], ABC):
 
 
 class KickRepository(AbstractKickRepository):
-
     def get(self, uuid: UUID) -> Optional[Kick]:
         return self.session.query(Kick).filter(Kick.id == uuid).first()
 

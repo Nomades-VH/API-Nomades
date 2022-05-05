@@ -19,19 +19,15 @@ def get_user_by_email(uow: AbstractUow, email: str) -> User:
         return uow.user.get_by_email(email)
 
 
-def create_new_user(uow: AbstractUow, user: UserModel) -> UserModel:
-    aux = get_user_by_email(uow, user.email)
-
-    if aux is not None:
-        raise HTTPException(status_code=400, detail="User already registered")
+def create_new_user(uow: AbstractUow, user: User) -> None:
+    if get_user_by_email(uow, user.email) is not None:
+        raise HTTPException(
+            status_code=400, detail=f"User {user.username} already registered"
+        )
 
     with uow:
-        user = change_model_user(user)
         user.password = hash_password(user.password)
         uow.user.add(user)
-
-        user = change_model_user(user)
-        return user
 
 
 def change_model_user(user: User | UserModel) -> UserModel | User:

@@ -37,4 +37,3 @@ class SqlAlchemyUow(AbstractUow):
 
     def rollback(self) -> None:
         self._session.rollback()
-

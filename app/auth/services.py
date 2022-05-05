@@ -14,7 +14,7 @@ from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth.value_object import Token
 
-_ALGORITHM = 'HS256'
+_ALGORITHM = "HS256"
 _TOKEN_EXPIRE_MINUTES = 120
 _AUTH_SECRET = os.getenv("AUTH_SECRET")
 
@@ -30,7 +30,7 @@ def _create_token(user_id: UUID) -> str:
             "exp": expire,
         },
         key=_AUTH_SECRET,
-        algorithm=_ALGORITHM
+        algorithm=_ALGORITHM,
     )
 
 
@@ -47,7 +47,9 @@ def generate_token(email: str, password: str, uow: AbstractUow) -> Token:
     return Token(access_token=_create_token(user.id), refresh_token="")
 
 
-def get_current_user(uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(
+    uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)
+) -> User:
     from app.user.services import get_user_by_id
 
     try:
@@ -66,14 +68,18 @@ def get_current_user(uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depe
     return user
 
 
-def get_current_user_with_permission(permissao: Permissions):
-
-    def _dependencia(uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)):
+def get_current_user_with_permission(permission: Permissions):
+    def _dependency(
+        uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)
+    ) -> User:
         user = get_current_user(uow, auth)
 
-        if user.permission < permissao.value:
-            raise HTTPException(status_code=401, detail=f"You are not authorized to access this resource: expected {permissao.name}, but got {Permissions(user.permission).name}")
+        if user.permission < permission.value:
+            raise HTTPException(
+                status_code=401,
+                detail=f"You are not authorized to access this resource: expected level permission {permission.value}, but got {Permissions(user.permission).value}",
+            )
 
         return user
 
-    return _dependencia
+    return _dependency
