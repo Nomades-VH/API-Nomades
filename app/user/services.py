@@ -6,7 +6,9 @@ from app.user.entities import User
 from app.user.models import User as UserModel
 from ports.uow import AbstractUow
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# TODO: Verify if this is necessary
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_user_by_id(uow: AbstractUow, user_id: UUID) -> User:
@@ -28,6 +30,21 @@ def create_new_user(uow: AbstractUow, user: User) -> None:
     with uow:
         user.password = hash_password(user.password)
         uow.user.add(user)
+
+
+# TODO: Create a service to update user
+def update_user():
+    pass
+
+
+# TODO: Create a service to delete user
+def delete_user():
+    pass
+
+
+# TODO: Create a service to get all users
+def get_all_users():
+    pass
 
 
 def change_model_user(user: User | UserModel) -> UserModel | User:

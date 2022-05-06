@@ -12,13 +12,14 @@ from ports.uow import AbstractUow
 router = APIRouter(prefix="/theory")
 
 
+# TODO: Review methods get_theories, post and get
 @router.get("/")
 async def get_theories(uow: AbstractUow = Depends(SqlAlchemyUow)) -> List[dict]:
     return list(map(asdict, get_all_theories(uow)))
 
 
 @router.post("/")
-def post_theory(model: ModelTheory, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
+async def post_theory(model: ModelTheory, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
     add_theory(uow, model)
 
 
@@ -27,3 +28,15 @@ async def get_theory(
     theory_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)
 ) -> Optional[dict]:
     return asdict(get_theory_by_id(uow, theory_id))
+
+
+# TODO: Create Put Method
+@router.put("/")
+async def put_theory():
+    pass
+
+
+# TODO: Create Delete Method
+@router.delete("/")
+async def delete_theory():
+    pass

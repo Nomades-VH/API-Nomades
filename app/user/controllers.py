@@ -13,14 +13,30 @@ from ports.uow import AbstractUow
 router = APIRouter(prefix="/user")
 
 
+# TODO: Verify methods
 @router.post("/")
-def create_user(user: UserModel, uow: AbstractUow = Depends(SqlAlchemyUow)):
+async def create_user(user: UserModel, uow: AbstractUow = Depends(SqlAlchemyUow)):
     try:
-        user = create_new_user(uow, user)
+        create_new_user(uow, user)
     except EmailAlreadyExists:
         raise EmailAlreadyExists(user.email)
 
 
 @router.get("/me")
-def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(get_current_user)):
     return asdict(current_user)
+
+
+# TODO: Create Get Method
+async def get_users():
+    pass
+
+
+# TODO: Create Update Method
+async def update_user():
+    pass
+
+
+# TODO: Create Delete Method
+async def delete_user():
+    pass

@@ -39,6 +39,7 @@ class BreakdownRepository(AbstractBreakdownRepository):
         return self.session.query(Breakdown).all()
 
 
+# TODO: Verificar os métodos abaixo
 class BandBreakdownRepository(AbstractBandBreakdownRepository):
     def get(self, id: UUID) -> Optional[BandBreakdown]:
         pass
@@ -55,6 +56,8 @@ class BandBreakdownRepository(AbstractBandBreakdownRepository):
     def iter(self) -> Iterator[BandBreakdown]:
         pass
 
+    # TODO: Pensar melhor sobre os métodos abaixo
+    # TODO: Aqui deve-se pegar um BandBreakdown ou a Band ou um Breakdown?
     def get_band_breakdown(
         self, band_breakdown: BandBreakdown
     ) -> Optional[BandBreakdown]:
@@ -67,6 +70,7 @@ class BandBreakdownRepository(AbstractBandBreakdownRepository):
             .first()
         )
 
+    # TODO: Aqui deve-se remover a BandBreakdown ou uma Band ou um Breakdown?
     def remove_band_breakdown(self, band_breakdown: BandBreakdown) -> None:
         self.session.query(BandBreakdown).filter(
             BandBreakdown.fk_band == band_breakdown.fk_band

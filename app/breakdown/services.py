@@ -9,6 +9,7 @@ from app.breakdown.models import Breakdown as BreakdownModel
 from ports.uow import AbstractUow
 
 
+# TODO: Revisar todos os serviços
 def get_all_breakdowns(uow: AbstractUow) -> Optional[Iterator[Breakdown]]:
     with uow:
         return uow.breakdown.iter()
@@ -55,15 +56,14 @@ def make_breakdown(model: BreakdownModel) -> Breakdown:
 
 def make_breakdown_update(
     id: UUID, model_breakdown_new: BreakdownModel, created_at: datetime
-) -> dict:
-    breakdown_new = asdict(
-        Breakdown(
+) -> Breakdown:
+    breakdown_new = Breakdown(
             id=id,
             name=model_breakdown_new.name,
             description=model_breakdown_new.description,
         )
-    )
-    breakdown_new.update(updated_at=datetime.now(), created_at=created_at)
+    breakdown_new.updated_at=datetime.now()
+    breakdown_new.created_at=created_at
     return breakdown_new
 
 

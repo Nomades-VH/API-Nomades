@@ -10,6 +10,7 @@ class AbstractKibonDonjakRepository(AbstractRepository[KibonDonjak], ABC):
     pass
 
 
+# TODO: Verificar todos os métodos
 class KibonDonjakRepository(AbstractKibonDonjakRepository):
     def get(self, uuid: UUID) -> Optional[KibonDonjak]:
         return self.session.query(KibonDonjak).filter(KibonDonjak.id == uuid).first()

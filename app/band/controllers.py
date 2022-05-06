@@ -23,7 +23,7 @@ router = APIRouter(prefix="/band")
 
 @router.get("/")
 async def get_bands(
-    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> List[dict]:
 

@@ -19,6 +19,8 @@ from ports.uow import AbstractUow
 router = APIRouter(prefix="/breakdown")
 
 
+# TODO: Implementar o controle de acesso em todas as rotas
+# TODO: Verificar se tem alguma chance de dar erro
 @router.get("/")
 async def get_breakdowns(
     uow: AbstractUow = Depends(SqlAlchemyUow),

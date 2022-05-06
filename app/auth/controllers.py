@@ -1,12 +1,8 @@
-import uuid
 from dataclasses import asdict
 from fastapi import APIRouter, Depends, HTTPException
 from app.auth.exceptions import InvalidCredentials
 from app.auth.schemas import Credentials
 from app.uow import SqlAlchemyUow
-from app.user.entities import User
-from app.user.services import create_new_user
-from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth.services import generate_token
 

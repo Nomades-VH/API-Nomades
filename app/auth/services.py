@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
-from app.auth.exceptions import InvalidCredentials, InvalidToken
+from app.auth.exceptions import InvalidCredentials
 from app.auth.hasher import verify_password
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
