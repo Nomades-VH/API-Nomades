@@ -4,6 +4,7 @@ from passlib.context import CryptContext
 from app.auth.hasher import hash_password
 from app.user.entities import User
 from app.user.models import User as UserModel
+from app.user.models import User as UserModel
 from ports.uow import AbstractUow
 
 
@@ -21,7 +22,8 @@ def get_user_by_email(uow: AbstractUow, email: str) -> User:
         return uow.user.get_by_email(email)
 
 
-def create_new_user(uow: AbstractUow, user: User) -> None:
+def create_new_user(uow: AbstractUow, user: UserModel) -> None:
+    user = change_model_user(user)
     if get_user_by_email(uow, user.email) is not None:
         raise HTTPException(
             status_code=400, detail=f"User {user.username} already registered"
