@@ -31,7 +31,7 @@ def get_band_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
         return uow.band.get_by_name(name)
 
 
-def add_new_band(uow: AbstractUow, band: BandEntity) -> None:
+def add_new_band(uow: AbstractUow, band: BandEntity, user: User) -> None:
     with uow:
         uow.band.add(band)
 
@@ -46,6 +46,12 @@ def update_band(uow: AbstractUow, band: BandEntity) -> None:
 def delete_band(uow: AbstractUow, uuid: UUID):
     with uow:
         uow.band.remove(uuid)
+
+
+def add_creator(band: BandEntity, user: User) -> BandEntity | BandModel:
+    band.created_for = user.username
+    band.updated_for = ""
+    return make_band(band)
 
 
 def make_band(band: BandModel | BandEntity) -> BandEntity | BandModel:

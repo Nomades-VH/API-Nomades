@@ -10,8 +10,7 @@ from app.band.services import (
     get_band_by_gub,
     get_band_by_user,
     get_band_by_name,
-    add_new_band,
-    make_band,
+    add_new_band, add_creator,
 )
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
@@ -27,21 +26,14 @@ async def get_bands(
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> List[dict]:
 
-    bands = list(map(asdict, get_all_bands(uow)))
-    # band_atual = get_band_by_id(uow, current_user.fk_band)
-    aux = []
-    for band in bands:
-        if current_user.permission > Permissions.table.value:
-            aux.append(band)
-
-    return aux
+    return list(map(asdict, get_all_bands(uow)))
 
 
 @router.get("/{band_id}")
 async def get_band(
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
     uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> Band:
+) -> dict:
 
     if current_user.fk_band is None:
         raise HTTPException(
@@ -55,7 +47,7 @@ async def get_band(
             status_code=401, detail="You are not authorized to access this resource"
         )
 
-    return band
+    return asdict(band)
 
 
 @router.get("/gub/{gub}")
@@ -87,7 +79,7 @@ async def add_band(
         get_current_user_with_permission(Permissions.president)
     ),
     uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> None:
+) -> dict:
 
     if get_band_by_gub(uow, band.gub) is not None:
         raise HTTPException(
@@ -99,10 +91,12 @@ async def add_band(
             status_code=400, detail=f"Band with name '{band.name}' already exists"
         )
 
-    band.created_for = current_user.username
-    band.updated_for = ""
-    band = make_band(band)
-    add_new_band(uow, band)
+    band = add_creator(band, current_user)
+    try:
+        add_new_band(uow, band=band, user=current_user)
+        return {"created for": band.created_for, "created at": band.created_at}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # TODO: Create Put method

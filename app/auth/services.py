@@ -34,6 +34,7 @@ def _create_token(user_id: UUID) -> str:
     )
 
 
+# TODO: Armazenar o token ao fazer login
 def generate_token(email: str, password: str, uow: AbstractUow) -> Token:
     from app.user.services import get_user_by_email
 
@@ -44,7 +45,9 @@ def generate_token(email: str, password: str, uow: AbstractUow) -> Token:
     if not verify_password(password, user.password):
         raise InvalidCredentials()
 
-    return Token(access_token=_create_token(user.id), refresh_token="")
+    token = Token(access_token=_create_token(user.id))
+
+    return token
 
 
 def get_current_user(
@@ -55,8 +58,10 @@ def get_current_user(
     try:
         payload = jwt.decode(auth, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
         user_id = payload.get("sub")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        if type(e) == JWTError:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Token expired")
 
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid token")

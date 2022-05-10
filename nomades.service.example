@@ -1,0 +1,13 @@
+[Unit]
+Description=Serviço para inicializar a API Nomades-VH
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Nomades-VH
+ExecStart=/home/ubuntu/Nomades-VH/venv/bin/python main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

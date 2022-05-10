@@ -44,6 +44,9 @@ SELECT * FROM users;
 DELETE FROM users
   WHERE username IN (SELECT username FROM users WHERE username = 'Felipe');
 
+DELETE FROM users 
+  WHERE permission IN (SELECT permission FROM users WHERE permission = 2);
+
 INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4a47-4d31-b8a0-20f7aa127771', 'Felipe', 'felipesampaio.contato@gmail.com', '$2b$12$B/ooiLbiHFI1ovMWtkZ0ae6gFEi4Gm6M.xqgOgkUftw6oGve2fo/a', 'Vice-Presidente');]]></console>
     </connection>
   </component>
