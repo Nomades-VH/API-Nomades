@@ -9,3 +9,12 @@ services:
       - "5432:5432"
     restart: always
 
+  nomades:
+    container_name: "nomades"
+    image: nomades:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - psql
+    restart: always
+

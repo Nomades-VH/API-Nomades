@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/Nomades-VH
-ExecStart=/home/ubuntu/Nomades-VH/venv/bin/python main.py
+ExecStart=docker run devsampaiodocker/nomades
 Restart=on-failure
 
 [Install]
