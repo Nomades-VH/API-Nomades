@@ -45,4 +45,4 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: | 
-            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades start
+            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades restart
