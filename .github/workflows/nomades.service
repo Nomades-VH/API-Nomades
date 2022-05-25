@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/Nomades-VH
-ExecStart=docker run devsampaiodocker/nomades
+ExecStart=docker run devsampaiodocker/nomades:main
 Restart=on-failure
 
 [Install]

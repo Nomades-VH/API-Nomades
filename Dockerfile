@@ -1,7 +1,11 @@
 FROM python:3.10.0
 WORKDIR /app
-COPY . .
+COPY /app .
+COPY /bootstrap .
+COPY /general_enum .
+COPY /ports .
+COPY main.py .
+COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
-CMD ["docker start postgres"]
-CMD ["docker-compose up"]
+CMD ["python", "main.py"]
 EXPOSE 80
