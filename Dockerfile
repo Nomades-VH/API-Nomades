@@ -7,6 +7,7 @@ COPY /ports .
 COPY main.py .
 COPY requirements.txt .
 COPY Dockerfile .
+COPY /venv .
 RUN python -m pip install -r requirements.txt
 CMD ["python", "main.py"]
 EXPOSE 8000
