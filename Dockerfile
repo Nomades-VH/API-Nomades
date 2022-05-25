@@ -4,10 +4,11 @@ COPY /app .
 COPY /bootstrap .
 COPY /general_enum .
 COPY /ports .
-COPY main.py .
-COPY requirements.txt .
-COPY Dockerfile .
-COPY .env .
+COPY /.env .
+COPY /main.py .
+COPY /requirements.txt .
+COPY /Dockerfile .
+
 RUN python -m pip install -r requirements.txt
 CMD ["python", "main.py"]
 EXPOSE 8000
