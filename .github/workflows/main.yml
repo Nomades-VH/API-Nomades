@@ -45,5 +45,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
-          echo "{{ secret.SERVER_USER_PASSWORD }}" | sudo mv nomades.service /etc/systemd/system/
+          echo "{{ secret.SERVER_USER_PASSWORD }}" | sudo mv nomades.service /etc/systemd/system
           echo "${{ secret.SERVER_USER_PASSWORD }}" | sudo docker run devsampaiodocker/nomades
