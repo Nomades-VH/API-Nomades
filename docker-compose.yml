@@ -11,7 +11,7 @@ services:
 
   nomades:
     container_name: "nomades"
-    image: nomades:latest
+    image: devsampaiodocker/nomades:main
     ports:
       - "8080:8000"
     depends_on:

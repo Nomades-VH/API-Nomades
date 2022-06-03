@@ -1,4 +1,4 @@
-name: Deploy to EC2 instance
+name: Deploy in EC2
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  push_to_registry:
+  push_to_docker_hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
@@ -45,4 +45,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: | 
+            echo docker login
+            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S docker pull devsampaiodocker/nomades:main
             echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades restart

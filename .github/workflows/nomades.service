@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/Nomades-VH
-ExecStart=/home/ubuntu/.nomades-postgres/docker-compose up
+WorkingDirectory=/home/ubuntu/.nomades-postgres
+ExecStart=docker-compose up
 Restart=on-failure
 
 [Install]
