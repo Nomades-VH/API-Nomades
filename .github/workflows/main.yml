@@ -34,7 +34,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   pull_to_docker_hub:
-    if: ${{ success(push_to_docker_hub) }}
     name: Pull docker image from docker hub
     runs-on: ubuntu-latest
     steps:
