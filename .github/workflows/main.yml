@@ -46,5 +46,6 @@ jobs:
           port: 22
           script: | 
             echo docker login
+            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades stop
             echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S docker pull devsampaiodocker/nomades:main
-            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades restart
+            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades start

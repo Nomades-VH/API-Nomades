@@ -11,4 +11,4 @@ if __name__ == "__main__":
 
     import uvicorn
 
-    uvicorn.run(app="bootstrap.server:app", host="")
+    uvicorn.run(app="bootstrap.server:app", host="", port="80")
