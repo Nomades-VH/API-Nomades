@@ -1,4 +1,4 @@
-name: Deploy in EC2
+name: Deploy in EC2 AWS
 
 on:
   push:
@@ -10,8 +10,8 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Check out the repo
-        uses: actions/checkout@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
@@ -29,12 +29,13 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
+          build: true
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  pull_to_docker_hub:
-    name: Pull docker image from docker hub
+  pull_from_docker_hub:
+    name: Pull image
     runs-on: ubuntu-latest
     steps:
       - name: Get image from docker hub and start service
