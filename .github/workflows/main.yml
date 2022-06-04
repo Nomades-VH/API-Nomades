@@ -47,5 +47,5 @@ jobs:
           script: | 
             echo docker login
             echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades stop
-            echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S docker pull devsampaiodocker/nomades:main
+            echo docker pull devsampaiodocker/nomades:main
             echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S service nomades start
