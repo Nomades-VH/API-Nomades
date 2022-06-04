@@ -10,5 +10,5 @@ if __name__ == "__main__":
     ensure_all_entities()
 
     import uvicorn
-    print("A atualização foi realizada com sucesso pelo github actions")
-    uvicorn.run(app="bootstrap.server:app", host="", port=8000)
+
+    uvicorn.run(app="bootstrap.server:app", host="", port="8000")
