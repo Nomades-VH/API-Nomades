@@ -34,7 +34,6 @@ def _create_token(user_id: UUID) -> str:
     )
 
 
-# TODO: Armazenar o token ao fazer login
 def generate_token(email: str, password: str, uow: AbstractUow) -> Token:
     from app.user.services import get_user_by_email
 
