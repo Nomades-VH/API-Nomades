@@ -6,44 +6,44 @@ from app.user.models import User
 from ports.uow import AbstractUow
 
 
-def get_all_bands(uow: AbstractUow) -> Iterator[BandEntity]:
+def get_all(uow: AbstractUow) -> Iterator[BandEntity]:
     with uow:
         yield from uow.band.iter()
 
 
-def get_band_by_user(uow: AbstractUow, user: User) -> BandEntity:
+def get_by_user(uow: AbstractUow, user: User) -> BandEntity:
     with uow:
         return uow.band.get(user.fk_band)
 
 
-def get_band_by_id(uow: AbstractUow, id: UUID) -> Optional[BandEntity]:
+def get_by_id(uow: AbstractUow, id: UUID) -> Optional[BandEntity]:
     with uow:
         return uow.band.get(id)
 
 
-def get_band_by_gub(uow: AbstractUow, gub: int) -> Optional[BandEntity]:
+def get_by_gub(uow: AbstractUow, gub: int) -> Optional[BandEntity]:
     with uow:
         return uow.band.get_by_gub(gub)
 
 
-def get_band_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
+def get_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
     with uow:
         return uow.band.get_by_name(name)
 
 
-def add_new_band(uow: AbstractUow, band: BandEntity, user: User) -> None:
+def add(uow: AbstractUow, band: BandEntity, user: User) -> None:
     with uow:
         uow.band.add(band)
 
 
 # TODO: Review a service to update
-def update_band(uow: AbstractUow, band: BandEntity) -> None:
+def update(uow: AbstractUow, band: BandEntity) -> None:
     with uow:
         uow.band.update(band)
 
 
 # TODO: Review a service to delete
-def delete_band(uow: AbstractUow, uuid: UUID):
+def remove(uow: AbstractUow, uuid: UUID):
     with uow:
         uow.band.remove(uuid)
 

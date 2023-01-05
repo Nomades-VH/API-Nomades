@@ -11,10 +11,10 @@ services:
 
   nomades:
     container_name: "nomades"
-    image: devsampaiodocker/nomades:main
+    # Alterar esta linha para devsampaiodocker/nomades:main quando for subir para o servidor
+    image: nomades:latest
     ports:
       - "8000:8000"
     depends_on:
       - psql
     restart: always
-

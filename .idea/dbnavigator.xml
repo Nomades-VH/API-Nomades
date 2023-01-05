@@ -18,6 +18,7 @@
       <destination value="FILE" />
       <format value="EXCEL" />
       <charset value="UTF-8" />
+      <charset value="UTF-8" />
     </export-instructions>
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
@@ -28,7 +29,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="ef29c66d-0028-407a-acca-19aa001949f0">
-      <console name="Connection" type="STANDARD" schema="information_schema" session="Main" />
+      <console name="Connection" type="STANDARD" schema="information_schema" session="Main"><![CDATA[select count(*) feeds;]]></console>
       <console name="Connection 1" type="STANDARD" schema="public" session="Main"><![CDATA[SELECT * FROM band_breakdown;
 
 SELECT * FROM breakdowns;
@@ -47,8 +48,13 @@ DELETE FROM users
 DELETE FROM users 
   WHERE permission IN (SELECT permission FROM users WHERE permission = 2);
 
-INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4a47-4d31-b8a0-20f7aa127771', 'Felipe', 'felipesampaio.contato@gmail.com', '$2b$12$B/ooiLbiHFI1ovMWtkZ0ae6gFEi4Gm6M.xqgOgkUftw6oGve2fo/a', 'Vice-Presidente');]]></console>
+INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4a47-4d31-b8a0-20f7aa127771', 'Felipe', 'felipesampaio.contato@gmail.com', '$2b$12$B/ooiLbiHFI1ovMWtkZ0ae6gFEi4Gm6M.xqgOgkUftw6oGve2fo/a', 'Vice-Presidente');
+
+select count(*) from feeds;]]></console>
     </connection>
+  </component>
+  <component name="DBNavigator.Project.DatabaseEditorStateManager">
+    <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files />
@@ -101,7 +107,7 @@ INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4
           <database value="postgres" />
           <type value="USER_PASSWORD" />
           <user value="Felipe" />
-          <deprecated-pwd value="bm9tYWRlc3ZhbGVoaXN0b3JpY28=" />
+          <deprecated-pwd value="" />
         </database>
         <properties>
           <auto-commit value="false" />
@@ -139,7 +145,7 @@ INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4
           <alternative-statement-delimiter value="" />
         </details>
         <object-filters hide-empty-schemas="false" hide-pseudo-columns="false">
-          <object-type-filter use-master-settings="true">
+          <object-type-filter>
             <object-type name="SCHEMA" enabled="true" />
             <object-type name="USER" enabled="true" />
             <object-type name="ROLE" enabled="true" />
@@ -210,6 +216,7 @@ INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4
         <object-type name="FUNCTION" sorting-type="NAME" />
         <object-type name="PROCEDURE" sorting-type="NAME" />
         <object-type name="ARGUMENT" sorting-type="POSITION" />
+        <object-type name="TYPE ATTRIBUTE" sorting-type="POSITION" />
       </sorting>
       <default-editors>
         <object-type name="VIEW" editor-type="SELECTION" />
@@ -256,11 +263,11 @@ INSERT INTO users(id, username, email, password, permission) VALUES ('0f77bc06-4
         <nulls-first value="true" />
         <max-sorting-columns value="4" />
       </sorting>
-      <tracking-columns>
-        <columnNames value="" />
+      <audit-columns>
+        <column-names value="" />
         <visible value="true" />
         <editable value="false" />
-      </tracking-columns>
+      </audit-columns>
     </dataset-grid-settings>
     <dataset-editor-settings>
       <text-editor-popup>
