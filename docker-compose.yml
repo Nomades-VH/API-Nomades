@@ -8,13 +8,31 @@ services:
     ports:
       - "5432:5432"
     restart: always
+    networks:
+      - nm-network
 
   nomades:
     container_name: "nomades"
     # Alterar esta linha para devsampaiodocker/nomades:main quando for subir para o servidor
     image: nomades:latest
+    build: .
     ports:
       - "8000:8000"
+    restart: always
+    env_file:
+      - .env
     depends_on:
       - psql
-    restart: always
+    healthcheck:
+      test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
+      interval: 1m
+      timeout: 10s
+      retries: 2
+      start_period: 15s
+    networks:
+      - nm-network
+
+networks:
+  nm-network:
+    driver:
+      bridge

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="dataSourceStorageLocal" created-in="PY-223.8214.51">
+  <component name="dataSourceStorageLocal" created-in="PY-232.10203.26">
     <data-source name="nomades@localhost" uuid="aa86accf-ccde-4177-90b8-2ffe21982e7d">
-      <database-info product="PostgreSQL" version="14.2 (Debian 14.2-1.pgdg110+1)" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.2.22" dbms="POSTGRES" exact-version="14.2" exact-driver-version="42.2">
+      <database-info product="PostgreSQL" version="16.0 (Debian 16.0-1.pgdg120+1)" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.6.0" dbms="POSTGRES" exact-version="16.0" exact-driver-version="42.6">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
       <secret-storage>master_key</secret-storage>
-      <user-name>Felipe</user-name>
+      <user-name>user</user-name>
       <schema-mapping>
         <introspection-scope>
           <node kind="database" qname="@">

@@ -10,7 +10,8 @@ _POSTGRES_HOST = environ.get("POSTGRES_HOST")
 _POSTGRES_PORT = environ.get("POSTGRES_PORT")
 _POSTGRES_DATABASE = environ.get("POSTGRES_DB")
 
-_POSTGRES_URI = f"postgresql+psycopg2://{_POSTGRES_USER}:{_POSTGRES_PASSWORD}@{_POSTGRES_HOST}:{_POSTGRES_PORT}/{_POSTGRES_DATABASE}"
+_POSTGRES_URI = (f"postgresql+psycopg2://"
+                 f"{_POSTGRES_USER}:{_POSTGRES_PASSWORD}@{_POSTGRES_HOST}:{_POSTGRES_PORT}/{_POSTGRES_DATABASE}")
 
 _engine = create_engine(_POSTGRES_URI)
 _Session = sessionmaker(bind=_engine)
