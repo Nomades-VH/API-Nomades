@@ -31,6 +31,8 @@ services:
       start_period: 15s
     networks:
       - nm-network
+    volumes:
+      - ./:/usr/src/app/
 
 networks:
   nm-network:
