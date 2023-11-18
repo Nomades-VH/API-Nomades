@@ -11,6 +11,8 @@ router = APIRouter(prefix="/auth")
 
 
 # use: form_data: OAuth2PasswordRequestForm = Depends(), para testar no docs fastapi
+# use: username: str = Body(...),
+# use: password: str = Body(...) para sistemas fora do fastapi
 @router.post("")
 async def login(
         form_data: OAuth2PasswordRequestForm = Depends(),

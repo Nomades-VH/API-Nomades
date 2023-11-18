@@ -1,3 +1,4 @@
+from app.auth.hasher import hash_password
 from ports.uow import AbstractUow
 from dotenv import load_dotenv
 from os import environ
@@ -27,7 +28,7 @@ if __name__ == "__main__":
                 uow.user.add(User(
                     username=environ.get("ROOT_USER"),
                     email=environ.get("ROOT_USER_EMAIL"),
-                    password=environ.get("ROOT_USER_PASSWORD"),
+                    password=hash_password(environ.get("ROOT_USER_PASSWORD")),
                     permission=Permissions.root.value,
                     fk_band=None
                 ))

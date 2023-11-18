@@ -26,9 +26,9 @@ services:
     healthcheck:
       test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
       interval: 1m
-      timeout: 10s
+      timeout: 15s
       retries: 2
-      start_period: 15s
+      start_period: 20s
     networks:
       - nm-network
     volumes:
