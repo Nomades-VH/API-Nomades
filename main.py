@@ -1,5 +1,6 @@
 from ports.uow import AbstractUow
 from dotenv import load_dotenv
+from os import environ
 
 if __name__ == "__main__":
 
@@ -24,9 +25,9 @@ if __name__ == "__main__":
         if not root_user:
             with uow:
                 uow.user.add(User(
-                    username='felipe-root',
-                    email='felipesampaio.contato@gmail.com',
-                    password='FelipePy',
+                    username=environ.get("ROOT_USER"),
+                    email=environ.get("ROOT_USER_EMAIL"),
+                    password=environ.get("ROOT_USER_PASSWORD"),
                     permission=Permissions.root.value,
                     fk_band=None
                 ))
