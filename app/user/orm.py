@@ -26,7 +26,7 @@ exame = Table(
     "exame",
     mapper_registry.metadata,
     Column("fk_user", UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id"), primary_key=True),
+    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id"), nullable=True),
     Column("note_poomsae", Float),
     Column("note_kibondonjak", Float),
     Column("note_kick", Float),

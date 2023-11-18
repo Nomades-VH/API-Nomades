@@ -1,14 +1,15 @@
 from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Body
 
-from app.auth.services import get_current_user
+from app.auth.services import get_current_user, get_current_user_with_permission
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
+from app.user.exceptions import UserException
 from app.user.models import User as ModelUser
-from app.user.exceptions import EmailAlreadyExists
-from app.user.services import create_new_user, get_user_by_email, change_user, get_user_by_username, \
-    verify_if_user_exists
+from app.user.services import create_new_user, change_user, \
+    verify_if_user_exists, get_all_users
+from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
 router = APIRouter(prefix="/user")
@@ -16,13 +17,14 @@ router = APIRouter(prefix="/user")
 
 # TODO: Verify methods
 @router.post("/")
-async def create_user(user: ModelUser, uow: AbstractUow = Depends(SqlAlchemyUow)) -> None:
+async def create_user(user: ModelUser, uow: AbstractUow = Depends(SqlAlchemyUow)) -> Body(...):
     try:
         user = change_user(user)
         verify_if_user_exists(uow, user)
-        return create_new_user(uow, user)
-    except EmailAlreadyExists:
-        raise EmailAlreadyExists()
+        create_new_user(uow, user)
+        return {'user': user.id}
+    except UserException as e:
+        return {'status': e.status_code, 'message': e.message}
 
 
 @router.get("/me")
@@ -31,8 +33,13 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 
 # TODO: Create Get Method
-async def get_users():
-    pass
+
+@router.get('/')
+async def get_users(
+        current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president)),
+        uow: AbstractUow = Depends(SqlAlchemyUow)
+):
+    return get_all_users(uow)
 
 
 # TODO: Create Update Method

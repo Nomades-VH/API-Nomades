@@ -1,11 +1,11 @@
+from dataclasses import asdict
 from typing import Optional
 from uuid import UUID
-
-from fastapi import HTTPException
 
 from app.auth.hasher import hash_password
 from app.auth.schemas import Credentials
 from app.user.entities import User
+from app.user.exceptions import UserAlreadyExists, EmailAlreadyExists
 from app.user.models import User as ModelUser
 from ports.uow import AbstractUow
 
@@ -29,7 +29,7 @@ def get_user_by_username(uow: AbstractUow, username: str) -> Optional[User]:
         return uow.user.get_by_username(username)
 
 
-def create_new_user(uow: AbstractUow, user: User) -> None:
+def create_new_user(uow: AbstractUow, user: User):
     with uow:
         user.password = hash_password(user.password)
         uow.user.add(user)
@@ -39,12 +39,12 @@ def verify_if_user_exists(uow: AbstractUow, user: User):
     user_created = get_user_by_email(uow, user.email)
     if user_created:
         if user_created.email == user.email:
-            raise HTTPException(status_code=400, detail=f"User with email '{user.email}' already exists")
+            raise EmailAlreadyExists(email=user_created.email)
 
     user_created = get_user_by_username(uow, user.username)
     if user_created:
         if user_created.username == user.username:
-            raise HTTPException(status_code=400, detail=f"User with username '{user.username}' already exists")
+            raise UserAlreadyExists(username=user_created.username)
 
 
 # TODO: Create a service to update user
@@ -58,8 +58,9 @@ def delete_user():
 
 
 # TODO: Create a service to get all users
-def get_all_users():
-    pass
+def get_all_users(uow: AbstractUow):
+    with uow:
+        return list(map(asdict, uow.user.iter()))
 
 
 def change_user(user: User | ModelUser) -> ModelUser | User:
