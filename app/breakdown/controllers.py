@@ -4,16 +4,14 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.auth.services import get_current_user_with_permission
 from app.breakdown.models import Breakdown as BreakdownModel
-from app.breakdown.services import (
-    get_all_breakdowns,
-    get_breakdown_by_id,
-    add_breakdown,
-    add_band_breakdown,
-    update_breakdown,
-    remove_breakdown,
-)
+from app.breakdown import services as sv
+
+
 from app.uow import SqlAlchemyUow
+from app.user.entities import User
+from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
 router = APIRouter(prefix="/breakdown")
@@ -24,30 +22,33 @@ router = APIRouter(prefix="/breakdown")
 @router.get("/")
 async def get_breakdowns(
     uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> List[BreakdownModel]:
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student))
+) -> List[dict]:
     try:
-        return list(map(asdict, get_all_breakdowns(uow)))
+        return list(map(asdict, sv.get_all(uow)))
     except Exception:
         raise HTTPException(status_code=400, detail="Bad request")
 
 
 @router.post("/{band_id}")
 async def post_breakdown(
-    band_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow)
+    band_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
     try:
-        breakdown_id = add_breakdown(model, uow)
-        add_band_breakdown(band_id, breakdown_id, uow)
+        breakdown_id = sv.add(model, uow)
+        sv.add_band_breakdown(band_id, breakdown_id, uow)
     except Exception:
         raise HTTPException(status_code=400, detail="Bad request")
 
 
 @router.get("/{id}")
 async def get_breakdown(
-    id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)
+    id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> Optional[dict] | HTTPException:
     try:
-        return asdict(get_breakdown_by_id(id, uow))
+        return asdict(sv.get_by_id(id, uow))
 
     # TODO: Change to BreakdownNotFoundException but I don't know how to do that
     except Exception:
@@ -56,19 +57,21 @@ async def get_breakdown(
 
 @router.put("/{id}")
 async def put_breakdown(
-    breakdown_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow)
+    breakdown_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
     try:
-        update_breakdown(breakdown_id, model, uow)
+        sv.update(breakdown_id, model, uow)
     except Exception:
         raise HTTPException(status_code=400, detail="Bad request")
 
 
 @router.delete("/{band_id}/{breakdown_id}")
 async def delete_breakdown(
-    band_id: UUID, breakdown_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)
+    band_id: UUID, breakdown_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
     try:
-        remove_breakdown(band_id, breakdown_id, uow)
+        sv.remove_breakdown(band_id, breakdown_id, uow)
     except Exception:
         raise HTTPException(status_code=400, detail="Bad request")

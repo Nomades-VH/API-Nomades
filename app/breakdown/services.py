@@ -10,17 +10,17 @@ from ports.uow import AbstractUow
 
 
 # TODO: Revisar todos os serviços
-def get_all_breakdowns(uow: AbstractUow) -> Optional[Iterator[Breakdown]]:
+def get_all(uow: AbstractUow) -> Optional[Iterator[Breakdown]]:
     with uow:
         return uow.breakdown.iter()
 
 
-def get_breakdown_by_id(breakdown_id: UUID, uow: AbstractUow) -> Optional[Breakdown]:
+def get_by_id(breakdown_id: UUID, uow: AbstractUow) -> Optional[Breakdown]:
     with uow:
         return uow.breakdown.get(breakdown_id)
 
 
-def add_breakdown(model: BreakdownModel, uow: AbstractUow) -> UUID:
+def add(model: BreakdownModel, uow: AbstractUow) -> UUID:
     with uow:
         breakdown = make_breakdown(model)
         uow.breakdown.add(breakdown)
@@ -28,11 +28,11 @@ def add_breakdown(model: BreakdownModel, uow: AbstractUow) -> UUID:
         return breakdown.id
 
 
-def update_breakdown(
+def update(
     breakdown_id: UUID, model_new: BreakdownModel, uow: AbstractUow
 ) -> None:
     with uow:
-        breakdown = get_breakdown_by_id(breakdown_id, uow)
+        breakdown = get_by_id(breakdown_id, uow)
         if breakdown is not None:
             created_at = breakdown.created_at
             breakdown_new = make_breakdown_update(breakdown_id, model_new, created_at)
@@ -76,7 +76,7 @@ def make_band_breakdown(band_id: UUID, breakdown_id: UUID) -> BandBreakdown:
 
 def remove_breakdown(band_id: UUID, breakdown_id: UUID, uow: AbstractUow) -> None:
     with uow:
-        breakdown = get_breakdown_by_id(breakdown_id, uow)
+        breakdown = get_by_id(breakdown_id, uow)
         if breakdown is not None:
             remove_band_breakdown(band_id, breakdown_id, uow)
             uow.breakdown.remove(breakdown.id)
