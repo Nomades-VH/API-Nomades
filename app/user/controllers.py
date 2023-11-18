@@ -17,7 +17,11 @@ router = APIRouter(prefix="/user")
 
 # TODO: Verify methods
 @router.post("/")
-async def create_user(user: ModelUser, uow: AbstractUow = Depends(SqlAlchemyUow)) -> Body(...):
+async def create_user(
+        user: ModelUser,
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+        uow: AbstractUow = Depends(SqlAlchemyUow)
+) -> Body(...):
     try:
         user = change_user(user)
         verify_if_user_exists(uow, user)
@@ -43,7 +47,10 @@ async def get_users(
 
 
 # TODO: Create Update Method
-async def update_user():
+async def update_user(
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+        uow: AbstractUow = Depends(SqlAlchemyUow)
+):
     pass
 
 

@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class Permissions(Enum):
+    root = 9
     president = 8
     vice_president = 7
     treasurer = 6
