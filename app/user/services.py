@@ -60,7 +60,7 @@ def delete_user():
 # TODO: Create a service to get all users
 def get_all_users(uow: AbstractUow):
     with uow:
-        return list(map(asdict, uow.user.iter()))
+        yield from uow.user.iter()
 
 
 def change_user(user: User | ModelUser) -> ModelUser | User:
