@@ -66,12 +66,10 @@ async def get_by_gub(
 
 
 @router.post("/")
-async def post(
+async def post_band(
     band: Band,
-    current_user: User = Depends(
-        get_current_user_with_permission(Permissions.president)
-    ),
     uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.president)),
 ) -> dict:
 
     if sv.get_by_gub(uow, band.gub) is not None:

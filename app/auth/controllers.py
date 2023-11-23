@@ -24,6 +24,7 @@ async def login(
             username=username, password=password, uow=uow
         )
 
+        print(token.access_token)
         return {"access_token": token.access_token, "token_type": "bearer"}
     except InvalidCredentials:
         raise HTTPException(status_code=400, detail="Invalid credentials")

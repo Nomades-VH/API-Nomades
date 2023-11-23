@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.band.controllers import router as band_router
 from app.breakdown.controllers import router as breakdown_router
@@ -13,6 +14,14 @@ from app.auth.controllers import router as auth_router
 
 app = FastAPI(
     title="Nômades",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 app.include_router(router=band_router)
