@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.exceptions import InvalidCredentials
@@ -15,12 +15,13 @@ router = APIRouter(prefix="/auth")
 # use: password: str = Body(...) para sistemas fora do fastapi
 @router.post("")
 async def login(
-        form_data: OAuth2PasswordRequestForm = Depends(),
+        username: str = Body(...),
+        password: str = Body(...),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
         token = generate_token(
-            username=form_data.username, password=form_data.password, uow=uow
+            username=username, password=password, uow=uow
         )
 
         return {"access_token": token.access_token, "token_type": "bearer"}

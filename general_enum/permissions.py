@@ -12,3 +12,7 @@ class Permissions(Enum):
     student = 2
     user = 1
     visitor = 0
+
+# User e visitor não serão usuários do sistema
+
+# Poderiamos criar um tipo de usuário somente para os pais dos alunos

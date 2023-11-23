@@ -1,5 +1,7 @@
 from typing import Iterator, Optional
 from uuid import UUID
+
+from app.auth.services import get_current_user
 from app.band.entities import Band as BandEntity
 from app.band.models import Band as BandModel
 from app.user.models import User
@@ -49,8 +51,8 @@ def remove(uow: AbstractUow, uuid: UUID):
 
 
 def add_creator(band: BandEntity, user: User) -> BandEntity | BandModel:
-    band.created_for = user.username
-    band.updated_for = ""
+    band.created_for = get_current_user().username
+    band.updated_for = get_current_user().username
     return make_band(band)
 
 
@@ -60,15 +62,13 @@ def make_band(band: BandModel | BandEntity) -> BandEntity | BandModel:
             gub=band.gub,
             name=band.name,
             meaning=band.meaning,
-            created_for=band.created_for,
-            updated_for=band.updated_for,
+            created_for=get_current_user().username,
+            updated_for=get_current_user().username,
             fk_theory=band.fk_theory,
         )
     return BandModel(
         gub=band.gub,
         name=band.name,
         meaning=band.meaning,
-        created_for=band.created_for,
-        updated_for=band.updated_for,
         fk_theory=band.fk_theory,
     )
