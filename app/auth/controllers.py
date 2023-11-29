@@ -23,9 +23,7 @@ async def login(
 ):
     # TODO: O usuário pode fazer quantos logins quiser, criando assim vários tokens, e mesmo já estando logado
     try:
-        token = sv.generate_token(
-            username=username, password=password, uow=uow
-        )
+        token = sv.add_token(uow, username, password)
 
         return {"access_token": token.access_token, "token_type": "bearer"}
     except InvalidCredentials:
@@ -35,7 +33,7 @@ async def login(
 # TODO: Criar sistema de logout
 @router.post("/logout")
 async def logout(token: str = Depends(sv.oauth2_scheme)):
-    sv.add_token_blacklist(token)
+    # sv.add_token_blacklist(token)
     return {"status": 200, "detail": "Logout realizado com sucesso"}
 
 
@@ -46,9 +44,9 @@ async def refresh_token(
 ):
     try:
 
-        token = sv.refresh_token(user=current_user, token=auth)
+        # token = sv.refresh_token(user=current_user, token=auth)
 
-        return {"access_token": token.access_token, "token_type": "bearer"}
+        return {"access_token": 'asd', "token_type": "bearer"}
 
     except HTTPException as e:
         return e
