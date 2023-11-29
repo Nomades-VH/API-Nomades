@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
+from app.auth.repositories import AbstractAuthRepository
 from app.band.repositories import AbstractBandRepository
 from app.breakdown.repositories import (
     AbstractBreakdownRepository,
@@ -25,6 +26,7 @@ class AbstractUow(ABC):
     stretching: AbstractStretchingRepository
     theory: AbstractTheoryRepository
     user: AbstractUserRepository
+    auth: AbstractAuthRepository
 
     def __init__(self, session_factory: Callable[[], Any]):
         self.session_factory = session_factory

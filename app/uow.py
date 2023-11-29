@@ -1,3 +1,4 @@
+from app.auth.repositories import AuthRepository
 from app.band.repositories import BandRepository
 from app.breakdown.repositories import BreakdownRepository, BandBreakdownRepository
 from app.kibon_donjak.repositories import KibonDonjakRepository
@@ -26,6 +27,7 @@ class SqlAlchemyUow(AbstractUow):
         self.stretching = StretchingRepository(self._session)
         self.theory = TheoryRepository(self._session)
         self.user = UserRepository(self._session)
+        self.auth = AuthRepository(self._session)
 
     def _close_session(self) -> None:
         self._session.expunge_all()

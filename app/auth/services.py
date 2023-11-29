@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import datetime, timedelta
 from uuid import UUID
@@ -6,8 +5,9 @@ from uuid import UUID
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from starlette.status import HTTP_403_FORBIDDEN
+from starlette.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
 
+from app.auth.entities import Auth
 from app.auth.exceptions import InvalidCredentials
 from app.auth.hasher import verify_password
 from app.uow import SqlAlchemyUow
@@ -28,7 +28,6 @@ _TOKEN_EXPIRE_MINUTES = 120
 _AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
-_token_blacklist = set()
 
 
 def _create_token(user_id: UUID) -> str:
@@ -44,8 +43,8 @@ def _create_token(user_id: UUID) -> str:
     )
 
 
+# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
 def generate_token(username: str, password: str, uow: AbstractUow) -> Token:
-    from app.user.services import get_user_by_email
 
     user = sv.get_user_by_username(uow, username)
     if not user:
@@ -57,10 +56,11 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Token:
     return Token(access_token=_create_token(user.id))
 
 
-def refresh_token(user: User, token: str = Depends(oauth2_scheme)) -> Token:
-    if not is_revoked_token:
-        add_token_blacklist(token)
-        return Token(access_token=_create_token(user.id))
+# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
+# def refresh_token(user: User, token: str = Depends(oauth2_scheme)) -> Token:
+#     if not is_revoked_token:
+#         add_token_blacklist(token)
+#         return Token(access_token=_create_token(user.id))
 
 
 def verify_time_token(token: str = Depends(oauth2_scheme)):
@@ -80,28 +80,39 @@ def verify_time_token(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
 
 
-def is_revoked_token(token: str = Depends(oauth2_scheme)):
-    if verify_time_token(token):
-        if token in _token_blacklist:
-            return True
-    else:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado")
+# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
+# def is_revoked_token(token: str = Depends(oauth2_scheme)):
+#     if verify_time_token(token):
+#         if token in _token_blacklist:
+#             return True
+#     else:
+#         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado")
 
 
-def add_token_blacklist(token: str = Depends(oauth2_scheme)):
-    if not is_revoked_token(token):
-        _token_blacklist.add(token)
-    else:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Esse Token já está revogado.")
+def add_token(uow: AbstractUow, username: str, password: str):
+    with uow:
+        user = sv.get_user_by_username(uow, username)
+        if not uow.auth.get_by_user(user.id):
+            access_token = generate_token(username, password, uow)
+            token = Auth(
+                access_token=access_token.access_token,
+                fk_user=user.id
+            )
+
+            uow.auth.add(token)
+            return access_token
+        else:
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Você já está conectado.")
 
 
+# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
 def get_current_user(
         uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)
 ) -> User:
     from app.user.services import get_user_by_id
-
-    if is_revoked_token(auth):
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado")
+    #
+    # if is_revoked_token(auth):
+    #     raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado")
 
     try:
         payload = jwt.decode(auth, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
@@ -120,6 +131,7 @@ def get_current_user(
     return user
 
 
+# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
 def get_current_user_with_permission(permission: Permissions):
     def _dependency(
             uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)
