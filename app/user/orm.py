@@ -19,7 +19,7 @@ users = Table(
     Column("permission", Integer, nullable=False),
     Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id")),
     Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow),
+    Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
 )
 
 exame = Table(
