@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.exceptions import InvalidCredentials
-from app.auth.value_object import Token
 from app.uow import SqlAlchemyUow
+from app.user.models import User
 from ports.uow import AbstractUow
-from app.auth.services import generate_token
+from app.auth import services as sv
 
 router = APIRouter(prefix="/auth")
+
+# TODO: Precisamos melhorar todos os controllers
 
 
 # use: form_data: OAuth2PasswordRequestForm = Depends(), para testar no docs fastapi
@@ -15,20 +17,38 @@ router = APIRouter(prefix="/auth")
 # use: password: str = Body(...) para sistemas fora do fastapi
 @router.post("")
 async def login(
-        form_data: OAuth2PasswordRequestForm = Depends(),
+        username: str = Body(...),
+        password: str = Body(...),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
+    # TODO: O usuário pode fazer quantos logins quiser, criando assim vários tokens, e mesmo já estando logado
     try:
-        token = generate_token(
-            username=form_data.username, password=form_data.password, uow=uow
+        token = sv.generate_token(
+            username=username, password=password, uow=uow
         )
 
         return {"access_token": token.access_token, "token_type": "bearer"}
     except InvalidCredentials:
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+        return {"status_code": 401, "message": "Credenciais inválidas."}
 
 
 # TODO: Criar sistema de logout
-@router.post("")
-async def logout(token: Token, uow: AbstractUow = Depends(SqlAlchemyUow)):
-    ...
+@router.post("/logout")
+async def logout(token: str = Depends(sv.oauth2_scheme)):
+    sv.add_token_blacklist(token)
+    return {"status": 200, "detail": "Logout realizado com sucesso"}
+
+
+@router.post("/refresh-token")
+async def refresh_token(
+        current_user: User = Depends(sv.get_current_user),
+        auth: str = Depends(sv.oauth2_scheme)
+):
+    try:
+
+        token = sv.refresh_token(user=current_user, token=auth)
+
+        return {"access_token": token.access_token, "token_type": "bearer"}
+
+    except HTTPException as e:
+        return e
