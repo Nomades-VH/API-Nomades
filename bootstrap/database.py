@@ -46,4 +46,7 @@ def ensure_all_entities():
     # noinspection PyUnresolvedReferences
     import app.user.orm
 
+    # noinspection PyUnresolvedReferences
+    import app.auth.orm
+
     mapper_registry.metadata.create_all(bind=_engine)
