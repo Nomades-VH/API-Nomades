@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from app.auth.value_object import Token
 from ports.entity import Entity
 
 
