@@ -1,6 +1,9 @@
+import dataclasses
 from abc import ABC
 from typing import Iterator, Optional
 from uuid import UUID
+
+from sqlalchemy import and_
 
 from app.auth.entities import Auth
 from ports.repository import AbstractRepository
@@ -10,6 +13,9 @@ class AbstractAuthRepository(AbstractRepository[Auth], ABC):
     def get_by_user(self, uuid: UUID) -> Optional[Auth]:
         ...
 
+    def get_by_token(self, token: str) -> Optional[Auth]:
+        ...
+
 
 class AuthRepository(AbstractAuthRepository):
 
@@ -17,21 +23,19 @@ class AuthRepository(AbstractAuthRepository):
         self.session.add(entity)
 
     def get(self, uuid: UUID) -> Optional[Auth]:
-        return self.session.query(Auth).filter(Auth.id == uuid and not Auth.is_invalid).first()
+        return self.session.query(Auth).filter(and_(Auth.id == uuid, not Auth.is_invalid == False)).first()
 
     def get_by_user(self, uuid: UUID) -> Optional[Auth]:
-        return self.session.query(Auth).filter(Auth.is_invalid and Auth.fk_user == uuid).first()
+        return self.session.query(Auth).filter(and_(Auth.fk_user == uuid, Auth.is_invalid == False)).first()
 
-    # TODO: Não é uma boa prática apagar dados do usuário do banco de dados
-    # Para TODAS as tabelas, inserir um campo chamado "deleted" booleano para que quando algo for deletado
-    # Ele seja alterado de False para True. Assim, na lógica ao buscar os dados, buscaremos somente aqueles que tenham
-    # O campo "deleted" como False. Desse jeito não perdemos dados do banco de dados, e também conseguimos ter um
-    # Dontrole dos dados "deletados"
-    def remove(self, uuid: UUID) -> Optional[Auth]:
-        return self.session.query(Auth).filter(Auth.id == uuid).first().delete()
+    def get_by_token(self, token: str) -> Optional[Auth]:
+        return self.session.query(Auth).filter(and_(Auth.access_token == token, Auth.is_invalid == False)).first()
+
+    def remove(self, token: str) -> Optional[Auth]:
+        ...
 
     def update(self, entity: Auth) -> None:
-        self.session.query(Auth).filter(entity.id == Auth.id).first().update(entity)
+        self.session.query(Auth).filter(Auth.id == entity.id).update(dataclasses.asdict(entity))
 
     def iter(self) -> Iterator[Auth]:
         pass

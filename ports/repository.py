@@ -20,7 +20,7 @@ class AbstractRepository(Generic[_T], ABC):
         pass
 
     @abstractmethod
-    def remove(self, id: UUID) -> Optional[_T]:
+    def remove(self, uuid: UUID) -> Optional[_T]:
         pass
 
     @abstractmethod
