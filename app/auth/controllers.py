@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.status import HTTP_400_BAD_REQUEST
@@ -24,11 +26,16 @@ async def login(
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
-        token = sv.add_token(uow, username, password)
+        token = await sv.add_token(uow, username, password)
 
         return {"access_token": token.access_token or token, "token_type": "bearer"}
     except InvalidCredentials:
         return {"status_code": 401, "message": "Credenciais inválidas."}
+
+
+@router.get("/")
+async def get_all(uow: AbstractUow = Depends(SqlAlchemyUow)):
+    return list(map(asdict, sv.get_all(uow)))
 
 
 @router.post("/logout")
@@ -40,12 +47,11 @@ async def logout(token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depe
 @router.put("/refresh-token")
 async def refresh_token(
         current_user: User = Depends(sv.get_current_user),
-        auth: str = Depends(sv.oauth2_scheme),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
 
-        token = sv.refresh_token(uow=uow, user=current_user, token=auth)
+        token = sv.refresh_token(uow=uow, user=current_user)
 
         return {"access_token": token.access_token, "token_type": "bearer"}
 

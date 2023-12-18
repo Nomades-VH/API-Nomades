@@ -97,7 +97,7 @@ async def post(
 async def put(
     band: Band, current_user:
     User = Depends(
-        get_current_user_with_permission(Permissions.vice_president)
+        get_current_user_with_permission(Permissions.president)
     ),
     uow: AbstractUow = Depends(SqlAlchemyUow)
 ) -> None:

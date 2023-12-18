@@ -16,6 +16,9 @@ class AbstractAuthRepository(AbstractRepository[Auth], ABC):
     def get_by_token(self, token: str) -> Optional[Auth]:
         ...
 
+    def update_from_user(self, entity: Auth, user_id: UUID) -> None:
+        ...
+
 
 class AuthRepository(AbstractAuthRepository):
 
@@ -23,10 +26,10 @@ class AuthRepository(AbstractAuthRepository):
         self.session.add(entity)
 
     def get(self, uuid: UUID) -> Optional[Auth]:
-        return self.session.query(Auth).filter(and_(Auth.id == uuid, not Auth.is_invalid == False)).first()
+        return self.session.query(Auth).filter(Auth.id == uuid).first()
 
     def get_by_user(self, uuid: UUID) -> Optional[Auth]:
-        return self.session.query(Auth).filter(and_(Auth.fk_user == uuid, Auth.is_invalid == False)).first()
+        return self.session.query(Auth).filter(Auth.fk_user == uuid).first()
 
     def get_by_token(self, token: str) -> Optional[Auth]:
         return self.session.query(Auth).filter(and_(Auth.access_token == token, Auth.is_invalid == False)).first()
@@ -35,7 +38,10 @@ class AuthRepository(AbstractAuthRepository):
         ...
 
     def update(self, entity: Auth) -> None:
-        self.session.query(Auth).filter(Auth.id == entity.id).update(dataclasses.asdict(entity))
+        self.session.query(Auth).filter(and_(Auth.id == entity.id)).update(dataclasses.asdict(entity))
+
+    def update_from_user(self, entity: Auth, user_id: UUID) -> None:
+        self.session.query(Auth).filter(Auth.fk_user == user_id).update(dataclasses.asdict(entity))
 
     def iter(self) -> Iterator[Auth]:
-        pass
+        yield from self.session.query(Auth).filter(Auth.is_invalid == False).all()

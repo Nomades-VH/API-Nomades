@@ -49,26 +49,23 @@ def remove(uow: AbstractUow, uuid: UUID):
 
 
 def add_creator(band: BandEntity, user: User) -> BandEntity | BandModel:
-    band.created_for = user.username
-    band.updated_for = ""
-    return make_band(band)
+    band_entity = make_band(band, user.username)
+    return band_entity
 
 
-def make_band(band: BandModel | BandEntity) -> BandEntity | BandModel:
+def make_band(band: BandModel | BandEntity, username) -> BandEntity | BandModel:
     if type(band) == BandModel:
         return BandEntity(
             gub=band.gub,
             name=band.name,
             meaning=band.meaning,
-            created_for=band.created_for,
-            updated_for=band.updated_for,
+            created_for=username,
+            updated_for=username,
             fk_theory=band.fk_theory,
         )
     return BandModel(
         gub=band.gub,
         name=band.name,
         meaning=band.meaning,
-        created_for=band.created_for,
-        updated_for=band.updated_for,
         fk_theory=band.fk_theory,
     )
