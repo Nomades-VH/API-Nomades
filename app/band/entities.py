@@ -13,3 +13,4 @@ class Band(Entity):
     created_for: str
     updated_for: Optional[str]
     fk_theory: UUID
+
