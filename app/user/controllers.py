@@ -1,6 +1,7 @@
 from dataclasses import asdict
+from typing import Optional
 
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends
 
 from app.auth.services import get_current_user, get_current_user_with_permission
 from app.uow import SqlAlchemyUow
@@ -20,7 +21,7 @@ async def create_user(
         user: ModelUser,
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
-) -> Body(...):
+) -> Optional[dict]:
     try:
         user = sv.change_user(user)
         sv.verify_if_user_exists(uow, user)

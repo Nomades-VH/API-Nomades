@@ -46,7 +46,7 @@ async def post_breakdown(
 async def get_breakdown(
     id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student))
-) -> Optional[dict] | HTTPException:
+) -> Optional[dict]:
     try:
         return asdict(sv.get_by_id(id, uow))
 

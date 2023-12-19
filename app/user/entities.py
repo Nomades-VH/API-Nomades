@@ -14,6 +14,19 @@ class User(Entity):
     permission: Permissions
     fk_band: Optional[UUID] = None
 
+    @classmethod
+    def to_dict(cls, user: "User") -> dict:
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "password": user.password,
+            "permission": user.permission,
+            "fk_band": user.fk_band,
+            "created_at": user.created_at,
+            "updated_at": user.updated_at
+        }
+
 
 @dataclass
 class Exame(Entity):

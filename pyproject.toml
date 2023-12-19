@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "api-nomades"
+version = "0.1.0"
+description = ""
+authors = ["FelipePy <felipespsampaiomotasp@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+bcrypt = "^4.1.2"
+sqlalchemy = "^2.0.23"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.9"
+fastapi = "^0.105.0"
+email-validator = "^2.1.0.post1"
+uvicorn = "^0.24.0.post1"
+aiocron = "^1.8"
+jose = "^1.0.0"
+python-jose = "^3.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
