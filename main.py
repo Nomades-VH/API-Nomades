@@ -1,10 +1,4 @@
-import asyncio
-
-from aiocron import crontab
-from fastapi import Depends
-
 from app.auth.hasher import hash_password
-from app.auth.services import auto_revoke_token, run_auto_revoke_token
 from ports.uow import AbstractUow
 from dotenv import load_dotenv
 from os import environ
@@ -27,7 +21,7 @@ if __name__ == "__main__":
         from general_enum.permissions import Permissions
         from app.user.services import get_user_by_email
 
-        root_user = get_user_by_email(uow, 'felipesampaio.contato@gmail.com')
+        root_user = get_user_by_email(uow, environ.get("ROOT_USER_EMAIL"))
 
         if not root_user:
             with uow:
@@ -44,4 +38,4 @@ if __name__ == "__main__":
     _create_root(uow)
     import uvicorn
 
-    uvicorn.run(app="bootstrap.server:app", host="", port=8000)
+    uvicorn.run(app="bootstrap.server:app", host="0.0.0.0", port=8000)

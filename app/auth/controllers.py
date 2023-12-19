@@ -1,15 +1,12 @@
 from dataclasses import asdict
 
 from fastapi import APIRouter, Depends, HTTPException, Body
-from fastapi.security import OAuth2PasswordRequestForm
-from starlette.status import HTTP_400_BAD_REQUEST
 
 from app.auth.exceptions import InvalidCredentials
 from app.uow import SqlAlchemyUow
 from app.user.models import User
 from ports.uow import AbstractUow
 from app.auth import services as sv
-from app.user import services as user_sv
 
 router = APIRouter(prefix="/auth")
 
@@ -50,10 +47,7 @@ async def refresh_token(
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
-
         token = sv.refresh_token(uow=uow, user=current_user)
-
         return {"access_token": token.access_token, "token_type": "bearer"}
-
     except HTTPException as e:
         return e
