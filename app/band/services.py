@@ -31,7 +31,7 @@ def get_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
         return uow.band.get_by_name(name)
 
 
-def add(uow: AbstractUow, band: BandEntity, user: User) -> None:
+def add(uow: AbstractUow, band: BandEntity) -> None:
     with uow:
         uow.band.add(band)
 

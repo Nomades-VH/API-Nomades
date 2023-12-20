@@ -230,7 +230,7 @@ def get_current_user_with_permission(permission: Permissions):
     ) -> User:
         user = get_current_user(uow, auth)
 
-        if user.permission < permission.value:
+        if user.permission.value < permission.value:
             raise HTTPException(
                 status_code=HTTP_403_FORBIDDEN,
                 detail=f"Você não tem autorização para acessar essa página."

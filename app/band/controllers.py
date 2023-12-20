@@ -90,7 +90,7 @@ async def post(
 
     band = sv.add_creator(band, current_user)
     try:
-        sv.add(uow, band=band, user=current_user)
+        sv.add(uow, band=band)
         return {"created for": band.created_for, "created at": band.created_at}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

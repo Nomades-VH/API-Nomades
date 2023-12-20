@@ -28,7 +28,7 @@ def _create_root(uow: AbstractUow):
                 username=environ.get("ROOT_USER"),
                 email=environ.get("ROOT_USER_EMAIL"),
                 password=hash_password(environ.get("ROOT_USER_PASSWORD")),
-                permission=Permissions.root.value,
+                permission=Permissions.root,
                 fk_band=None
             ))
 
