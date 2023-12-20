@@ -43,7 +43,7 @@ def update(uow: AbstractUow, band: BandEntity) -> None:
 
 
 # TODO: Review a service to delete
-def remove(uow: AbstractUow, uuid: UUID):
+def delete(uow: AbstractUow, uuid: UUID):
     with uow:
         uow.band.remove(uuid)
 

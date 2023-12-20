@@ -20,7 +20,7 @@ def add_theory(uow: AbstractUow, model: ModelTheory) -> None:
 
 
 # TODO: Review this service
-def get_theory_by_id(uow: AbstractUow, id: UUID) -> Theory:
+def get_by_id(uow: AbstractUow, id: UUID) -> Theory:
     with uow:
         return uow.theory.get(id)
 
@@ -31,8 +31,9 @@ def put_theory():
 
 
 # TODO: Create a service to delete theory
-def delete_theory():
-    pass
+def delete(uow: AbstractUow, id: UUID) -> None:
+    with uow:
+        uow.theory.remove(id)
 
 
 # TODO: Review this service

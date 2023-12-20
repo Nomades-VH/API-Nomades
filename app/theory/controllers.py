@@ -9,6 +9,7 @@ from app.theory.models import Theory as ModelTheory
 from app.theory import services as sv
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
+from app.utils.delete_controller import delete_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
@@ -37,7 +38,7 @@ async def get_theory(
     theory_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> Optional[dict]:
-    return asdict(sv.get_theory_by_id(uow, theory_id))
+    return asdict(sv.get_by_id(uow, theory_id))
 
 
 # TODO: Create Put Method
@@ -47,6 +48,13 @@ async def put_theory():
 
 
 # TODO: Create Delete Method
-@router.delete("/")
-async def delete_theory():
+@router.delete("/{id}")
+@delete_controller(sv)
+async def delete_theory(
+        id: UUID,
+        message_success: str = "A teoria foi deletada com sucesso.",
+        message_error: str = "A teoria não foi encontrada.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.president))
+):
     pass
