@@ -7,12 +7,18 @@ from ports.repository import AbstractRepository
 
 
 class AbstractPoomsaeRepository(AbstractRepository[Poomsae], ABC):
+    def get_by_name(self, name: str) -> Optional[Poomsae]:
+        ...
+
     pass
 
 
 class PoomsaeRepository(AbstractPoomsaeRepository):
     def get(self, uuid: UUID) -> Optional[Poomsae]:
         return self.session.query(Poomsae).filter(Poomsae.id == uuid).first()
+
+    def get_by_name(self, name: str) -> Optional[Poomsae]:
+        return self.session.query(Poomsae).filter(Poomsae.name == name).first()
 
     def add(self, poomsae: Poomsae) -> None:
         self.session.add(poomsae)

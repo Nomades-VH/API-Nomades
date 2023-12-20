@@ -1,7 +1,6 @@
 from typing import Iterator
 
 from app.poomsae.entities import Poomsae as PoomsaeEntity
-from app.poomsae.models import Poomsae as PoomsaeModel
 from ports.uow import AbstractUow
 
 
@@ -11,10 +10,16 @@ def get_all_poomsaes(uow: AbstractUow) -> Iterator[PoomsaeEntity]:
         yield from uow.poomsae.iter()
 
 
-def add(uow: AbstractUow, poomsae: PoomsaeEntity):
+def add(uow: AbstractUow, poomsae):
     with uow:
+        poomsae = poomsae.to_entity()
+        print(type(poomsae))
         uow.poomsae.add(poomsae)
 
+
+def get_by_name(uow: AbstractUow, name: str) -> PoomsaeEntity:
+    with uow:
+        return uow.poomsae.get_by_name(name=name)
 
 # TODO: Create a service get poomsae
 def get_poomsae():
