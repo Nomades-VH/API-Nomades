@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy import Enum
 from uuid import uuid4
 
-from sqlalchemy import Table, Column, String, SmallInteger, DateTime, ForeignKey
+from sqlalchemy import Table, Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.poomsae.entities import Poomsae
@@ -16,7 +16,7 @@ poomsaes = Table(
     Column("name", String[50], nullable=False, unique=True),
     Column("description", String[250], nullable=False),
     Column("difficulty", Enum(Difficulty), nullable=False),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='SET NULL'), default=uuid4),
+    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='SET NULL'), nullable=True),
     Column("created_at", DateTime, default=datetime.utcnow),
     Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
 )

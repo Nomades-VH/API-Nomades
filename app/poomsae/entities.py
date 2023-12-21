@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from uuid import UUID
 
 from general_enum.difficulty import Difficulty
@@ -10,4 +11,4 @@ class Poomsae(Entity):
     name: str
     description: str
     difficulty: Difficulty
-    fk_band: UUID
+    fk_band: Optional[UUID] = None
