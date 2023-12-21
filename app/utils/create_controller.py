@@ -27,6 +27,7 @@ def create_controller(service):
                 )
 
             try:
+                entity = entity.to_entity()
                 service.add(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,

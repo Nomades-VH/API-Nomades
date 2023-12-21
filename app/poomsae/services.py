@@ -5,15 +5,13 @@ from ports.uow import AbstractUow
 
 
 # TODO: Create a service get_all poomsae
-def get_all_poomsaes(uow: AbstractUow) -> Iterator[PoomsaeEntity]:
+def get(uow: AbstractUow) -> Iterator[PoomsaeEntity]:
     with uow:
         yield from uow.poomsae.iter()
 
 
 def add(uow: AbstractUow, poomsae):
     with uow:
-        poomsae = poomsae.to_entity()
-        print(type(poomsae))
         uow.poomsae.add(poomsae)
 
 

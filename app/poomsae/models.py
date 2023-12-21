@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel
 from general_enum.difficulty import Difficulty
@@ -8,7 +9,7 @@ class Poomsae(BaseModel):
     name: str
     description: str
     difficulty: Difficulty
-    fk_band: UUID
+    fk_band: Optional[UUID] = None
 
     # TODO: Isso deve ser padrão para o projeto inteiro
     #  Invés de criar um serviço para realizar isso, fazer direto no model ou entity
