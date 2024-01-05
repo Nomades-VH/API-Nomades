@@ -59,7 +59,7 @@ async def update_poomsae(
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
 ):
-    pass
+    ...
 
 
 # TODO: Create Delete Method
