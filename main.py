@@ -40,7 +40,7 @@ if __name__ == "__main__":
     logger = logger
     logger.add(
         'app.log',
-        format="{time} | {level} | line:{line} | {extra} | message: {message}",
+        format="{time} | {level} | {name}:{line} | {extra} | message: {message}",
         level='DEBUG'
     )
 

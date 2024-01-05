@@ -40,4 +40,5 @@ def to_entity(entity: PoomsaeEntity, model: PoomsaeModel):
     entity.name = model.name
     entity.description = model.description
     entity.difficulty = model.difficulty
+    entity.fk_band = model.fk_band
     return entity
