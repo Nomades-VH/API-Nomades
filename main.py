@@ -1,4 +1,5 @@
 from app.auth.hasher import hash_password
+from loguru import logger
 from ports.uow import AbstractUow
 from dotenv import load_dotenv
 from os import environ
@@ -35,6 +36,13 @@ def _create_root(uow: AbstractUow):
 
 if __name__ == "__main__":
     # TODO: Algumas urls ainda permitem acesso sem o token de acesso
+
+    logger = logger
+    logger.add(
+        'app.log',
+        format="{time} | {level} | line:{line} | {extra} | message: {message}",
+        level='DEBUG'
+    )
 
     _load_env()
     _create_tables()

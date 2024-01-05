@@ -5,6 +5,7 @@ from typing import TypeVar
 from fastapi.responses import JSONResponse
 
 from app.user.entities import User
+from loguru import logger
 from ports.uow import AbstractUow
 
 T = TypeVar("T")
@@ -20,13 +21,16 @@ def create_controller(service):
                 uow: AbstractUow,
                 current_user: User
         ):
-            if service.get_by_name(uow, model.name) is not None:
-                return JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": f"{message_error}: {model.name} já existe."}
-                )
-
             try:
+                if service.get_by_name(uow, model.name) is not None:
+                    logger.info(message_error, extra={
+                        'user': current_user.id
+                    })
+                    return JSONResponse(
+                        status_code=HTTPStatus.BAD_REQUEST,
+                        content={"message": f"{message_error}: {model.name} já existe."}
+                    )
+
                 entity = model.to_entity()
                 service.add(uow, entity)
                 return JSONResponse(
@@ -34,10 +38,15 @@ def create_controller(service):
                     content={"message": f"{message_success}"}
                 )
             except Exception as e:
-                print(e)
+                logger.warning(message_error, extra={
+                    'user': current_user,
+                    'error': str(e)
+                })
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={"message": f"{message_error}"}
                 )
+
         return wrapper
+
     return inner
