@@ -19,30 +19,13 @@ from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth.entities import Auth
 
-# TODO: Os métodos fazem as próprias verificações o que resulta em repetição de código,
-#  Seria bom já possuir um método que já realizam essas verificações todas
-
-# TODO: Melhorar em todo o sistema as mensagens de erro. Padronizar e criar exceptions personalizadas. ESTÁ HORRÍVEL
-
-# TODO: Fazer um método chamado "auto_revoke_token" para quando o tempo do token se expirar, o sistema automaticamente,
-#  invalidar esses tokens
-
-# TODO: Refresh token para que caso o token vença, ele seja inativado
-
-# TODO: Posso pegar o dispositivo que o usuário esta acessando o site, e inserir essa informação no token, para que caso
-#  O usuário queira realizar o login em diferentes dispositivos,
-#   ele possa (Atualmente o usuário pode ter somente um token)
-
-# TODO: O usuário pode sim possuir vários tokens, para que possa realizar login em diferentes dispositivos.
-#  (Ou usar o mesmo)
-
-
 _ALGORITHM = "HS256"
 _TOKEN_EXPIRE_MINUTES = 120
 _AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
+# TODO: Melhorar o tratamento de exceções no código INTEIRO.
 
 def _create_token(user_id: UUID) -> str:
     expire = datetime.utcnow() + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
@@ -71,7 +54,7 @@ def auto_revoke_token(uow: AbstractUow = Depends(SqlAlchemyUow)):
             try:
                 if is_revoked_token(uow, token):
                     revoke_token(uow, token.access_token)
-            except ExpiredSignatureError:
+            except ExpiredSignatureError as e:
                 revoke_token(uow, token.access_token)
 
 
@@ -88,8 +71,7 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
         raise InvalidCredentials()
 
     if not verify_password(password, user.password):
-        if not password == user.password:
-            raise InvalidCredentials()
+        raise InvalidCredentials()
 
     return Auth(
         access_token=_create_token(user.id),
@@ -121,7 +103,7 @@ def invalidate_token(uow: AbstractUow, auth: Auth):
 
 
 # TODO: Verificar se realmente está correto
-def is_expired_token(token: Auth):
+def _is_token_expired(token: Auth):
     try:
         payload = jwt.decode(token.access_token, algorithms=_ALGORITHM, key=_AUTH_SECRET)
         expiration = payload.get('exp')
@@ -146,7 +128,7 @@ def is_revoked_token(uow: AbstractUow, token_db: Auth):
             if not token_db:
                 return True
 
-            if is_expired_token(token_db):
+            if _is_token_expired(token_db):
                 return True
 
             else:
@@ -161,7 +143,10 @@ async def add_token(uow: AbstractUow, username: str, password: str) -> Auth | st
         user = sv.get_user_by_username(uow, username)
 
         if not user:
-            raise InvalidCredentials
+            raise InvalidCredentials()
+
+        if not verify_password(password, user.password):
+            raise InvalidCredentials()
 
         token = uow.auth.get_by_user(user.id)
 
