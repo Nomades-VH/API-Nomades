@@ -10,6 +10,7 @@ from app.poomsae.models import Poomsae
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.utils.create_controller import create_controller
+from app.utils.delete_controller import delete_controller
 from app.utils.get_controller import get_controller
 from app.utils.update_controller import update_controller
 from general_enum.permissions import Permissions
@@ -63,6 +64,13 @@ async def update_poomsae(
 
 
 # TODO: Create Delete Method
-@router.delete("/")
-async def delete_poomsae():
-    pass
+@router.delete("/{id}")
+@delete_controller(poomsae_sv)
+async def delete_poomsae(
+        id: UUID,
+        message_success: str = "Poomsae deletado com sucesso.",
+        message_error: str = "Não foi possível deletar o poomsae.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.president))
+):
+    ...
