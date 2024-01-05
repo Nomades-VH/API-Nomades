@@ -113,10 +113,10 @@ async def put(
 
 
 # TODO: Create Delete method
-@router.delete("/{id}")
+@router.delete("/{uuid}")
 @delete_controller(sv)
 async def delete(
-        id: UUID,
+        uuid: UUID,
         message_success: str = "A faixa foi deletada com sucesso.",
         message_error: str = "A faixa não foi encontrada.",
         uow: AbstractUow = Depends(SqlAlchemyUow),

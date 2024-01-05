@@ -44,17 +44,17 @@ async def get_theory(
 # TODO: Create Put Method
 @router.put("/")
 async def put_theory():
-    pass
+    ...
 
 
 # TODO: Create Delete Method
 @router.delete("/{id}")
 @delete_controller(sv)
 async def delete_theory(
-        id: UUID,
+        uuid: UUID,
         message_success: str = "A teoria foi deletada com sucesso.",
         message_error: str = "A teoria não foi encontrada.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.president))
 ):
-    pass
+    ...

@@ -1,16 +1,16 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi import Response
 
 from app.auth.services import get_current_user_with_permission
 from app.poomsae import services as poomsae_sv
-from app.poomsae.entities import Poomsae as PoomsaeEntity
 from app.poomsae.models import Poomsae
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.utils.create_controller import create_controller
 from app.utils.delete_controller import delete_controller
+from app.utils.get_by_id_controller import get_by_id_controller
 from app.utils.get_controller import get_controller
 from app.utils.update_controller import update_controller
 from general_enum.permissions import Permissions
@@ -31,9 +31,16 @@ async def get_all(
 
 
 # TODO: Create Get Method
-@router.get("/{poomsae_id}")
-async def get_poomsae():
-    pass
+@router.get("/{uuid}")
+@get_by_id_controller(poomsae_sv)
+async def get_poomsae(
+        uuid: UUID,
+        message_success: str = "Poomsae encontrado com sucesso.",
+        message_error: str = "Não foi possível encontrar o Poomsae.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
+):
+    ...
 
 
 # TODO: Create Post Method
@@ -67,7 +74,7 @@ async def update_poomsae(
 @router.delete("/{id}")
 @delete_controller(poomsae_sv)
 async def delete_poomsae(
-        id: UUID,
+        uuid: UUID,
         message_success: str = "Poomsae deletado com sucesso.",
         message_error: str = "Não foi possível deletar o poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
