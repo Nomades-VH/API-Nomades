@@ -1,8 +1,9 @@
 from functools import wraps
 from http import HTTPStatus
 from typing import TypeVar
+from uuid import UUID
 
-from fastapi.responses import JSONResponse
+from starlette.responses import JSONResponse
 
 from app.user.entities import User
 from ports.uow import AbstractUow
@@ -10,31 +11,32 @@ from ports.uow import AbstractUow
 T = TypeVar("T")
 
 
-def create_controller(service):
+def update_controller(service):
     def inner(func):
         @wraps(func)
         def wrapper(
+                id: UUID,
                 model: T,
                 message_success: str,
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
         ):
-            if service.get_by_name(uow, model.name) is not None:
+            entity = service.get_by_id(uow, id)
+            if not entity:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": f"{message_error}: {model.name} já existe."}
+                    content={"message": f"{message_error}"}
                 )
 
             try:
-                entity = model.to_entity()
-                service.add(uow, entity)
+                entity = service.to_entity(entity, model)
+                service.update(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,
                     content={"message": f"{message_success}"}
                 )
             except Exception as e:
-                print(e)
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={"message": f"{message_error}"}

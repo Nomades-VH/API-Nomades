@@ -1,6 +1,8 @@
+import dataclasses
 from abc import ABC
 from typing import Iterator, Optional
 from uuid import UUID
+from sqlalchemy.orm import attributes, object_mapper
 
 from app.poomsae.entities import Poomsae
 from ports.repository import AbstractRepository
@@ -27,7 +29,7 @@ class PoomsaeRepository(AbstractPoomsaeRepository):
         return self.session.query(Poomsae).filter(Poomsae.id == uuid).delete()
 
     def update(self, poomsae: Poomsae) -> None:
-        self.session.query(Poomsae).filter(Poomsae.id == poomsae.id).update(poomsae)
+        self.session.query(Poomsae).filter(Poomsae.id == poomsae.id).update(dataclasses.asdict(poomsae))
 
     def iter(self) -> Iterator[Poomsae]:
         return self.session.query(Poomsae).all()
