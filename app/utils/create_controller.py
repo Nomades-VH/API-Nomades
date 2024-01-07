@@ -14,13 +14,17 @@ T = TypeVar("T")
 def create_controller(service):
     def inner(func):
         @wraps(func)
-        def wrapper(
+        async def wrapper(
                 model: T,
                 message_success: str,
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
         ):
+            response = await func(model, message_success, message_error, uow, current_user)
+            if response:
+                return response
+
             try:
                 if service.get_by_name(uow, model.name) is not None:
                     logger.info(message_error, extra={
@@ -31,7 +35,8 @@ def create_controller(service):
                         content={"message": f"{message_error}: {model.name} já existe."}
                     )
 
-                entity = model.to_entity()
+                entity = model.to_entity(current_user)
+
                 service.add(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,
@@ -39,7 +44,8 @@ def create_controller(service):
                 )
             except Exception as e:
                 logger.warning(message_error, extra={
-                    'user': current_user,
+                    'user': current_user.id,
+
                     'error': str(e)
                 })
                 return JSONResponse(

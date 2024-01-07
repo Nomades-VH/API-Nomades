@@ -12,5 +12,5 @@ class Band(Entity):
     meaning: str
     created_for: str
     updated_for: Optional[str]
-    fk_theory: UUID
+    fk_theory: Optional[UUID] = None
 
