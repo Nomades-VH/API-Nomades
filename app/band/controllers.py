@@ -1,15 +1,18 @@
 from dataclasses import asdict
+from http import HTTPStatus
 from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
 from fastapi import Response
+from starlette.responses import JSONResponse
 
 from app.auth.services import get_current_user_with_permission
 from app.band.models import Band
 from app.band.entities import Band as BandEntity
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
+from app.utils.create_controller import create_controller
 from app.utils.delete_controller import delete_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
@@ -71,29 +74,21 @@ async def get_by_gub(
 
 
 @router.post("/")
+@create_controller(sv)
 async def post(
-        band: Band,
+        model: Band,
+        message_success: str = "Faixa criada com sucesso.",
+        message_error: str = "Erro ao criar a faixa.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(
             get_current_user_with_permission(Permissions.president)
-        ),
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> dict:
-    if sv.get_by_gub(uow, band.gub) is not None:
-        raise HTTPException(
-            status_code=400, detail=f"Band with gub '{band.gub}' already exists"
         )
-
-    if sv.get_by_name(uow, band.name) is not None:
-        raise HTTPException(
-            status_code=400, detail=f"Band with name '{band.name}' already exists"
+):
+    if sv.get_by_gub(uow, model.gub) is not None:
+        return JSONResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            content={"message": f"A faixa com o gub {model.gub} já existe."}
         )
-
-    band = sv.add_creator(band, current_user)
-    try:
-        sv.add(uow, band=band)
-        return {"created for": band.created_for, "created at": band.created_at}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
 
 # TODO: Create Put method

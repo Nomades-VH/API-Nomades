@@ -17,7 +17,7 @@ bands = Table(
     Column("meaning", String(150), nullable=False),
     Column("created_for", String(50), nullable=False),
     Column("updated_for", String(50), nullable=False),
-    Column("fk_theory", UUID(as_uuid=True), ForeignKey("theory.id"), default=uuid4),
+    Column("fk_theory", UUID(as_uuid=True), ForeignKey("theory.id"), nullable=True),
     Column("created_at", DateTime, default=datetime.utcnow),
     Column("updated_at", DateTime, onupdate=datetime.utcnow),
 )
