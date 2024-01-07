@@ -31,11 +31,11 @@ async def get_all(
     return list(map(asdict, sv.get_all(uow)))
 
 
-@router.get("/{band_id}")
-async def get_by_id(
+@router.get("/me/")
+async def get_my_band(
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> dict:
+):
     if current_user.fk_band is None:
         raise HTTPException(
             status_code=401, detail="You need a band to access this resource"
@@ -48,7 +48,24 @@ async def get_by_id(
             status_code=401, detail="You are not authorized to access this resource"
         )
 
-    return asdict(band)
+    return band
+
+
+@router.get("/{band_id}")
+async def get_by_id(
+        band_id: UUID,
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+):
+    if current_user.permission.value < Permissions.table.value:
+        raise HTTPException(
+            status_code=401, detail="Você não tem permissão para buscar essa faixa."
+        )
+
+    band = sv.get_by_id(uow, band_id)
+
+    return band
+
 
 
 @router.get("/gub/{gub}")
