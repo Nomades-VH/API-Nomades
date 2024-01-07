@@ -3,6 +3,8 @@ from http import HTTPStatus
 from typing import TypeVar
 from uuid import UUID
 
+from loguru import logger
+from sqlalchemy.exc import IntegrityError
 from starlette.responses import JSONResponse
 
 from app.user.entities import User
@@ -14,15 +16,19 @@ T = TypeVar("T")
 def update_controller(service):
     def inner(func):
         @wraps(func)
-        def wrapper(
-                id: UUID,
+        async def wrapper(
+                uuid: UUID,
                 model: T,
                 message_success: str,
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
         ):
-            entity = service.get_by_id(uow, id)
+            response = await func(uuid, model, message_success, message_error, uow, current_user)
+            if response:
+                return response
+
+            entity = service.get_by_id(uow, uuid)
             if not entity:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
@@ -36,10 +42,24 @@ def update_controller(service):
                     status_code=HTTPStatus.OK,
                     content={"message": f"{message_success}"}
                 )
-            except Exception as e:
+            except IntegrityError as e:
+                # TODO: IMPORTANTE
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": f"{message_error}"}
+                    content={
+                        "message": f"Chave estrangeira inválida"
+                    }
+                )
+            except Exception as e:
+                logger.debug(
+                    e
+                )
+                return JSONResponse(
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    content={
+                        "message": f"{message_error}",
+                        "error": str(e)
+                    }
                 )
         return wrapper
     return inner

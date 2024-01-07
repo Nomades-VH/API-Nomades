@@ -69,3 +69,11 @@ def make_band(band: BandModel | BandEntity, username) -> BandEntity | BandModel:
         meaning=band.meaning,
         fk_theory=band.fk_theory,
     )
+
+
+def to_entity(band_entity: BandEntity, band_model: BandModel) -> BandEntity:
+    band_entity.gub = band_model.gub
+    band_entity.name = band_model.name
+    band_entity.meaning = band_model.meaning
+    band_entity.fk_theory = band_model.fk_theory
+    return band_entity
