@@ -36,6 +36,7 @@ def create_controller(service):
                     )
 
                 entity = model.to_entity(current_user)
+
                 service.add(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,
@@ -44,6 +45,7 @@ def create_controller(service):
             except Exception as e:
                 logger.warning(message_error, extra={
                     'user': current_user.id,
+
                     'error': str(e)
                 })
                 return JSONResponse(
