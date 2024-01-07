@@ -1,3 +1,4 @@
+import dataclasses
 from abc import ABC
 from typing import Optional, Iterator
 from uuid import UUID
@@ -33,7 +34,7 @@ class BandRepository(AbstractBandRepository):
         return self.session.query(Band).filter(Band.id == uuid).delete()
 
     def update(self, band: Band) -> None:
-        self.session.query(Band).filter(Band.id == band.id).update(band)
+        self.session.query(Band).filter(Band.id == band.id).update(dataclasses.asdict(band))
 
     def iter(self) -> Iterator[Band]:
         yield from self.session.query(Band).all()

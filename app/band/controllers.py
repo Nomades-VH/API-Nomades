@@ -5,6 +5,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
 from fastapi import Response
+from loguru import logger
 from starlette.responses import JSONResponse
 
 from app.auth.services import get_current_user_with_permission
@@ -14,6 +15,8 @@ from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.utils.create_controller import create_controller
 from app.utils.delete_controller import delete_controller
+from app.utils.get_by_id_controller import get_by_id_controller
+from app.utils.update_controller import update_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.band import services as sv
@@ -51,21 +54,21 @@ async def get_my_band(
     return band
 
 
-@router.get("/{band_id}")
+@router.get("/{uuid}")
+@get_by_id_controller(sv)
 async def get_by_id(
-        band_id: UUID,
+        uuid: UUID,
+        message_error: str = "Não foi possível buscar essa faixa.",
+        message_success: str = "Faixa encontrada com sucesso.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
 ):
     if current_user.permission.value < Permissions.table.value:
-        raise HTTPException(
-            status_code=401, detail="Você não tem permissão para buscar essa faixa."
+        return JSONResponse(
+            status_code=HTTPStatus.FORBIDDEN,
+            content={
+                "message": "Você não tem permissão para buscar essa faixa."}
         )
-
-    band = sv.get_by_id(uow, band_id)
-
-    return band
-
 
 
 @router.get("/gub/{gub}")
@@ -109,19 +112,26 @@ async def post(
 
 
 # TODO: Create Put method
-@router.put("/")
+@router.put("/{uuid}")
+@update_controller(sv)
 async def put(
-        band: Band, current_user:
-        User = Depends(
-            get_current_user_with_permission(Permissions.president)
-        ),
-        uow: AbstractUow = Depends(SqlAlchemyUow)
-) -> None:
-    band_actually = sv.get_by_name(uow, band.name)
-    if band_actually is None:
-        return
-
-    sv.update(uow=uow, band=band)
+        uuid: UUID,
+        model: Band,
+        message_success: str = "Faixa atualizada com sucesso.",
+        message_error: str = "Erro ao atualizar a faixa.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(
+            get_current_user_with_permission(Permissions.table)
+        )
+):
+    if not sv.get_by_id(uow, uuid):
+        logger.debug(
+            uuid
+        )
+        return JSONResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            content={"message": f"A faixa com esse ID não existe."}
+        )
 
 
 # TODO: Create Delete method
