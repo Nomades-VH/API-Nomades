@@ -109,7 +109,7 @@ def get_current_user(
 
             user = get_user_by_id(uow, user_id)
             if user is None:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Esse usuário não existe")
 
         except JWTError:
             raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
