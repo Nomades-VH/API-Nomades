@@ -102,6 +102,12 @@ class TestController(TestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(type(r.json()), dict)
 
+    def test_8_get_by_gub(self):
+        band = self._get_band()
+        r = self._send_request(requests.get, url_increment=f"gub/{band['gub']}")
+        self.assertEqual(r.status_code, HTTPStatus.OK)
+        self.assertEqual(r.json()['gub'], band['gub'])
+
     def test_8_get_by_id_not_exists(self):
         id = '8c3846d3-f05b-41ea-a580-d54fa2aa5a1b'
         r = self._send_request(requests.get, url_increment=id)

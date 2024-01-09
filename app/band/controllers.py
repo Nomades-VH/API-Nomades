@@ -1,15 +1,13 @@
-from dataclasses import asdict
 from http import HTTPStatus
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, FastAPI
+from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import Response
 from loguru import logger
 from starlette.responses import JSONResponse
 
 from app.auth.services import get_current_user_with_permission
 from app.band.models import Band
-from app.band.entities import Band as BandEntity
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.utils.create_controller import create_controller
@@ -20,8 +18,6 @@ from app.utils.update_controller import update_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.band import services as sv
-
-app = FastAPI()
 
 router = APIRouter(prefix="/band")
 
@@ -69,26 +65,29 @@ async def get_by_id(
     ...
 
 
-@router.get("/gub/{gub}")
+@router.get("/gub/{param}")
+@get_by_controller(sv.get_by_gub)
 async def get_by_gub(
-        gub: int,
+        param: int,
         uow: AbstractUow = Depends(SqlAlchemyUow),
+        message_success: str = "Faixa encontrada",
+        message_error: str = "Faixa não encontrada",
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ):
-    if sv.get_by_gub(uow, gub) is None:
-        raise HTTPException(
-            status_code=404, detail=f"Band with gub '{gub}' does not exist"
-        )
+    # TODO: não estou recebdo o usuário aqui
+    logger.debug(
+        "Aqui temos um usuário", extra={"user": current_user}
+    )
+    if current_user.fk_band:
+        band = sv.get_by_user(uow, current_user)
 
-    user_band: BandEntity = sv.get_by_user(uow, current_user)
-
-    if user_band.gub > gub and current_user.permission < Permissions.table.value:
-        raise HTTPException(
-            status_code=401,
-            detail=f"You are not authorized to access this resource: expected gub less then {gub}, but got {user_band.gub}",
-        )
-
-    return asdict(sv.get_by_gub(uow, gub))
+        if band.gub > param and current_user.permission.value < Permissions.table.value:
+            return JSONResponse(
+                status_code=HTTPStatus.FORBIDDEN,
+                content={
+                    "message": "Você ainda não chegou nessa faixa."
+                }
+            )
 
 
 @router.post("/")
