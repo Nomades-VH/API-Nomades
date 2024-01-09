@@ -13,10 +13,6 @@ from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
 
-# TODO: Verify if this is necessary
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
 def get_user_by_id(uow: AbstractUow, user_id: UUID) -> Optional[User]:
     with uow:
         return uow.user.get(user_id)
@@ -75,7 +71,6 @@ def delete_user():
     pass
 
 
-# TODO: Create a service to get all users
 def get_all_users(uow: AbstractUow):
     with uow:
         yield from uow.user.iter()

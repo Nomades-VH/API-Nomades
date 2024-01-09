@@ -1,10 +1,9 @@
-from dataclasses import asdict
 from functools import wraps
 from http import HTTPStatus
-from typing import TypeVar
-from uuid import UUID
+from typing import TypeVar, Any
 
-from fastapi import Response
+from loguru import logger
+from starlette.responses import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
@@ -14,28 +13,31 @@ from ports.uow import AbstractUow
 T = TypeVar("T")
 
 
-def get_by_id_controller(service):
+def get_by_controller(get_service):
     def inner(func):
         @wraps(func)
         async def wrapper(
-                uuid: UUID,
+                param: Any,
                 message_success: str,
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
-            entity = jsonable_encoder(service.get_by_id(uow, uuid))
+            response = await func(param, message_success, message_error)
+            if response:
+                return response
+
+            entity = jsonable_encoder(get_service(uow, param))
 
             if not entity:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": message_error}
+                    content={"message": message_error + f' Identificador {param} não encontrado.'}
                 )
 
             return JSONResponse(
                 status_code=HTTPStatus.OK,
                 content=entity
-
             )
 
         return wrapper

@@ -36,8 +36,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return asdict(current_user)
 
 
-# TODO: Create Get Method
-
+# TODO: Update Get Method
 @router.get('/')
 async def get_users(
         current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president)),

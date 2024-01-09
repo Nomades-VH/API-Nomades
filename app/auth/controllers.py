@@ -10,8 +10,6 @@ from app.auth import services as sv
 
 router = APIRouter(prefix="/auth")
 
-# TODO: Precisamos melhorar todos os controllers
-
 
 # use: form_data: OAuth2PasswordRequestForm = Depends(), para testar no docs fastapi
 # use: username: str = Body(...),
@@ -37,7 +35,10 @@ async def get_all(uow: AbstractUow = Depends(SqlAlchemyUow)):
 
 @router.post("/logout")
 async def logout(token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depends(SqlAlchemyUow)):
-    sv.revoke_token(uow, token)
+    response = sv.revoke_token(uow, token)
+    if response:
+        return response
+
     return {"status": 200, "detail": "Logout realizado com sucesso"}
 
 

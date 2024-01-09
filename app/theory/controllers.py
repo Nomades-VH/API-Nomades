@@ -47,7 +47,6 @@ async def put_theory():
     ...
 
 
-# TODO: Create Delete Method
 @router.delete("/{id}")
 @delete_controller(sv)
 async def delete_theory(

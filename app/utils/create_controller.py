@@ -3,6 +3,7 @@ from http import HTTPStatus
 from typing import TypeVar
 
 from fastapi.responses import JSONResponse
+from starlette.responses import Response
 
 from app.user.entities import User
 from loguru import logger
@@ -20,7 +21,7 @@ def create_controller(service):
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
-        ):
+        ) -> Response:
             response = await func(model, message_success, message_error, uow, current_user)
             if response:
                 return response
