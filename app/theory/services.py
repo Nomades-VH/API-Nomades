@@ -6,20 +6,17 @@ from app.theory.models import Theory as ModelTheory
 from ports.uow import AbstractUow
 
 
-# TODO: Review this service
 def get_all_theories(uow: AbstractUow) -> Iterator[Theory]:
     with uow:
         return uow.theory.iter()
 
 
-# TODO: Review this service
 def add_theory(uow: AbstractUow, model: ModelTheory) -> None:
     with uow:
         theory = make_theory(model)
         uow.theory.add(theory)
 
 
-# TODO: Review this service
 def get_by_id(uow: AbstractUow, id: UUID) -> Theory:
     with uow:
         return uow.theory.get(id)
@@ -30,7 +27,6 @@ def put_theory():
     pass
 
 
-# TODO: Create a service to delete theory
 def delete(uow: AbstractUow, id: UUID) -> None:
     with uow:
         uow.theory.remove(id)

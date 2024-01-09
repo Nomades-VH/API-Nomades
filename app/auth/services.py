@@ -1,6 +1,7 @@
 import os
 from dataclasses import asdict
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from typing import Iterator
 from uuid import UUID
 
@@ -8,6 +9,8 @@ from aiocron import crontab
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
+from loguru import logger
+from starlette.responses import JSONResponse
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
 
 from app.auth.exceptions import InvalidCredentials
@@ -25,7 +28,6 @@ _AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
-# TODO: Melhorar o tratamento de exceções no código INTEIRO.
 
 def _create_token(user_id: UUID) -> str:
     expire = datetime.utcnow() + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
@@ -45,26 +47,6 @@ def get_all(uow: AbstractUow) -> Iterator[Auth]:
         yield from uow.auth.iter()
 
 
-def auto_revoke_token(uow: AbstractUow = Depends(SqlAlchemyUow)):
-    with uow:
-        tokens = list(map(asdict, get_all(uow)))
-
-        for token in tokens:
-            token = Auth.from_dict(token)
-            try:
-                if is_revoked_token(uow, token):
-                    revoke_token(uow, token.access_token)
-            except ExpiredSignatureError as e:
-                revoke_token(uow, token.access_token)
-
-
-@crontab("*/20 * * * *")
-async def run_auto_revoke_token():
-    uow: AbstractUow = SqlAlchemyUow()
-    with uow:
-        auto_revoke_token(uow)
-
-
 def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
     user = sv.get_user_by_username(uow, username)
     if not user:
@@ -77,64 +59,6 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
         access_token=_create_token(user.id),
         fk_user=user.id
     )
-
-
-def refresh_token(user: User, uow: AbstractUow) -> Auth:
-    with uow:
-        auth = uow.auth.get_by_user(user.id)
-
-        if not auth:
-            raise InvalidCredentials()
-
-        if not is_revoked_token(uow, auth):
-            auth.access_token = _create_token(user.id)
-
-            uow.auth.update_from_user(auth, user.id)
-
-            return auth
-        else:
-            HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado.")
-
-
-def invalidate_token(uow: AbstractUow, auth: Auth):
-    with uow:
-        auth.is_invalid = True
-        uow.auth.update(auth)
-
-
-# TODO: Verificar se realmente está correto
-def _is_token_expired(token: Auth):
-    try:
-        payload = jwt.decode(token.access_token, algorithms=_ALGORITHM, key=_AUTH_SECRET)
-        expiration = payload.get('exp')
-
-        if expiration is None:
-            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
-
-        return False
-    except ExpiredSignatureError:
-        return True
-    except JWTError:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
-
-
-def is_revoked_token(uow: AbstractUow, token_db: Auth):
-    with uow:
-        try:
-            if not token_db:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token expirado")
-
-            token_db = uow.auth.get_by_token(token_db.access_token)
-            if not token_db:
-                return True
-
-            if _is_token_expired(token_db):
-                return True
-
-            else:
-                return False
-        except ExpiredSignatureError:
-            return True
 
 
 async def add_token(uow: AbstractUow, username: str, password: str) -> Auth | str:
@@ -156,31 +80,16 @@ async def add_token(uow: AbstractUow, username: str, password: str) -> Auth | st
             uow.auth.add(token)
             return token
         else:
-            # TODO: Dessa forma todos os logins terão o mesmo token, se alguem fizer logout, o token será invalidado
-            #  em todos os dispositivos.
             if not is_revoked_token(uow, token):
                 return token
 
             token.access_token = _create_token(user.id)
-
-            if token.is_invalid:
-                token.is_invalid = False
+            token.is_invalid = False
 
             uow.auth.update(token)
             return token
 
 
-def revoke_token(uow: AbstractUow, token: str):
-    with uow:
-        auth = uow.auth.get_by_token(token)
-        if not is_revoked_token(uow, auth):
-            auth.is_invalid = True
-            uow.auth.update(auth)
-        else:
-            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Este token já foi revogado.")
-
-
-# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
 def get_current_user(
         uow: AbstractUow = Depends(SqlAlchemyUow), token: str = Depends(oauth2_scheme)
 ) -> User:
@@ -208,7 +117,6 @@ def get_current_user(
         return user
 
 
-# TODO: Atualizar para o novo modo com o token sendo inserido no banco de dados
 def get_current_user_with_permission(permission: Permissions):
     def _dependency(
             uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)
@@ -224,3 +132,103 @@ def get_current_user_with_permission(permission: Permissions):
         return user
 
     return _dependency
+
+
+@crontab("*/1 * * * *")
+async def run_auto_revoke_token():
+    uow: AbstractUow = SqlAlchemyUow()
+    with uow:
+        auto_revoke_token(uow)
+
+
+def auto_revoke_token(uow: AbstractUow):
+    with uow:
+        tokens = list(map(asdict, get_all(uow)))
+        if not tokens:
+            return
+
+        for token in tokens:
+            token = Auth.from_dict(token)
+            if token.is_invalid:
+                return
+            try:
+                if is_revoked_token(uow, token):
+                    revoke_token(uow, token.access_token)
+                    logger.info('Token revogado', extra={'token': token})
+            except ExpiredSignatureError as e:
+                logger.info('Token revogado', extra={'token': token})
+                revoke_token(uow, token.access_token)
+
+
+def revoke_token(uow: AbstractUow, token: str):
+    with uow:
+        auth = uow.auth.get_by_token(token)
+
+        if not auth:
+            raise HTTPException(
+                status_code=403,
+                detail={"message": "Você não está logado."}
+            )
+
+        if not is_revoked_token(uow, auth):
+            invalidate_token(uow, auth)
+        else:
+            invalidate_token(uow, auth)
+            return JSONResponse(
+                status_code=HTTPStatus.OK,
+                content={'message': 'Este token já foi revogado'}
+            )
+
+
+def is_revoked_token(uow: AbstractUow, token_db: Auth):
+    with uow:
+        try:
+            if _is_token_expired(token_db):
+                return True
+            if token_db.is_invalid:
+                return True
+            else:
+                return False
+        except ExpiredSignatureError:
+            return True
+
+
+def _is_token_expired(token: Auth):
+    try:
+        if not token:
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Você não está logado")
+
+        payload = jwt.decode(token.access_token, algorithms=_ALGORITHM, key=_AUTH_SECRET)
+        expiration = payload.get('exp')
+
+        if expiration is None:
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+
+        return False
+    except ExpiredSignatureError:
+        return True
+    except JWTError:
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+
+
+def invalidate_token(uow: AbstractUow, auth: Auth):
+    with uow:
+        auth.is_invalid = True
+        uow.auth.update(auth)
+
+
+def refresh_token(user: User, uow: AbstractUow) -> Auth:
+    with uow:
+        auth = uow.auth.get_by_user(user.id)
+
+        if not auth:
+            raise InvalidCredentials()
+
+        if not is_revoked_token(uow, auth):
+            auth.access_token = _create_token(user.id)
+
+            uow.auth.update_from_user(auth, user.id)
+
+            return auth
+        else:
+            HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado.")

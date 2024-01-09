@@ -32,7 +32,7 @@ class AuthRepository(AbstractAuthRepository):
         return self.session.query(Auth).filter(Auth.fk_user == uuid).first()
 
     def get_by_token(self, token: str) -> Optional[Auth]:
-        return self.session.query(Auth).filter(and_(Auth.access_token == token, Auth.is_invalid == False)).first()
+        return self.session.query(Auth).filter(Auth.access_token == token).first()
 
     def remove(self, token: str) -> Optional[Auth]:
         ...
@@ -44,4 +44,4 @@ class AuthRepository(AbstractAuthRepository):
         self.session.query(Auth).filter(Auth.fk_user == user_id).update(dataclasses.asdict(entity))
 
     def iter(self) -> Iterator[Auth]:
-        yield from self.session.query(Auth).filter(Auth.is_invalid == False).all()
+        yield from self.session.query(Auth).filter().all()

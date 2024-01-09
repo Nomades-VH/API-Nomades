@@ -9,7 +9,6 @@ from app.breakdown.models import Breakdown as BreakdownModel
 from ports.uow import AbstractUow
 
 
-# TODO: Revisar todos os serviços
 def get_all(uow: AbstractUow) -> Optional[Iterator[Breakdown]]:
     with uow:
         return uow.breakdown.iter()

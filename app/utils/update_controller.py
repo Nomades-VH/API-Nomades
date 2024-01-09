@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 
 from app.user.entities import User
 from ports.uow import AbstractUow
+from starlette.responses import Response
 
 T = TypeVar("T")
 
@@ -23,7 +24,7 @@ def update_controller(service):
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
-        ):
+        ) -> Response:
             response = await func(uuid, model, message_success, message_error, uow, current_user)
             if response:
                 return response
@@ -36,6 +37,7 @@ def update_controller(service):
                 )
 
             try:
+                # TODO: PAdronizar, todos os to_model ficar no entities e todos os to_entity ficar no service.
                 entity = service.to_entity(entity, model)
                 service.update(uow, entity)
                 return JSONResponse(
@@ -43,7 +45,7 @@ def update_controller(service):
                     content={"message": f"{message_success}"}
                 )
             except IntegrityError as e:
-                # TODO: IMPORTANTE
+                # TODO: IMPORTANTE Usar isso no sistema
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={

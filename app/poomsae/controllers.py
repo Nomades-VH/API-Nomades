@@ -10,9 +10,9 @@ from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.utils.create_controller import create_controller
 from app.utils.delete_controller import delete_controller
-from app.utils.get_by_id_controller import get_by_id_controller
-from app.utils.get_controller import get_controller
+from app.utils.get_all_controller import get_all_controller
 from app.utils.update_controller import update_controller
+from app.utils.get_by_controller import get_by_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/poomsae")
 
 # TODO: Create Get Method
 @router.get("/")
-@get_controller(poomsae_sv)
+@get_all_controller(poomsae_sv)
 async def get_all(
         message_error: str = "Não foi possível encontrar os poomsaes.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
@@ -31,10 +31,10 @@ async def get_all(
 
 
 # TODO: Create Get Method
-@router.get("/{uuid}")
-@get_by_id_controller(poomsae_sv)
-async def get_poomsae(
-        uuid: UUID,
+@router.get("/{param}")
+@get_by_controller(poomsae_sv.get_by_id)
+async def get_by_id(
+        param: UUID,
         message_success: str = "Poomsae encontrado com sucesso.",
         message_error: str = "Não foi possível encontrar o Poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
@@ -57,10 +57,10 @@ async def create_poomsae(
 
 
 # TODO: Create Put Method
-@router.put("/{id}")
+@router.put("/{uuid}")
 @update_controller(poomsae_sv)
 async def update_poomsae(
-        id: UUID,
+        uuid: UUID,
         model: Poomsae,
         message_success: str = "Poomsae atualizado com sucesso.",
         message_error: str = "Não foi possível atualizar o Poomsae.",
@@ -71,7 +71,7 @@ async def update_poomsae(
 
 
 # TODO: Create Delete Method
-@router.delete("/{id}")
+@router.delete("/{uuid}")
 @delete_controller(poomsae_sv)
 async def delete_poomsae(
         uuid: UUID,

@@ -13,11 +13,3 @@ class Band(Entity):
     created_for: str
     updated_for: Optional[str]
     fk_theory: Optional[UUID] = None
-
-    def to_dict(self) -> dict:
-        return {
-            "gub": self.gub,
-            "name": self.name,
-            "meaning": self.meaning
-        }
-

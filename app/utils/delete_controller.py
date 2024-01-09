@@ -2,7 +2,7 @@ from functools import wraps
 from http import HTTPStatus
 from uuid import UUID
 
-from fastapi import Response
+from starlette.responses import Response
 from fastapi.responses import JSONResponse
 from app.user.entities import User
 from ports.uow import AbstractUow
@@ -18,6 +18,10 @@ def delete_controller(service):
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
+            response = await func(uuid, message_success, message_error, uow, current_user)
+            if response:
+                return response
+
             model = service.get_by_id(uow, uuid)
             if not model:
                 return JSONResponse(

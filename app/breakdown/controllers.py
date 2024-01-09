@@ -17,8 +17,6 @@ from ports.uow import AbstractUow
 router = APIRouter(prefix="/breakdown")
 
 
-# TODO: Implementar o controle de acesso em todas as rotas
-# TODO: Verificar se tem alguma chance de dar erro
 @router.get("/")
 async def get_breakdowns(
     uow: AbstractUow = Depends(SqlAlchemyUow),
@@ -50,7 +48,6 @@ async def get_breakdown(
     try:
         return asdict(sv.get_by_id(id, uow))
 
-    # TODO: Change to BreakdownNotFoundException but I don't know how to do that
     except Exception:
         raise HTTPException(status_code=404, detail="Breakdown not found")
 

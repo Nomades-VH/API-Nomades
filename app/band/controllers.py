@@ -1,10 +1,9 @@
 from dataclasses import asdict
 from http import HTTPStatus
-from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
-from fastapi import Response
+from starlette.responses import Response
 from loguru import logger
 from starlette.responses import JSONResponse
 
@@ -15,7 +14,8 @@ from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.utils.create_controller import create_controller
 from app.utils.delete_controller import delete_controller
-from app.utils.get_by_id_controller import get_by_id_controller
+from app.utils.get_all_controller import get_all_controller
+from app.utils.get_by_controller import get_by_controller
 from app.utils.update_controller import update_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
@@ -27,11 +27,13 @@ router = APIRouter(prefix="/band")
 
 
 @router.get("/")
+@get_all_controller(sv)
 async def get_all(
+        message_error: str = "Não foi possível encontrar as faixas.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> List[dict]:
-    return list(map(asdict, sv.get_all(uow)))
+) -> Response:
+    ...
 
 
 @router.get("/me/")
@@ -54,21 +56,17 @@ async def get_my_band(
     return band
 
 
-@router.get("/{uuid}")
-@get_by_id_controller(sv)
+@router.get("/{param}")
+@get_by_controller(sv.get_by_id)
 async def get_by_id(
-        uuid: UUID,
+        param: UUID,
         message_error: str = "Não foi possível buscar essa faixa.",
         message_success: str = "Faixa encontrada com sucesso.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
-):
-    if current_user.permission.value < Permissions.table.value:
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={
-                "message": "Você não tem permissão para buscar essa faixa."}
-        )
+) -> Response:
+    # TODO: Bloquear para que o estudante não possa pegar faixas diferentes da dele ou anteriores.
+    ...
 
 
 @router.get("/gub/{gub}")
@@ -103,7 +101,7 @@ async def post(
         current_user: User = Depends(
             get_current_user_with_permission(Permissions.president)
         )
-):
+) -> Response:
     if sv.get_by_gub(uow, model.gub) is not None:
         return JSONResponse(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -111,7 +109,6 @@ async def post(
         )
 
 
-# TODO: Create Put method
 @router.put("/{uuid}")
 @update_controller(sv)
 async def put(
@@ -134,7 +131,6 @@ async def put(
         )
 
 
-# TODO: Create Delete method
 @router.delete("/{uuid}")
 @delete_controller(sv)
 async def delete(
@@ -144,4 +140,8 @@ async def delete(
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.president))
 ) -> Response:
-    ...
+    if not sv.get_by_id(uow, uuid):
+        return JSONResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            content={"message": f"A faixa com esse ID não existe"}
+        )

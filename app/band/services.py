@@ -6,7 +6,7 @@ from app.user.models import User
 from ports.uow import AbstractUow
 
 
-def get_all(uow: AbstractUow) -> Iterator[BandEntity]:
+def get(uow: AbstractUow) -> Iterator[BandEntity]:
     with uow:
         yield from uow.band.iter()
 
@@ -36,39 +36,14 @@ def add(uow: AbstractUow, band: BandEntity) -> None:
         uow.band.add(band)
 
 
-# TODO: Review a service to update
 def update(uow: AbstractUow, band: BandEntity) -> None:
     with uow:
         uow.band.update(band)
 
 
-# TODO: Review a service to delete
 def delete(uow: AbstractUow, uuid: UUID):
     with uow:
         uow.band.remove(uuid)
-
-
-def add_creator(band: BandEntity, user: User) -> BandEntity | BandModel:
-    band_entity = make_band(band, user.username)
-    return band_entity
-
-
-def make_band(band: BandModel | BandEntity, username) -> BandEntity | BandModel:
-    if type(band) == BandModel:
-        return BandEntity(
-            gub=band.gub,
-            name=band.name,
-            meaning=band.meaning,
-            created_for=username,
-            updated_for=username,
-            fk_theory=band.fk_theory,
-        )
-    return BandModel(
-        gub=band.gub,
-        name=band.name,
-        meaning=band.meaning,
-        fk_theory=band.fk_theory,
-    )
 
 
 def to_entity(band_entity: BandEntity, band_model: BandModel) -> BandEntity:
@@ -77,3 +52,21 @@ def to_entity(band_entity: BandEntity, band_model: BandModel) -> BandEntity:
     band_entity.meaning = band_model.meaning
     band_entity.fk_theory = band_model.fk_theory
     return band_entity
+
+
+def to_model(band_entity: BandEntity) -> BandModel:
+    return BandModel(
+        gub=band_entity.gub,
+        name=band_entity.name,
+        meaning=band_entity.meaning,
+        fk_theory=band_entity.fk_theory
+    )
+
+
+def to_model_dict(band_dict: dict) -> BandModel:
+    return BandModel(
+        gub=band_dict['gub'],
+        name=band_dict['name'],
+        meaning=band_dict['meaning'],
+        fk_theory=band_dict['fk_theory']
+    )
