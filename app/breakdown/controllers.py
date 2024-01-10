@@ -18,7 +18,7 @@ router = APIRouter(prefix="/breakdown")
 
 
 @router.get("/")
-async def get_breakdowns(
+async def get(
     uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> List[dict]:
@@ -29,7 +29,7 @@ async def get_breakdowns(
 
 
 @router.post("/{band_id}")
-async def post_breakdown(
+async def post(
     band_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
@@ -41,7 +41,7 @@ async def post_breakdown(
 
 
 @router.get("/{id}")
-async def get_breakdown(
+async def get_by_id(
     id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> Optional[dict]:
@@ -53,7 +53,7 @@ async def get_breakdown(
 
 
 @router.put("/{id}")
-async def put_breakdown(
+async def put(
     breakdown_id: UUID, model: BreakdownModel, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
@@ -64,7 +64,7 @@ async def put_breakdown(
 
 
 @router.delete("/{band_id}/{breakdown_id}")
-async def delete_breakdown(
+async def delete(
     band_id: UUID, breakdown_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
