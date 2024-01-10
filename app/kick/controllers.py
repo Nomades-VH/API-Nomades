@@ -5,29 +5,29 @@ router = APIRouter(prefix="/kick")
 
 # TODO: Create Get Method
 @router.get("/")
-async def get_kicks():
+async def get():
     pass
 
 
 # TODO: Create Get Method
 @router.get("/")
-async def get_kick():
+async def get_by_id():
     pass
 
 
 # TODO: Create Post Method
 @router.post("/")
-async def post_kick():
+async def post():
     pass
 
 
 # TODO: Create Put Method
 @router.put("/")
-async def put_kick():
+async def put():
     pass
 
 
 # TODO: Create Delete Method
 @router.delete("/")
-async def delete_kick():
+async def delete():
     pass
