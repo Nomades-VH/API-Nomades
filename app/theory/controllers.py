@@ -18,7 +18,7 @@ router = APIRouter(prefix="/theory")
 
 # TODO: Review methods get_theories, post and get
 @router.get("/")
-async def get_theories(
+async def get(
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> List[dict]:
@@ -26,7 +26,7 @@ async def get_theories(
 
 
 @router.post("/")
-async def post_theory(
+async def post(
         model: ModelTheory, uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president))
 ) -> None:
@@ -34,7 +34,7 @@ async def post_theory(
 
 
 @router.get("/{theory_id}")
-async def get_theory(
+async def get_by_id(
     theory_id: UUID, uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> Optional[dict]:
@@ -43,13 +43,13 @@ async def get_theory(
 
 # TODO: Create Put Method
 @router.put("/")
-async def put_theory():
+async def put():
     ...
 
 
 @router.delete("/{id}")
 @delete_controller(sv)
-async def delete_theory(
+async def delete(
         uuid: UUID,
         message_success: str = "A teoria foi deletada com sucesso.",
         message_error: str = "A teoria não foi encontrada.",
