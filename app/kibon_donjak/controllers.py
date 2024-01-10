@@ -5,29 +5,29 @@ router = APIRouter(prefix="/kibon_donjak")
 
 # TODO: Create Get method
 @router.get("/")
-async def get_breakdowns():
+async def get():
     pass
 
 
 # TODO: Create Get Method
 @router.get("/")
-async def get_breakdown():
+async def get_by_id():
     pass
 
 
 # TODO: Create Post Method
 @router.post("/")
-async def create_breakdown():
+async def post():
     pass
 
 
 # TODO: Create Put Method
 @router.put("/")
-async def update_breakdown():
+async def put():
     pass
 
 
 # TODO: Create Delete Method
 @router.delete("/")
-async def delete_breakdown():
+async def delete():
     pass
