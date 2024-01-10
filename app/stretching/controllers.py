@@ -5,29 +5,29 @@ router = APIRouter(prefix="/stretching")
 
 # TODO: Create Get Method
 @router.get("/")
-async def get_stretchings():
+async def get():
     pass
 
 
 # TODO: Create Get Method
 @router.get("/")
-async def get_stretching():
+async def get_by_id():
     pass
 
 
 # TODO: Create Post Method
 @router.post("/")
-async def post_stretching():
+async def post():
     pass
 
 
 # TODO: Create Put Method
 @router.put("/")
-async def put_stretching():
+async def put():
     pass
 
 
 # TODO: Create Delete Method
 @router.delete("/")
-async def delete_stretching():
+async def delete():
     pass
