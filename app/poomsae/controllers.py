@@ -22,7 +22,7 @@ router = APIRouter(prefix="/poomsae")
 # TODO: Create Get Method
 @router.get("/")
 @get_all_controller(poomsae_sv)
-async def get_all(
+async def get(
         message_error: str = "Não foi possível encontrar os poomsaes.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
@@ -46,7 +46,7 @@ async def get_by_id(
 # TODO: Create Post Method
 @router.post("/")
 @create_controller(poomsae_sv)
-async def create_poomsae(
+async def post(
         model: Poomsae,
         message_success: str = "Poomsae criado com sucesso.",
         message_error: str = "Não foi possível criar o Poomsae.",
@@ -59,7 +59,7 @@ async def create_poomsae(
 # TODO: Create Put Method
 @router.put("/{uuid}")
 @update_controller(poomsae_sv)
-async def update_poomsae(
+async def put(
         uuid: UUID,
         model: Poomsae,
         message_success: str = "Poomsae atualizado com sucesso.",
@@ -73,7 +73,7 @@ async def update_poomsae(
 # TODO: Create Delete Method
 @router.delete("/{uuid}")
 @delete_controller(poomsae_sv)
-async def delete_poomsae(
+async def delete(
         uuid: UUID,
         message_success: str = "Poomsae deletado com sucesso.",
         message_error: str = "Não foi possível deletar o poomsae.",
