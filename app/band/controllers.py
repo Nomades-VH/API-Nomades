@@ -3,7 +3,6 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import Response
-from loguru import logger
 from starlette.responses import JSONResponse
 
 from app.auth.services import get_current_user_with_permission
@@ -24,7 +23,7 @@ router = APIRouter(prefix="/band")
 
 @router.get("/")
 @get_all_controller(sv)
-async def get_all(
+async def get(
         message_error: str = "Não foi possível encontrar as faixas.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
@@ -73,11 +72,8 @@ async def get_by_gub(
         message_success: str = "Faixa encontrada",
         message_error: str = "Faixa não encontrada",
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-):
+) -> Response:
     # TODO: não estou recebdo o usuário aqui
-    logger.debug(
-        "Aqui temos um usuário", extra={"user": current_user}
-    )
     if current_user.fk_band:
         band = sv.get_by_user(uow, current_user)
 
@@ -121,9 +117,6 @@ async def put(
         )
 ):
     if not sv.get_by_id(uow, uuid):
-        logger.debug(
-            uuid
-        )
         return JSONResponse(
             status_code=HTTPStatus.BAD_REQUEST,
             content={"message": f"A faixa com esse ID não existe."}

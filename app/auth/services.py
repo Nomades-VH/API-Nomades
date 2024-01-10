@@ -29,6 +29,7 @@ _AUTH_SECRET = os.getenv("AUTH_SECRET")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 
+# TODO: Melhorar todos os serviços de login, logout, refresh token e auto revoke token
 def _create_token(user_id: UUID) -> str:
     expire = datetime.utcnow() + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
 

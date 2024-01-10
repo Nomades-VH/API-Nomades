@@ -8,17 +8,19 @@ from fastapi.responses import JSONResponse
 
 from app.user.entities import User
 from ports.uow import AbstractUow
+from app.utils.Logs import Logs as Log
 
 
 def get_all_controller(service):
     def inner(func):
         @wraps(func)
+        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
-            response = await func(message_error, current_user, uow)
+            response: JSONResponse = await func(message_error, current_user, uow)
             if response:
                 return response
 

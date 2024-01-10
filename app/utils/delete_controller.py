@@ -6,11 +6,13 @@ from starlette.responses import Response
 from fastapi.responses import JSONResponse
 from app.user.entities import User
 from ports.uow import AbstractUow
+from app.utils.Logs import Logs as Log
 
 
 def delete_controller(service):
     def inner(func):
         @wraps(func)
+        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 uuid: UUID,
                 message_success: str,
@@ -18,7 +20,7 @@ def delete_controller(service):
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
-            response = await func(uuid, message_success, message_error, uow, current_user)
+            response: JSONResponse = await func(uuid, message_success, message_error, uow, current_user)
             if response:
                 return response
 

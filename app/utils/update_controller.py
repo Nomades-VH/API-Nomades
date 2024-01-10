@@ -3,11 +3,11 @@ from http import HTTPStatus
 from typing import TypeVar
 from uuid import UUID
 
-from loguru import logger
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import JSONResponse
 
 from app.user.entities import User
+from app.utils.Logs import Logs as Log
 from ports.uow import AbstractUow
 from starlette.responses import Response
 
@@ -17,6 +17,7 @@ T = TypeVar("T")
 def update_controller(service):
     def inner(func):
         @wraps(func)
+        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 uuid: UUID,
                 model: T,
@@ -25,7 +26,7 @@ def update_controller(service):
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
-            response = await func(uuid, model, message_success, message_error, uow, current_user)
+            response: JSONResponse = await func(uuid, model, message_success, message_error, uow, current_user)
             if response:
                 return response
 
@@ -53,9 +54,6 @@ def update_controller(service):
                     }
                 )
             except Exception as e:
-                logger.debug(
-                    e
-                )
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={

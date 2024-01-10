@@ -1,3 +1,5 @@
+import sys
+
 from app.auth.hasher import hash_password
 from loguru import logger
 from ports.uow import AbstractUow
@@ -20,7 +22,6 @@ def _create_tables():
 
 
 def _create_root(uow: AbstractUow):
-
     root_user = get_user_by_email(uow, environ.get("ROOT_USER_EMAIL"))
 
     if not root_user:
@@ -35,7 +36,6 @@ def _create_root(uow: AbstractUow):
 
 
 def _create_student(uow: AbstractUow):
-
     student_user = get_user_by_email(uow, environ.get("STUDENT_USER_EMAIL"))
 
     if not student_user:
@@ -53,9 +53,17 @@ if __name__ == "__main__":
     # TODO: Algumas urls ainda permitem acesso sem o token de acesso
 
     logger = logger
+    logger.remove()
+    logger.add(
+        sys.stderr,
+        format="<blue>{time:YYYY-MM-DD HH:mm:ss}</blue> | <b>{level}</b> | <cyan>{message}</cyan> | "
+               "<r>{extra[status_code]}</r> | <b>{extra[user_id]}</b>",
+        level='DEBUG'
+    )
     logger.add(
         'app.log',
-        format="{time} | {level} | {name}:{line} | {extra} | message: {message}",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message} | "
+               "{extra[status_code]} | {extra[user_id]}",
         level='DEBUG'
     )
 
@@ -67,4 +75,5 @@ if __name__ == "__main__":
     _create_student(uow)
 
     import uvicorn
+
     uvicorn.run(app="bootstrap.server:app", host="0.0.0.0", port=8000)

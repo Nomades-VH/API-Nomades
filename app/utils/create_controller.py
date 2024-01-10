@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from starlette.responses import Response
 
 from app.user.entities import User
-from loguru import logger
+from app.utils.Logs import Logs as Log
 from ports.uow import AbstractUow
 
 T = TypeVar("T")
@@ -15,6 +15,7 @@ T = TypeVar("T")
 def create_controller(service):
     def inner(func):
         @wraps(func)
+        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 model: T,
                 message_success: str,
@@ -22,15 +23,12 @@ def create_controller(service):
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
-            response = await func(model, message_success, message_error, uow, current_user)
+            response: JSONResponse = await func(model, message_success, message_error, uow, current_user)
             if response:
                 return response
 
             try:
                 if service.get_by_name(uow, model.name) is not None:
-                    logger.info(message_error, extra={
-                        'user': current_user.id
-                    })
                     return JSONResponse(
                         status_code=HTTPStatus.BAD_REQUEST,
                         content={"message": f"{message_error}: {model.name} já existe."}
@@ -44,11 +42,7 @@ def create_controller(service):
                     content={"message": f"{message_success}"}
                 )
             except Exception as e:
-                logger.warning(message_error, extra={
-                    'user': current_user.id,
-
-                    'error': str(e)
-                })
+                print(e)
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={"message": f"{message_error}"}
