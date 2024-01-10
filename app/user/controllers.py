@@ -1,5 +1,6 @@
 from dataclasses import asdict
 from typing import Optional
+from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
@@ -9,6 +10,8 @@ from app.user.entities import User
 from app.user.exceptions import UserException
 from app.user.models import User as ModelUser
 from app.user import services as sv
+from app.utils.delete_controller import delete_controller
+from app.utils.get_all_controller import get_all_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
@@ -38,11 +41,13 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 # TODO: Update Get Method
 @router.get('/')
-async def get_users(
+@get_all_controller(sv)
+async def get(
+        message_error: str = "Não foi possível pegar os usuários",
         current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
-    return list(map(asdict, sv.get_all_users(uow)))
+    ...
 
 
 # TODO: Create Update Method
@@ -54,5 +59,13 @@ async def update_user(
 
 
 # TODO: Create Delete Method
-async def delete_user():
-    pass
+@router.delete('/{uuid}')
+@delete_controller(sv)
+async def delete_user(
+        uuid: UUID,
+        message_success: str = "Usuário deletado com sucesso.",
+        message_error: str = "Não foi possível deletar o usuário.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
+):
+    ...

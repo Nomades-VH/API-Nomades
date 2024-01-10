@@ -35,7 +35,6 @@ async def get(
 @get_by_controller(poomsae_sv.get_by_id)
 async def get_by_id(
         param: UUID,
-        message_success: str = "Poomsae encontrado com sucesso.",
         message_error: str = "Não foi possível encontrar o Poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
