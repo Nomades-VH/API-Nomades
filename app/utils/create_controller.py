@@ -47,7 +47,5 @@ def create_controller(service):
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={"message": f"{message_error}"}
                 )
-
         return wrapper
-
     return inner

@@ -94,7 +94,7 @@ async def add_token(uow: AbstractUow, username: str, password: str) -> Auth | st
 def get_current_user(
         uow: AbstractUow = Depends(SqlAlchemyUow), token: str = Depends(oauth2_scheme)
 ) -> User:
-    from app.user.services import get_user_by_id
+    from app.user.services import get_by_id
     with uow:
         try:
             auth = uow.auth.get_by_token(token)
@@ -108,7 +108,7 @@ def get_current_user(
             if not user_id:
                 raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
 
-            user = get_user_by_id(uow, user_id)
+            user = get_by_id(uow, user_id)
             if user is None:
                 raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Esse usuário não existe")
 

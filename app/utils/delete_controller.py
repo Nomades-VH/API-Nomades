@@ -27,7 +27,7 @@ def delete_controller(service):
             model = service.get_by_id(uow, uuid)
             if not model:
                 return JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST,
+                    status_code=HTTPStatus.NOT_FOUND,
                     content={"message": f"{message_error}"}
                 )
 

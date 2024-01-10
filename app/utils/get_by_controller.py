@@ -19,12 +19,11 @@ def get_by_controller(get_service):
         @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 param: Any,
-                message_success: str,
                 message_error: str,
                 uow: AbstractUow,
                 current_user: User
         ) -> Response:
-            response: JSONResponse = await func(param, message_success, message_error, uow, current_user)
+            response: JSONResponse = await func(param, message_error, uow, current_user)
             if response:
                 return response
 
@@ -32,8 +31,8 @@ def get_by_controller(get_service):
 
             if not entity:
                 response = JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": message_error + f' Identificador {param} não encontrado.'},
+                    status_code=HTTPStatus.NOT_FOUND,
+                    content={"message": message_error},
                 )
                 return response
 

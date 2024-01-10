@@ -55,8 +55,7 @@ async def get_my_band(
 @get_by_controller(sv.get_by_id)
 async def get_by_id(
         param: UUID,
-        message_error: str = "Não foi possível buscar essa faixa.",
-        message_success: str = "Faixa encontrada com sucesso.",
+        message_error: str = "Faixa não encontrada.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response:
@@ -69,8 +68,7 @@ async def get_by_id(
 async def get_by_gub(
         param: int,
         uow: AbstractUow = Depends(SqlAlchemyUow),
-        message_success: str = "Faixa encontrada",
-        message_error: str = "Faixa não encontrada",
+        message_error: str = "Faixa não encontrada.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ) -> Response:
     # TODO: não estou recebdo o usuário aqui
@@ -109,31 +107,23 @@ async def post(
 async def put(
         uuid: UUID,
         model: Band,
-        message_success: str = "Faixa atualizada com sucesso.",
-        message_error: str = "Erro ao atualizar a faixa.",
+        message_success: str = "Faixa atualizada.",
+        message_error: str = "Faixa não atualizada.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(
             get_current_user_with_permission(Permissions.table)
         )
 ):
-    if not sv.get_by_id(uow, uuid):
-        return JSONResponse(
-            status_code=HTTPStatus.BAD_REQUEST,
-            content={"message": f"A faixa com esse ID não existe."}
-        )
+    ...
 
 
 @router.delete("/{uuid}")
 @delete_controller(sv)
 async def delete(
         uuid: UUID,
-        message_success: str = "A faixa foi deletada com sucesso.",
-        message_error: str = "A faixa não foi encontrada.",
+        message_success: str = "Faixa deletada.",
+        message_error: str = "Faixa não encontrada.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.president))
 ) -> Response:
-    if not sv.get_by_id(uow, uuid):
-        return JSONResponse(
-            status_code=HTTPStatus.BAD_REQUEST,
-            content={"message": f"A faixa com esse ID não existe"}
-        )
+    ...

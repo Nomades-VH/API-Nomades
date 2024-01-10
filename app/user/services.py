@@ -13,7 +13,7 @@ from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
 
-def get_user_by_id(uow: AbstractUow, user_id: UUID) -> Optional[User]:
+def get_by_id(uow: AbstractUow, user_id: UUID) -> Optional[User]:
     with uow:
         return uow.user.get(user_id)
 
@@ -67,11 +67,12 @@ def update_user():
 
 
 # TODO: Create a service to delete user
-def delete_user():
-    pass
+def delete(uow: AbstractUow, user_id: UUID):
+    with uow:
+        uow.user.remove(user_id)
 
 
-def get_all_users(uow: AbstractUow):
+def get(uow: AbstractUow):
     with uow:
         yield from uow.user.iter()
 
