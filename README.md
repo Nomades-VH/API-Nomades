@@ -20,7 +20,18 @@ cp .env.example .env
 ```
 Depois disso, basta alterar as variáveis de ambiente.
 
-### 3. Executar o container
+### 3. Executar o container com postgres e pgbouncer
 ```
-docker compose up
+docker compose up pgbouncer
+```
+
+### 4. Poetry
+ 
+``` 
+poetry shell && poetry install
+```
+
+### 5. Executar projeto
+```
+python main.py
 ```

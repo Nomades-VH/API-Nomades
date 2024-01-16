@@ -7,12 +7,16 @@ from ports.repository import AbstractRepository
 
 
 class AbstractKickRepository(AbstractRepository[Kick], ABC):
-    pass
+    def get_by_name(self, name: str) -> Optional[Kick]:
+        ...
 
 
 class KickRepository(AbstractKickRepository):
     def get(self, uuid: UUID) -> Optional[Kick]:
         return self.session.query(Kick).filter(Kick.id == uuid).first()
+
+    def get_by_name(self, name: str) -> Optional[Kick]:
+        return self.session.query(Kick).filter(Kick.name == name).first()
 
     def add(self, kick: Kick) -> None:
         self.session.add(kick)
