@@ -15,8 +15,8 @@ tokens = Table(
     Column("access_token", String(250), unique=True, nullable=False),
     Column("is_invalid", Boolean, nullable=False, default=False),
     Column("fk_user", UUID(as_uuid=True), ForeignKey("users.id"), default=uuid4),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now()),
+    Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now()),
 )
 
 mapper_registry.map_imperatively(Auth, tokens)

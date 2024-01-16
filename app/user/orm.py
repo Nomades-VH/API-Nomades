@@ -19,8 +19,8 @@ users = Table(
     Column("password", String(100), nullable=False),
     Column("permission", Enum(Permissions), nullable=False),
     Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='SET NULL')),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now()),
+    Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now()),
 )
 
 exame = Table(
@@ -34,8 +34,8 @@ exame = Table(
     Column("note_stretching", Float),
     Column("note_breakdown", Float),
     Column("note_theory", Float),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("exame_date_at", DateTime, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now()),
+    Column("exame_date_at", DateTime, onupdate=datetime.now()),
 )
 
 mapper_registry.map_imperatively(Exame, exame)

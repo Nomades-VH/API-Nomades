@@ -1,7 +1,8 @@
+from http import HTTPStatus
+
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from starlette import status
 from starlette.responses import JSONResponse
 
 from app.band.controllers import router as band_router
@@ -21,15 +22,23 @@ app = FastAPI(
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    loc = exc.errors()[0]['loc'][1]
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=jsonable_encoder({
-            "Dados de entrada": exc.errors()[0]['input'],
-            "Dados que faltam": loc,
-            "message": f"O campo {loc} é necessário"
-        })
-    )
+    try:
+        loc = exc.errors()[0]['loc'][1]
+        return JSONResponse(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "Dados de entrada": exc.errors()[0]['input'],
+                "Dados que faltam": loc,
+                "message": f"O campo {loc} é necessário"
+            })
+        )
+    except IndexError:
+        return JSONResponse(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder({
+                "Message": "Não foi passado nenhum argumento."
+            })
+        )
 
 
 app.include_router(router=band_router)

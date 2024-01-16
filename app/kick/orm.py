@@ -1,11 +1,13 @@
 from datetime import datetime
 from uuid import uuid4
+from sqlalchemy import Enum
 
-from sqlalchemy import Table, Column, String, SmallInteger, DateTime
+from sqlalchemy import Table, Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.kick.entities import Kick
 from bootstrap.database import mapper_registry
+from general_enum.difficulty import Difficulty
 
 kicks = Table(
     "kicks",
@@ -13,9 +15,9 @@ kicks = Table(
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("name", String[50], nullable=False, unique=True),
     Column("description", String[250], nullable=False),
-    Column("difficulty", SmallInteger, nullable=False),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow),
+    Column("difficulty", Enum(Difficulty), nullable=False),
+    Column("created_at", DateTime, default=datetime.now()),
+    Column("updated_at", DateTime, onupdate=datetime.now()),
 )
 
 mapper_registry.map_imperatively(Kick, kicks)

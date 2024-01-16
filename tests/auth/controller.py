@@ -1,19 +1,17 @@
-import json
-from http import HTTPStatus
-from unittest import TestCase, main
+import unittest
+
 import requests
-from app.auth import services as sv
-from app.auth.entities import Auth
+
 from tests.utils import send_request
 
+url = "http://127.0.0.1:8000/auth"
 
-class TestController(TestCase):
-    url: str = "http://127.0.0.1:8000/auth/"
-    headers = {}
-    sv = sv
 
-    def test_0_login(self):
-        r = send_request(self.url, self.headers)
+class TestController(unittest.TestCase):
 
-if __name__ == "__main__":
-    main()
+    def test_post_auth(self):
+        r = send_request(url, requests.post, data={
+            "username": "felipe-root",
+            "password": "FelipePy"
+        })
+        self.assertEqual(r.status_code, 200)
