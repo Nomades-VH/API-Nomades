@@ -20,3 +20,11 @@ class Band(BaseModel):
             created_for=user.username,
             updated_for=user.username
         )
+
+    def dict_to_model(self, user: dict):
+        self.gub = user.get("gub")
+        self.name = user.get("name")
+        self.meaning = user.get("meaning")
+        self.fk_theory = user.get("fk_theory")
+        return self
+

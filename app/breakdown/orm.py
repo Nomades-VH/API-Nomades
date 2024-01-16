@@ -15,8 +15,8 @@ breakdowns = Table(
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("name", String(50), nullable=False, unique=True),
     Column("description", String(150), nullable=False),
-    Column("created_at", DateTime, default=datetime.now()),
-    Column("updated_at", DateTime, onupdate=datetime.now()),
+    Column("created_at", DateTime, default=datetime.utcnow),
+    Column("updated_at", DateTime, onupdate=datetime.utcnow),
 )
 
 band_breakdown = Table(

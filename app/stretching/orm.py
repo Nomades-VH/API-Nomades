@@ -14,8 +14,8 @@ stretchings = Table(
     Column("name", String(50), nullable=False, unique=True),
     Column("description", String(250), nullable=False),
     Column("difficulty", SmallInteger, nullable=False),
-    Column("created_at", DateTime, default=datetime.now()),
-    Column("updated_at", DateTime, onupdate=datetime.now()),
+    Column("created_at", DateTime, default=datetime.utcnow),
+    Column("updated_at", DateTime, onupdate=datetime.utcnow),
 )
 
 mapper_registry.map_imperatively(Stretching, stretchings)

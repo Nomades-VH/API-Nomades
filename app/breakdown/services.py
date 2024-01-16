@@ -61,7 +61,7 @@ def make_breakdown_update(
             name=model_breakdown_new.name,
             description=model_breakdown_new.description,
         )
-    breakdown_new.updated_at=datetime.now()
+    breakdown_new.updated_at=datetime.utcnow
     breakdown_new.created_at=created_at
     return breakdown_new
 
