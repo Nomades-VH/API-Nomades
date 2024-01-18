@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from sqlalchemy import Table, Column, String, DateTime
@@ -12,8 +12,8 @@ theory = Table(
     mapper_registry.metadata,
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("description", String(200), nullable=False),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
 )
 
 mapper_registry.map_imperatively(Theory, theory)

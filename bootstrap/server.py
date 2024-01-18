@@ -23,18 +23,15 @@ app = FastAPI(
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
-        loc = exc.errors()[0]['loc'][1]
         return JSONResponse(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=HTTPStatus.BAD_REQUEST,
             content=jsonable_encoder({
-                "Dados de entrada": exc.errors()[0]['input'],
-                "Dados que faltam": loc,
-                "message": f"O campo {loc} é necessário"
+                "message": "Argumento inválido ou ausência de argumentos."
             })
         )
     except IndexError:
         return JSONResponse(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            status_code=HTTPStatus.BAD_REQUEST,
             content=jsonable_encoder({
                 "Message": "Não foi passado nenhum argumento."
             })

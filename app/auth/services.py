@@ -1,6 +1,6 @@
 import os
 from dataclasses import asdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 from typing import Iterator
 from uuid import UUID
@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
 from loguru import logger
 from starlette.responses import JSONResponse
-from starlette.status import HTTP_403_FORBIDDEN, HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_403_FORBIDDEN
 
 from app.auth.exceptions import InvalidCredentials
 from app.auth.hasher import verify_password
@@ -31,7 +31,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 # TODO: Melhorar todos os serviços de login, logout, refresh token e auto revoke token
 def _create_token(user_id: UUID) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
 
     return jwt.encode(
         {
@@ -62,7 +62,7 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
     )
 
 
-async def add_token(uow: AbstractUow, username: str, password: str) -> Auth | str:
+async def add(uow: AbstractUow, username: str, password: str) -> Auth:
     with uow:
         # TODO: Tratamento de erros e exceção
         user = sv.get_user_by_username(uow, username)

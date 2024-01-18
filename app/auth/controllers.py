@@ -1,6 +1,9 @@
 from dataclasses import asdict
+from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import JSONResponse
 
 from app.auth.exceptions import InvalidCredentials
 from app.uow import SqlAlchemyUow
@@ -21,16 +24,25 @@ async def login(
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
-        token = await sv.add_token(uow, username, password)
+        token = await sv.add(uow, username, password)
 
-        return {"access_token": token.access_token or token, "token_type": "bearer"}
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={
+                "access_token": token.access_token,
+                "token_type": "bearer"
+            }
+        )
     except InvalidCredentials:
-        return {"status_code": 401, "message": "Credenciais inválidas."}
+        return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={"message": "Credenciais inválidas."})
 
 
 @router.get("/")
 async def get_all(uow: AbstractUow = Depends(SqlAlchemyUow)):
-    return list(map(asdict, sv.get_all(uow)))
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content=jsonable_encoder(list(map(asdict, sv.get_all(uow))))
+    )
 
 
 @router.post("/logout")
@@ -39,7 +51,7 @@ async def logout(token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depe
     if response:
         return response
 
-    return {"status": 200, "detail": "Logout realizado com sucesso"}
+    return JSONResponse(status_code=HTTPStatus.OK, content={"message": "Logout realizado com sucesso."})
 
 
 @router.put("/refresh-token")
@@ -49,6 +61,13 @@ async def refresh_token(
 ):
     try:
         token = sv.refresh_token(uow=uow, user=current_user)
-        return {"access_token": token.access_token, "token_type": "bearer"}
+
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={
+                "access_token": token.access_token,
+                "token_type": "bearer"
+            }
+        )
     except HTTPException as e:
         return e

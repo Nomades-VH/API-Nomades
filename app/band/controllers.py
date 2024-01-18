@@ -98,7 +98,7 @@ async def post(
     if sv.get_by_gub(uow, model.gub) is not None:
         return JSONResponse(
             status_code=HTTPStatus.BAD_REQUEST,
-            content={"message": f"A faixa com o gub {model.gub} já existe."}
+            content={"message": f"Gub {model.gub} já existe."}
         )
 
 
