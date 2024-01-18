@@ -12,7 +12,6 @@ class Kick(BaseModel):
     difficulty: Difficulty
 
     def to_entity(self, user: User):
-        print(user)
         return KickEntity(
             name=self.name,
             description=self.description,

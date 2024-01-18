@@ -9,6 +9,15 @@ services:
     networks:
       - nm-network
 
+  psql_test:
+    container_name: "postgres_test"
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "6432:5432"
+    restart: always
+
   pgbouncer:
     container_name: "pgbouncer"
     image: edoburu/pgbouncer

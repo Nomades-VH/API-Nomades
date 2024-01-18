@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Enum
 from uuid import uuid4
 
@@ -17,8 +17,8 @@ poomsaes = Table(
     Column("description", String[250], nullable=False),
     Column("difficulty", Enum(Difficulty), nullable=False),
     Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='SET NULL'), nullable=True),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
 )
 
 mapper_registry.map_imperatively(Poomsae, poomsaes)

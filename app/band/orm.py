@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -18,8 +18,8 @@ bands = Table(
     Column("created_for", String(50), nullable=False),
     Column("updated_for", String(50), nullable=False),
     Column("fk_theory", UUID(as_uuid=True), ForeignKey("theory.id"), nullable=True),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
 )
 
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from sqlalchemy import Table, Column, DateTime, String, ForeignKey
@@ -15,8 +15,8 @@ breakdowns = Table(
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("name", String(50), nullable=False, unique=True),
     Column("description", String(150), nullable=False),
-    Column("created_at", DateTime, default=datetime.utcnow),
-    Column("updated_at", DateTime, onupdate=datetime.utcnow),
+    Column("created_at", DateTime, default=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
 )
 
 band_breakdown = Table(

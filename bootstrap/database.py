@@ -1,18 +1,17 @@
-from os import environ
-from sqlalchemy import create_engine, pool
+import os
+import sys
+
+from sqlalchemy import create_engine
 from sqlalchemy.orm import registry, sessionmaker
 
 mapper_registry = registry()
 
-_POSTGRES_USER = environ.get("POSTGRES_USER")
-_POSTGRES_PASSWORD = environ.get("POSTGRES_PASSWORD")
-_POSTGRES_HOST = environ.get("POSTGRES_HOST")
-_POSTGRES_PORT = environ.get("POSTGRES_PORT")
-_POSTGRES_DATABASE = environ.get("POSTGRES_DB")
-_URI = environ.get('PGBOUNCER_URI')
 
-_POSTGRES_URI = (f"postgresql+psycopg2://"
-                 f"{_POSTGRES_USER}:{_POSTGRES_PASSWORD}@{_POSTGRES_HOST}:{_POSTGRES_PORT}/{_POSTGRES_DATABASE}")
+if "pytest" in sys.modules:
+    _URI = os.environ['DATABASE_URI_TEST']
+else:
+    _URI = os.environ.get('DATABASE_URI')
+
 
 _engine = create_engine(_URI)
 _Session = sessionmaker(bind=_engine)

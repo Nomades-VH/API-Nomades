@@ -31,7 +31,7 @@ def create_controller(service):
                 if service.get_by_name(uow, model.name) is not None:
                     return JSONResponse(
                         status_code=HTTPStatus.BAD_REQUEST,
-                        content={"message": f"{message_error}: {model.name} já existe."}
+                        content={"message": f"{model.name} já existe."}
                     )
 
                 entity = model.to_entity(current_user)
@@ -42,7 +42,6 @@ def create_controller(service):
                     content={"message": f"{message_success}"}
                 )
             except Exception as e:
-                print(e)
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={"message": f"{message_error}"}

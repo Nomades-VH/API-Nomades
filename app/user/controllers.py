@@ -27,6 +27,7 @@ async def create_user(
 ) -> Optional[dict]:
     try:
         user = sv.change_user(user)
+        print(user)
         sv.verify_if_user_exists(uow, user)
         sv.create_new_user(uow, user, current_user)
         return {'user': user.id}

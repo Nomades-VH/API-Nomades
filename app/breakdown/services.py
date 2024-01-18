@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Iterator, Optional
 from uuid import UUID
 
@@ -28,7 +28,7 @@ def add(model: BreakdownModel, uow: AbstractUow) -> UUID:
 
 
 def update(
-    breakdown_id: UUID, model_new: BreakdownModel, uow: AbstractUow
+        breakdown_id: UUID, model_new: BreakdownModel, uow: AbstractUow
 ) -> None:
     with uow:
         breakdown = get_by_id(breakdown_id, uow)
@@ -54,15 +54,15 @@ def make_breakdown(model: BreakdownModel) -> Breakdown:
 
 
 def make_breakdown_update(
-    id: UUID, model_breakdown_new: BreakdownModel, created_at: datetime
+        id: UUID, model_breakdown_new: BreakdownModel, created_at: datetime
 ) -> Breakdown:
     breakdown_new = Breakdown(
-            id=id,
-            name=model_breakdown_new.name,
-            description=model_breakdown_new.description,
-        )
-    breakdown_new.updated_at=datetime.utcnow
-    breakdown_new.created_at=created_at
+        id=id,
+        name=model_breakdown_new.name,
+        description=model_breakdown_new.description,
+    )
+    breakdown_new.updated_at = datetime.now(timezone.utc)
+    breakdown_new.created_at = created_at
     return breakdown_new
 
 

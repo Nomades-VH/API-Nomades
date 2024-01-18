@@ -1,10 +1,44 @@
-import json
+import os
 
-import requests
+from fastapi.testclient import TestClient
+
+username = os.environ.get("ROOT_USER")
+password = os.environ.get("ROOT_USER_PASSWORD")
 
 
-def send_request(url: str, func: requests, *, headers=None, url_increment='', data=None):
-    if data:
-        return func(url=url + url_increment, data=json.dumps(data), headers=headers)
+def get_authorization_headers(client: TestClient):
+    data = {
+        "username": username,
+        "password": password
+    }
+    token = client.post('/auth', json=data)
+    return {'Authorization': 'Bearer ' + token.json()['access_token']}
 
-    return func(url=url + url_increment, headers=headers)
+
+def user_valid() -> dict:
+    username = os.environ.get("ROOT_USER")
+    password = os.environ.get("ROOT_USER_PASSWORD")
+    return {
+        "username": username,
+        "password": password
+    }
+
+
+def band_valid() -> dict:
+    return {
+        "gub": 1,
+        "name": "string",
+        "meaning": "string"
+    }
+
+
+def band_invalid() -> dict:
+    return {
+        "gub": "string",
+        "name": "string",
+        "meaning": "string"
+    }
+
+
+def get_band_by_gub(gub: int, auth, client: TestClient) -> dict:
+    return client.get(url=f"/band/gub/{gub}", headers=auth).json()
