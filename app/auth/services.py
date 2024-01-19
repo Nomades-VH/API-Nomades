@@ -15,6 +15,7 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 from app.auth.exceptions import InvalidCredentials
 from app.auth.hasher import verify_password
+from app.auth.schemas import Credentials
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.user import services as sv
@@ -43,7 +44,7 @@ def _create_token(user_id: UUID) -> str:
     )
 
 
-def get_all(uow: AbstractUow) -> Iterator[Auth]:
+def get(uow: AbstractUow) -> Iterator[Auth]:
     with uow:
         yield from uow.auth.iter()
 
@@ -62,21 +63,25 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
     )
 
 
-async def add(uow: AbstractUow, username: str, password: str) -> Auth:
+async def add(uow: AbstractUow, credentials: Credentials) -> Auth:
     with uow:
         # TODO: Tratamento de erros e exceção
-        user = sv.get_user_by_username(uow, username)
+
+        if credentials.email:
+            user = sv.get_user_by_email(uow, credentials.email)
+        else:
+            user = sv.get_user_by_username(uow, credentials.username)
 
         if not user:
             raise InvalidCredentials()
 
-        if not verify_password(password, user.password):
+        if not verify_password(credentials.password, user.password):
             raise InvalidCredentials()
 
         token = uow.auth.get_by_user(user.id)
 
         if not token:
-            token = generate_token(username, password, uow)
+            token = generate_token(credentials.username, credentials.password, uow)
 
             uow.auth.add(token)
             return token
@@ -144,7 +149,7 @@ async def run_auto_revoke_token():
 
 def auto_revoke_token(uow: AbstractUow):
     with uow:
-        tokens = list(map(asdict, get_all(uow)))
+        tokens = list(map(asdict, get(uow)))
         if not tokens:
             return
 

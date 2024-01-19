@@ -7,13 +7,17 @@ from ports.repository import AbstractRepository
 
 
 class AbstractKibonDonjakRepository(AbstractRepository[KibonDonjak], ABC):
-    pass
+    def get_by_name(self, name: str) -> Optional[KibonDonjak]:
+        ...
 
 
 # TODO: Verificar todos os métodos
 class KibonDonjakRepository(AbstractKibonDonjakRepository):
     def get(self, uuid: UUID) -> Optional[KibonDonjak]:
         return self.session.query(KibonDonjak).filter(KibonDonjak.id == uuid).first()
+
+    def get_by_name(self, name: str) -> Optional[KibonDonjak]:
+        return self.session.query(KibonDonjak).filter(KibonDonjak.name == name).first()
 
     def add(self, kibon_donjak: KibonDonjak) -> None:
         self.session.add(kibon_donjak)

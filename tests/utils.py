@@ -15,6 +15,10 @@ def get_authorization_headers(client: TestClient):
     return {'Authorization': 'Bearer ' + token.json()['access_token']}
 
 
+def get_user_info(client: TestClient):
+    return client.get('/user/', headers=get_authorization_headers(client)).json()[0]
+
+
 def user_valid() -> dict:
     username = os.environ.get("ROOT_USER")
     password = os.environ.get("ROOT_USER_PASSWORD")

@@ -9,7 +9,7 @@ from app.theory.models import Theory as ModelTheory
 from app.theory import services as sv
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
-from app.utils.delete_controller import delete_controller
+from app.utils.controllers.delete_controller import delete_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 

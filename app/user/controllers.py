@@ -10,8 +10,8 @@ from app.user.entities import User
 from app.user.exceptions import UserException
 from app.user.models import User as ModelUser
 from app.user import services as sv
-from app.utils.delete_controller import delete_controller
-from app.utils.get_all_controller import get_all_controller
+from app.utils.controllers.delete_controller import delete_controller
+from app.utils.controllers.get_controller import get_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
@@ -27,7 +27,6 @@ async def create_user(
 ) -> Optional[dict]:
     try:
         user = sv.change_user(user)
-        print(user)
         sv.verify_if_user_exists(uow, user)
         sv.create_new_user(uow, user, current_user)
         return {'user': user.id}
@@ -42,7 +41,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 # TODO: Update Get Method
 @router.get('/')
-@get_all_controller(sv)
+@get_controller(sv)
 async def get(
         message_error: str = "Não foi possível pegar os usuários",
         current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president)),

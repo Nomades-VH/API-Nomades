@@ -9,11 +9,12 @@ message_update_error = "Faixa não atualizada."
 invalid_uuid = "f7f00446-6d6a-417c-82e5-33a0698af17b"
 url = "/band/"
 
+
 def test_get_bands(client: TestClient):
     authorization = get_authorization_headers(client)
     response = client.get(url, headers=authorization)
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == []
+    assert response.json() == "Não foram encontradas faixas."
 
 
 def test_post_band(client: TestClient):
@@ -50,7 +51,7 @@ def test_post_with_wrong_gub(client: TestClient):
     band['gub'] = 'wrong'
     response = client.post(url, json=band, headers=authorization)
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos."
+    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos.: gub"
 
 
 def test_post_with_wrong_name(client: TestClient):
@@ -59,7 +60,7 @@ def test_post_with_wrong_name(client: TestClient):
     band['name'] = 2
     response = client.post(url, json=band, headers=authorization)
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos."
+    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos.: name"
 
 
 def test_post_band_with_wrong_meaning(client: TestClient):
@@ -68,14 +69,14 @@ def test_post_band_with_wrong_meaning(client: TestClient):
     band['meaning'] = 1
     response = client.post(url, json=band, headers=authorization)
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos."
+    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos.: meaning"
 
 
 def test_post_band_without_arguments(client: TestClient):
     authorization = get_authorization_headers(client)
     response = client.post(url, json={}, headers=authorization)
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos."
+    assert response.json()['message'] == "Argumento inválido ou ausência de argumentos.: gub"
 
 
 def test_get_by_id(client: TestClient):
@@ -150,5 +151,5 @@ def test_delete_band(client: TestClient):
     uuid = client.get(url, headers=autorization).json()[0]['id']
     response = client.delete(f"{url}{uuid}", headers=autorization)
     assert response.status_code == HTTPStatus.OK
-    bands = client.get(url, headers=autorization).json()
-    assert len(bands) == 0
+    response = client.get(url, headers=autorization).json()
+    assert response == "Não foram encontradas faixas."

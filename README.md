@@ -1,6 +1,12 @@
 # Nomades-VH
 Esse é um projeto para a equipe de Taekwondo "Nômades do Vale Histórico".
 
+## Requisitos
+ - PYTHON >= 3.12
+ - DOCKER, DOCKER-COMPOSE
+ - POETRY
+
+
 ## Executar projeto
 
 ### 1. Baixar do repositório
@@ -14,24 +20,32 @@ git clone git@github.com:Nomades-VH/API-Nomades.git
 git clone https://github.com/Nomades-VH/API-Nomades.git
 ```
 
-### 2. Criar um arquivo .env seguindo o exemplo do arquivo .env.example
+### 2. .ENV
+### Criar um arquivo .env
 ```
 cp .env.example .env
 ```
-Depois disso, basta alterar as variáveis de ambiente.
-
-### 3. Executar o container com postgres e pgbouncer
+### Exportar as váriaveis do arquivo .env
 ```
-docker compose up pgbouncer
+export $(cat .env | xargs)
 ```
 
-### 4. Poetry
- 
+### 3. Poetry
+
 ``` 
 poetry shell && poetry install
 ```
 
-### 5. Executar projeto
+### 4. Executar o container com postgres e pgbouncer
+#### PRODUÇÃO
 ```
-python main.py
+make run-server
 ```
+
+#### DESENVOLVIMENTO
+```
+make run-dev-server
+```
+
+
+

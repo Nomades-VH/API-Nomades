@@ -1,6 +1,13 @@
 # TODO: Create a service for get_all KibonDonjaks
-def get_all_kibon_donjaks():
-    pass
+from dataclasses import asdict
+
+from app.kibon_donjak.entities import KibonDonjak
+from ports.uow import AbstractUow
+
+
+def get(uow: AbstractUow):
+    with uow:
+        return list(map(asdict, uow.kibondonjak.iter()))
 
 
 # TODO: Create a service for the get KiBonDonjak
@@ -8,9 +15,15 @@ def get_kibon_donjak():
     pass
 
 
+def get_by_name(uow: AbstractUow, name):
+    with uow:
+        return uow.kibondonjak.get_by_name(name)
+
+
 # TODO: Create a service for the post KiBonDonjak
-def post_kibon_donjak():
-    pass
+def add(uow: AbstractUow, kibondonjak: KibonDonjak):
+    with uow:
+        uow.kibondonjak.add(kibondonjak)
 
 
 # TODO: Create a service for the put KiBonDonjak

@@ -27,6 +27,15 @@ class User(Entity):
             "updated_at": user.updated_at
         }
 
+    @classmethod
+    def from_dict(cls, user_dict: dict) -> "User":
+        return cls(
+            username=user_dict["username"],
+            email=user_dict["email"],
+            password=user_dict["password"],
+            permission=user_dict["permission"]
+        )
+
 
 @dataclass
 class Exame(Entity):

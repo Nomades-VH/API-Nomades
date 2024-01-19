@@ -11,7 +11,7 @@ from ports.uow import AbstractUow
 from app.utils.Logs import Logs as Log
 
 
-def get_all_controller(service):
+def get_controller(service):
     def inner(func):
         @wraps(func)
         @Log.decorators_log(func.__module__, func.__name__)
@@ -24,11 +24,17 @@ def get_all_controller(service):
             if response:
                 return response
 
-            entity = jsonable_encoder(list(map(asdict, service.get(uow))))
+            entity = jsonable_encoder(service.get(uow))
+
+            if entity:
+                return JSONResponse(
+                    status_code=HTTPStatus.OK,
+                    content=entity
+                )
 
             return JSONResponse(
                 status_code=HTTPStatus.OK,
-                content=entity
+                content=message_error
             )
 
         return wrapper
