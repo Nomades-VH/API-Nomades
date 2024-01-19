@@ -1,13 +1,15 @@
-from dataclasses import asdict
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Body
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import JSONResponse
 
 from app.auth.exceptions import InvalidCredentials
+from app.auth.schemas import Credentials
+from app.auth.services import get_current_user_with_permission
 from app.uow import SqlAlchemyUow
 from app.user.models import User
+from app.utils.controllers.get_controller import get_controller
+from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth import services as sv
 
@@ -19,12 +21,11 @@ router = APIRouter(prefix="/auth")
 # use: password: str = Body(...) para sistemas fora do fastapi
 @router.post("")
 async def login(
-        username: str = Body(...),
-        password: str = Body(...),
+        credentials: Credentials,
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
-        token = await sv.add(uow, username, password)
+        token = await sv.add(uow, credentials)
 
         return JSONResponse(
             status_code=HTTPStatus.OK,
@@ -38,11 +39,13 @@ async def login(
 
 
 @router.get("/")
-async def get_all(uow: AbstractUow = Depends(SqlAlchemyUow)):
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content=jsonable_encoder(list(map(asdict, sv.get_all(uow))))
-    )
+@get_controller(sv)
+async def get(
+        message_error: str = "Tokens não encontrados.",
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.root))
+):
+    ...
 
 
 @router.post("/logout")

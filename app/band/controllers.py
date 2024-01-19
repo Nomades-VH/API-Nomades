@@ -9,11 +9,11 @@ from app.auth.services import get_current_user_with_permission
 from app.band.models import Band
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
-from app.utils.create_controller import create_controller
-from app.utils.delete_controller import delete_controller
-from app.utils.get_all_controller import get_all_controller
-from app.utils.get_by_controller import get_by_controller
-from app.utils.update_controller import update_controller
+from app.utils.controllers.create_controller import create_controller
+from app.utils.controllers.delete_controller import delete_controller
+from app.utils.controllers.get_by_controller import get_by_controller
+from app.utils.controllers.get_controller import get_controller
+from app.utils.controllers.update_controller import update_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.band import services as sv
@@ -22,9 +22,9 @@ router = APIRouter(prefix="/band")
 
 
 @router.get("/")
-@get_all_controller(sv)
+@get_controller(sv)
 async def get(
-        message_error: str = "Não foi possível encontrar as faixas.",
+        message_error: str = "Não foram encontradas faixas.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response:

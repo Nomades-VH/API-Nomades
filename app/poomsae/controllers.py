@@ -8,11 +8,11 @@ from app.poomsae import services as poomsae_sv
 from app.poomsae.models import Poomsae
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
-from app.utils.create_controller import create_controller
-from app.utils.delete_controller import delete_controller
-from app.utils.get_all_controller import get_all_controller
-from app.utils.update_controller import update_controller
-from app.utils.get_by_controller import get_by_controller
+from app.utils.controllers.create_controller import create_controller
+from app.utils.controllers.delete_controller import delete_controller
+from app.utils.controllers.get_controller import get_controller
+from app.utils.controllers.update_controller import update_controller
+from app.utils.controllers.get_by_controller import get_by_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/poomsae")
 
 # TODO: Create Get Method
 @router.get("/")
-@get_all_controller(poomsae_sv)
+@get_controller(poomsae_sv)
 async def get(
         message_error: str = "Não foi possível encontrar os poomsaes.",
         uow: AbstractUow = Depends(SqlAlchemyUow),

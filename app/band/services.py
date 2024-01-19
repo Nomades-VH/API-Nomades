@@ -1,4 +1,5 @@
-from typing import Iterator, Optional
+from dataclasses import asdict
+from typing import Optional, Any
 from uuid import UUID
 from app.band.entities import Band as BandEntity
 from app.band.models import Band as BandModel
@@ -6,9 +7,9 @@ from app.user.models import User
 from ports.uow import AbstractUow
 
 
-def get(uow: AbstractUow) -> Iterator[BandEntity]:
+def get(uow: AbstractUow) -> list[Optional[Any]]:
     with uow:
-        yield from uow.band.iter()
+        return list(map(asdict, uow.band.iter()))
 
 
 def get_by_user(uow: AbstractUow, user: User) -> BandEntity:
@@ -16,9 +17,9 @@ def get_by_user(uow: AbstractUow, user: User) -> BandEntity:
         return uow.band.get(user.fk_band)
 
 
-def get_by_id(uow: AbstractUow, id: UUID) -> Optional[BandEntity]:
+def get_by_id(uow: AbstractUow, uuid: UUID) -> Optional[BandEntity]:
     with uow:
-        return uow.band.get(id)
+        return uow.band.get(uuid)
 
 
 def get_by_gub(uow: AbstractUow, gub: int) -> Optional[BandEntity]:

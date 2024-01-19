@@ -4,7 +4,7 @@ services:
     container_name: "postgres"
     image: postgres:latest
     env_file:
-      - .env
+      - ../.env
     restart: always
     networks:
       - nm-network
@@ -13,7 +13,7 @@ services:
     container_name: "postgres_test"
     image: postgres:latest
     env_file:
-      - .env
+      - ../.env
     ports:
       - "6432:5432"
     restart: always
@@ -43,13 +43,15 @@ services:
     container_name: "nomades"
     # Alterar esta linha para devsampaiodocker/nomades:main quando for subir para o servidor
     image: nomades:latest
-    build: .
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ../.env
     depends_on:
-      - psql
+      - pgbouncer
     healthcheck:
       test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
       interval: 1m

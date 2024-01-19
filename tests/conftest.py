@@ -20,6 +20,11 @@ def client() -> Generator:
         yield c
 
 
+@pytest.fixture(scope="function")
+def uow() -> SqlAlchemyUow:
+    return SqlAlchemyUow()
+
+
 @pytest.fixture(scope="session", autouse=True)
 def create_root():
     uow = SqlAlchemyUow()

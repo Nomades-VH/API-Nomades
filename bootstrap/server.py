@@ -26,7 +26,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         return JSONResponse(
             status_code=HTTPStatus.BAD_REQUEST,
             content=jsonable_encoder({
-                "message": "Argumento inválido ou ausência de argumentos."
+                "message": f"Argumento inválido ou ausência de argumentos.: {exc.args[0][0]['loc'][1]}"
             })
         )
     except IndexError:
