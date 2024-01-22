@@ -1,7 +1,9 @@
+import uuid
 from functools import wraps
 from http import HTTPStatus
 from typing import TypeVar
 
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
 
@@ -35,16 +37,22 @@ def create_controller(service):
                     )
 
                 entity = model.to_entity(current_user)
+                entity.id = uuid.uuid4()
 
                 service.add(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,
-                    content={"message": f"{message_success}"}
+                    content={
+                        "message": f"{message_success}",
+                        "id": str(entity.id)
+                    }
                 )
             except Exception as e:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": f"{message_error}"}
+                    content={
+                        "message": f"{message_error}"
+                    }
                 )
         return wrapper
     return inner
