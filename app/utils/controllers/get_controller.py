@@ -34,7 +34,9 @@ def get_controller(service):
 
             return JSONResponse(
                 status_code=HTTPStatus.OK,
-                content=message_error
+                content={
+                    "message": message_error
+                }
             )
 
         return wrapper
