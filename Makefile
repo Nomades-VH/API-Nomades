@@ -9,6 +9,9 @@ run-build:
 run-database:
 	docker-compose -f infra/docker-compose.yml up -d pgbouncer
 
+run-database-test:
+	docker-compose -f infra/docker-compose.yml up -d psql_test
+
 run-server:
 	docker-compose -f infra/docker-compose.yml up nomades
 

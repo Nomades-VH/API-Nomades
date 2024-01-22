@@ -3,7 +3,6 @@ from functools import wraps
 from http import HTTPStatus
 from typing import TypeVar
 
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
 

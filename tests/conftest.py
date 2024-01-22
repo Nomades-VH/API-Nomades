@@ -22,7 +22,9 @@ def client() -> Generator:
 
 @pytest.fixture(scope="function")
 def uow() -> SqlAlchemyUow:
-    return SqlAlchemyUow()
+    uow = SqlAlchemyUow()
+    with uow:
+        yield uow
 
 
 @pytest.fixture(scope="session", autouse=True)
