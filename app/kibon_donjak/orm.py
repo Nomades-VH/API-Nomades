@@ -15,6 +15,8 @@ kibon_donjak = Table(
     Column("name", String(50), nullable=False, unique=True),
     Column("description", String(255), nullable=False),
     Column("difficulty", Enum(Difficulty), nullable=False),
+    Column("created_for", UUID(as_uuid=True), nullable=False),
+    Column("updated_for", UUID(as_uuid=True), nullable=False),
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
     Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
 )

@@ -15,10 +15,12 @@ class Poomsae(BaseModel):
 
     # TODO: Isso deve ser padrão para o projeto inteiro
     #  Invés de criar um serviço para realizar isso, fazer direto no model ou entity
-    def to_entity(self, user: User) -> PoomsaeEntity:
+    def to_create(self, user: User) -> PoomsaeEntity:
         return PoomsaeEntity(
             name=self.name,
             description=self.description,
             difficulty=self.difficulty,
-            fk_band=self.fk_band
+            fk_band=self.fk_band,
+            created_for=user.id,
+            updated_for=user.id
         )

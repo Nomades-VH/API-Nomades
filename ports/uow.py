@@ -4,27 +4,18 @@ from typing import Any
 
 from app.auth.repositories import AbstractAuthRepository
 from app.band.repositories import AbstractBandRepository
-from app.breakdown.repositories import (
-    AbstractBreakdownRepository,
-    AbstractBandBreakdownRepository,
-)
+
 from app.kibon_donjak.repositories import AbstractKibonDonjakRepository
 from app.kick.repositories import AbstractKickRepository
 from app.poomsae.repositories import AbstractPoomsaeRepository
-from app.stretching.repositories import AbstractStretchingRepository
-from app.theory.repositories import AbstractTheoryRepository
 from app.user.repositories import AbstractUserRepository
 
 
 class AbstractUow(ABC):
     band: AbstractBandRepository
-    band_breakdown: AbstractBandBreakdownRepository
-    breakdown: AbstractBreakdownRepository
     kibondonjak: AbstractKibonDonjakRepository
     kick: AbstractKickRepository
     poomsae: AbstractPoomsaeRepository
-    stretching: AbstractStretchingRepository
-    theory: AbstractTheoryRepository
     user: AbstractUserRepository
     auth: AbstractAuthRepository
 

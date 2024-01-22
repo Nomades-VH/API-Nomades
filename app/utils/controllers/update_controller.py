@@ -39,7 +39,7 @@ def update_controller(service):
 
             try:
                 # TODO: PAdronizar, todos os to_model ficar no entities e todos os to_entity ficar no service.
-                entity = service.to_entity(entity, model)
+                entity = service.to_update(entity, model, current_user.id)
                 service.update(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,

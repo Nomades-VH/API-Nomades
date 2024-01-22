@@ -47,11 +47,14 @@ def delete(uow: AbstractUow, uuid: UUID):
         uow.band.remove(uuid)
 
 
-def to_entity(band_entity: BandEntity, band_model: BandModel) -> BandEntity:
+def to_update(band_entity: BandEntity, band_model: BandModel, updated_for) -> BandEntity:
     band_entity.gub = band_model.gub
     band_entity.name = band_model.name
     band_entity.meaning = band_model.meaning
-    band_entity.fk_theory = band_model.fk_theory
+    band_entity.theory = band_model.theory
+    band_entity.breakdown = band_model.breakdown
+    band_entity.stretching = band_model.stretching
+    band_entity.updated_for = updated_for
     return band_entity
 
 
@@ -60,7 +63,9 @@ def to_model(band_entity: BandEntity) -> BandModel:
         gub=band_entity.gub,
         name=band_entity.name,
         meaning=band_entity.meaning,
-        fk_theory=band_entity.fk_theory
+        theory=band_entity.theory,
+        breakdown=band_entity.breakdown,
+        stretching=band_entity.stretching
     )
 
 
