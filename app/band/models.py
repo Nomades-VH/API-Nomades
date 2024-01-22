@@ -1,5 +1,3 @@
-from typing import Optional
-from uuid import UUID
 from pydantic import BaseModel
 from app.band.entities import Band as BandEntity
 from app.user.entities import User
@@ -9,22 +7,28 @@ class Band(BaseModel):
     gub: int
     name: str
     meaning: str
-    fk_theory: Optional[UUID] = None
+    theory: str
+    breakdown: str
+    stretching: str
 
     def to_entity(self, user: User) -> BandEntity:
         return BandEntity(
             gub=self.gub,
             name=self.name,
             meaning=self.meaning,
-            fk_theory=self.fk_theory,
-            created_for=user.username,
-            updated_for=user.username
+            theory=self.theory,
+            breakdown=self.breakdown,
+            stretching=self.stretching,
+            created_for=user.id,
+            updated_for=user.id
         )
 
-    def dict_to_model(self, user: dict):
-        self.gub = user.get("gub")
-        self.name = user.get("name")
-        self.meaning = user.get("meaning")
-        self.fk_theory = user.get("fk_theory")
+    def dict_to_model(self, data: dict):
+        self.gub = data.get("gub")
+        self.name = data.get("name")
+        self.meaning = data.get("meaning")
+        self.theory = data.get("theory")
+        self.breakdown = data.get("breakdown")
+        self.stretching = data.get("stretching")
         return self
 
