@@ -12,7 +12,7 @@ class AbstractRepository(Generic[_T], ABC):
         self.session = session
 
     @abstractmethod
-    def add(self, entity: _T) -> None:
+    def add(self, entity: _T):
         pass
 
     @abstractmethod

@@ -7,7 +7,7 @@ from app.user.models import User
 from ports.uow import AbstractUow
 
 
-def get(uow: AbstractUow) -> list[Optional[Any]]:
+def get(uow: AbstractUow) -> list[Optional[Any]]:z
     with uow:
         return list(map(asdict, uow.band.iter()))
 
