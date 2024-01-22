@@ -15,18 +15,17 @@ bands = Table(
     Column("gub", Integer, nullable=False, unique=True),
     Column("name", String(50), nullable=False, unique=True),
     Column("meaning", String(150), nullable=False),
-    Column("created_for", String(50), nullable=False),
-    Column("updated_for", String(50), nullable=False),
-    Column("fk_theory", UUID(as_uuid=True), ForeignKey("theory.id"), nullable=True),
+    Column("theory", String(150), nullable=False),
+    Column("breakdown", String(150), nullable=False),
+    Column("stretching", String(150), nullable=False),
+    Column("created_for", UUID(as_uuid=True), nullable=False),
+    Column("updated_for", UUID(as_uuid=True), nullable=False),
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
     Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
 )
 
-
 created_updated_for_index = Index('idx_created_updated_for', bands.c.created_for, bands.c.updated_for)
 gub_index = Index('idx_gub', bands.c.gub)
-fk_theory_index = Index('idx_fk_theory', bands.c.fk_theory)
 created_updated_at_index = Index('idx_created_updated_at', bands.c.created_at, bands.c.updated_at)
-
 
 mapper_registry.map_imperatively(Band, bands)
