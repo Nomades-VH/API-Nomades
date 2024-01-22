@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Float, Integer, Enum
+from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Float, Integer, Enum, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -22,6 +22,9 @@ users = Table(
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
     Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
 )
+
+username_index = Index("username_index", users.c.username)
+email_index = Index("email_index", users.c.email)
 
 exame = Table(
     "exame",

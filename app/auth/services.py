@@ -63,37 +63,30 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
     )
 
 
+# É aceitavel que o login demore alguns ms a mais, por conta da segurança
+# Esses ms a mais servem para que um ataque de força bruta não funciona corretamente.
 async def add(uow: AbstractUow, credentials: Credentials) -> Auth:
     with uow:
-        # TODO: Tratamento de erros e exceção
-
-        if credentials.email:
-            user = sv.get_user_by_email(uow, credentials.email)
-        else:
-            user = sv.get_user_by_username(uow, credentials.username)
-
-        if not user:
-            raise InvalidCredentials()
-
-        if not verify_password(credentials.password, user.password):
+        user = sv.get_user_by_email(uow, credentials.email) if credentials.email else sv.get_user_by_username(uow,
+                                                                                                              credentials.username)
+        # O ms a mais, vem da verificação de senha
+        if not user or not verify_password(credentials.password, user.password):
             raise InvalidCredentials()
 
         token = uow.auth.get_by_user(user.id)
 
+        if token and not is_revoked_token(uow, token):
+            return token
+
         if not token:
             token = generate_token(credentials.username, credentials.password, uow)
-
             uow.auth.add(token)
-            return token
         else:
-            if not is_revoked_token(uow, token):
-                return token
-
             token.access_token = _create_token(user.id)
             token.is_invalid = False
-
             uow.auth.update(token)
-            return token
+
+        return token
 
 
 def get_current_user(

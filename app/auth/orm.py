@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 
-from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Boolean, Index
 
 from app.auth.entities import Auth
 from bootstrap.database import mapper_registry
@@ -18,5 +18,9 @@ tokens = Table(
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
     Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
 )
+
+fk_user_index = Index('idx_fk_user', tokens.c.fk_user)
+token_index = Index('idx_fk_token', tokens.c.access_token)
+is_invalid_index = Index('idx_fk_is_invalid', tokens.c.is_invalid)
 
 mapper_registry.map_imperatively(Auth, tokens)
