@@ -32,7 +32,10 @@ def band_valid() -> dict:
     return {
         "gub": 1,
         "name": "string",
-        "meaning": "string"
+        "meaning": "string",
+        "theory": "string",
+        "breakdown": "string",
+        "stretching": "string"
     }
 
 
@@ -40,7 +43,10 @@ def band_invalid() -> dict:
     return {
         "gub": "string",
         "name": "string",
-        "meaning": "string"
+        "meaning": "string",
+        "theory": "string",
+        "breakdown": "string",
+        "stretching": "string"
     }
 
 
