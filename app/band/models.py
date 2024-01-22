@@ -11,7 +11,7 @@ class Band(BaseModel):
     breakdown: str
     stretching: str
 
-    def to_entity(self, user: User) -> BandEntity:
+    def to_create(self, user: User) -> BandEntity:
         return BandEntity(
             gub=self.gub,
             name=self.name,
@@ -23,7 +23,7 @@ class Band(BaseModel):
             updated_for=user.id
         )
 
-    def dict_to_model(self, data: dict):
+    def dict_to_model(self, data: dict) -> "Band":
         self.gub = data.get("gub")
         self.name = data.get("name")
         self.meaning = data.get("meaning")

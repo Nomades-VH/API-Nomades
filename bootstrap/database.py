@@ -26,12 +26,6 @@ def ensure_all_entities():
     import app.band.orm
 
     # noinspection PyUnresolvedReferences
-    import app.theory.orm
-
-    # noinspection PyUnresolvedReferences
-    import app.breakdown.orm
-
-    # noinspection PyUnresolvedReferences
     import app.kibon_donjak.orm
 
     # noinspection PyUnresolvedReferences
@@ -39,9 +33,6 @@ def ensure_all_entities():
 
     # noinspection PyUnresolvedReferences
     import app.poomsae.orm
-
-    # noinspection PyUnresolvedReferences
-    import app.stretching.orm
 
     # noinspection PyUnresolvedReferences
     import app.user.orm

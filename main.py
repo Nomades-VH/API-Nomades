@@ -49,6 +49,20 @@ def _create_student(uow: AbstractUow):
             ))
 
 
+def _create_table_user(uow: AbstractUow):
+    table_user = get_user_by_email(uow, environ.get("TABLE_USER_EMAIL"))
+
+    if not table_user:
+        with uow:
+            uow.user.add(User(
+                username=environ.get("TABLE_USER"),
+                email=environ.get("TABLE_USER_EMAIL"),
+                password=hash_password(environ.get("TABLE_USER_PASSWORD")),
+                permission=Permissions.table,
+                fk_band=None
+            ))
+
+
 if __name__ == "__main__":
     # TODO: Algumas urls ainda permitem acesso sem o token de acesso
 
@@ -73,6 +87,7 @@ if __name__ == "__main__":
     uow = SqlAlchemyUow()
     _create_root(uow)
     _create_student(uow)
+    _create_table_user(uow)
 
     import uvicorn
 

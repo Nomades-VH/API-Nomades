@@ -10,9 +10,11 @@ class KibonDonjak(BaseModel):
     description: str
     difficulty: Difficulty
 
-    def to_entity(self, user: User) -> KibonDonjakEntity:
+    def to_create(self, user: User) -> KibonDonjakEntity:
         return KibonDonjakEntity(
             name=self.name,
             description=self.description,
-            difficulty=self.difficulty
+            difficulty=self.difficulty,
+            created_for=user.id,
+            updated_for=user.id
         )

@@ -34,6 +34,7 @@ async def create_user(
         return {'status': e.status_code, 'message': e.message}
 
 
+# TODO: Deve retornar também o token de acesso do usuário
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
     return asdict(current_user)

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from uuid import UUID
 
 from app.user.entities import User
@@ -13,8 +14,8 @@ class Band(Entity):
     theory: str
     breakdown: str
     stretching: str
-    created_for: UUID
     updated_for: UUID
+    created_for: Optional[UUID] = None
 
     @classmethod
     def from_dict(cls, data: dict, user: User) -> "Band":

@@ -35,7 +35,7 @@ def create_controller(service):
                         content={"message": f"{model.name} já existe."}
                     )
 
-                entity = model.to_entity(current_user)
+                entity = model.to_create(current_user)
                 entity.id = uuid.uuid4()
 
                 service.add(uow, entity)

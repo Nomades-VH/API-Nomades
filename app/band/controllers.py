@@ -92,7 +92,7 @@ async def post(
         message_error: str = "Erro ao criar a faixa.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(
-            get_current_user_with_permission(Permissions.president)
+            get_current_user_with_permission(Permissions.table)
         )
 ) -> Response:
     if sv.get_by_gub(uow, model.gub) is not None:
@@ -124,6 +124,6 @@ async def delete(
         message_success: str = "Faixa deletada.",
         message_error: str = "Faixa não encontrada.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.president))
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
 ) -> Response:
     ...

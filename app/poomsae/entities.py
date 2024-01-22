@@ -11,4 +11,7 @@ class Poomsae(Entity):
     name: str
     description: str
     difficulty: Difficulty
+    updated_for: UUID
     fk_band: Optional[UUID] = None
+    created_for: Optional[UUID] = None
+
