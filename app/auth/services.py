@@ -9,7 +9,6 @@ from aiocron import crontab
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
-from loguru import logger
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_403_FORBIDDEN
 
@@ -153,9 +152,7 @@ def auto_revoke_token(uow: AbstractUow):
             try:
                 if is_revoked_token(uow, token):
                     revoke_token(uow, token.access_token)
-                    logger.info('Token revogado', extra={'token': token})
             except ExpiredSignatureError as e:
-                logger.info('Token revogado', extra={'token': token})
                 revoke_token(uow, token.access_token)
 
 
