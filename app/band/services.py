@@ -1,15 +1,16 @@
-from dataclasses import asdict
-from typing import Optional, Any
+import dataclasses
+from typing import Optional, List
 from uuid import UUID
-from app.band.entities import Band as BandEntity
+
+from app.band.entities import Band as BandEntity, Band
 from app.band.models import Band as BandModel
 from app.user.models import User
 from ports.uow import AbstractUow
 
 
-def get(uow: AbstractUow) -> list[Optional[Any]]:
+def get(uow: AbstractUow) -> List[Optional[Band]]:
     with uow:
-        return list(map(asdict, uow.band.iter()))
+        return uow.band.iter()
 
 
 def get_by_user(uow: AbstractUow, user: User) -> BandEntity:
@@ -17,7 +18,7 @@ def get_by_user(uow: AbstractUow, user: User) -> BandEntity:
         return uow.band.get(user.fk_band)
 
 
-def get_by_id(uow: AbstractUow, uuid: UUID) -> Optional[BandEntity]:
+def get_by_id(uow: AbstractUow, uuid: UUID):
     with uow:
         return uow.band.get(uuid)
 
@@ -37,7 +38,7 @@ def add(uow: AbstractUow, band: BandEntity) -> None:
         uow.band.add(band)
 
 
-def update(uow: AbstractUow, band: BandEntity) -> None:
+def update(uow: AbstractUow, band: dict) -> None:
     with uow:
         uow.band.update(band)
 
@@ -47,7 +48,7 @@ def delete(uow: AbstractUow, uuid: UUID):
         uow.band.remove(uuid)
 
 
-def to_update(band_entity: BandEntity, band_model: BandModel, updated_for) -> BandEntity:
+def to_update(band_entity: BandEntity, band_model: BandModel, updated_for) -> dict:
     band_entity.gub = band_model.gub
     band_entity.name = band_model.name
     band_entity.meaning = band_model.meaning
@@ -55,7 +56,7 @@ def to_update(band_entity: BandEntity, band_model: BandModel, updated_for) -> Ba
     band_entity.breakdown = band_model.breakdown
     band_entity.stretching = band_model.stretching
     band_entity.updated_for = updated_for
-    return band_entity
+    return exclude_classes(band_entity)
 
 
 def to_model(band_entity: BandEntity) -> BandModel:
@@ -76,3 +77,8 @@ def to_model_dict(band_dict: dict) -> BandModel:
         meaning=band_dict['meaning'],
         fk_theory=band_dict['fk_theory']
     )
+
+
+def exclude_classes(band: BandEntity) -> dict:
+    return {k: v for k, v in dataclasses.asdict(band).items() if k not in ['kicks'] if k not in ['poomsaes'] if
+                     k not in ['kibon_donjaks']}

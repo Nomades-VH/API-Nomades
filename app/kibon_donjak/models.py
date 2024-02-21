@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 
 from app.user.entities import User
@@ -9,12 +11,14 @@ class KibonDonjak(BaseModel):
     name: str
     description: str
     difficulty: Difficulty
+    fk_band: UUID
 
     def to_create(self, user: User) -> KibonDonjakEntity:
         return KibonDonjakEntity(
             name=self.name,
             description=self.description,
             difficulty=self.difficulty,
+            fk_band=self.fk_band,
             created_for=user.id,
             updated_for=user.id
         )

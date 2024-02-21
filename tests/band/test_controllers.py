@@ -122,7 +122,7 @@ def test_update_band_not_found(client: TestClient):
     band = band_valid()
     response = client.put(f"{url}{invalid_uuid}", json=band, headers=authorization)
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json()['message'] == message_update_error
+    assert response.json()['message'] == message_update_error + ' ID não encontrado.'
 
 
 def test_update_band(client: TestClient):

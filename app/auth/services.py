@@ -97,20 +97,20 @@ def get_current_user(
             auth = uow.auth.get_by_token(token)
 
             if is_revoked_token(uow, auth):
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado")
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token revogado.")
 
             payload = jwt.decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
             user_id = payload.get("sub")
 
             if not user_id:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
 
             user = get_by_id(uow, user_id)
             if user is None:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Esse usuário não existe")
+                raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Esse usuário não existe.")
 
         except JWTError:
-            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
 
         return user
 
@@ -123,7 +123,7 @@ def get_current_user_with_permission(permission: Permissions):
 
         if user.permission.value < permission.value:
             raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN,
+                status_code=HTTPStatus.UNAUTHORIZED,
                 detail=f"Você não tem autorização para acessar essa página."
             )
 
@@ -161,9 +161,11 @@ def revoke_token(uow: AbstractUow, token: str):
         auth = uow.auth.get_by_token(token)
 
         if not auth:
-            raise HTTPException(
-                status_code=403,
-                detail={"message": "Você não está logado."}
+            return JSONResponse(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                content={
+                    "message": "Você não está autenticado."
+                }
             )
 
         if not is_revoked_token(uow, auth):
@@ -172,7 +174,9 @@ def revoke_token(uow: AbstractUow, token: str):
             invalidate_token(uow, auth)
             return JSONResponse(
                 status_code=HTTPStatus.OK,
-                content={'message': 'Este token já foi revogado'}
+                content={
+                    'message': 'Token anulado.'
+                }
             )
 
 
@@ -218,7 +222,10 @@ def refresh_token(user: User, uow: AbstractUow) -> Auth:
         auth = uow.auth.get_by_user(user.id)
 
         if not auth:
-            raise InvalidCredentials()
+            JSONResponse(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                content={"message": "Não autenticado."}
+            )
 
         if not is_revoked_token(uow, auth):
             auth.access_token = _create_token(user.id)

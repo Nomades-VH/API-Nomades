@@ -4,8 +4,12 @@ from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime, Index
+from sqlalchemy.orm import relationship
 
 from app.band.entities import Band
+from app.kibon_donjak.entities import KibonDonjak
+from app.kick.entities import Kick
+from app.poomsae.entities import Poomsae
 from bootstrap.database import mapper_registry
 
 bands = Table(
@@ -21,11 +25,16 @@ bands = Table(
     Column("created_for", UUID(as_uuid=True), nullable=False),
     Column("updated_for", UUID(as_uuid=True), nullable=False),
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
-    Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
 )
 
 created_updated_for_index = Index('idx_created_updated_for', bands.c.created_for, bands.c.updated_for)
 gub_index = Index('idx_gub', bands.c.gub)
 created_updated_at_index = Index('idx_created_updated_at', bands.c.created_at, bands.c.updated_at)
 
-mapper_registry.map_imperatively(Band, bands)
+mapper_registry.map_imperatively(Band, bands, properties={
+    # Preciso criar uma relação com as tabelas kicks, poomsaes e kibon_donjaks
+    "kicks": relationship(Kick, lazy='joined'),
+    "poomsaes": relationship(Poomsae, lazy='joined'),
+    "kibon_donjaks": relationship(KibonDonjak, lazy='joined')
+})

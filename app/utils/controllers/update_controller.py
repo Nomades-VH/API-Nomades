@@ -34,7 +34,7 @@ def update_controller(service):
             if not entity:
                 return JSONResponse(
                     status_code=HTTPStatus.NOT_FOUND,
-                    content={"message": f"{message_error}"}
+                    content={"message": f"{message_error} ID não encontrado."}
                 )
 
             try:

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Table, Column, String, DateTime, Enum
+from sqlalchemy import Table, Column, String, DateTime, Enum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.kibon_donjak.entities import KibonDonjak
@@ -17,8 +17,9 @@ kibon_donjak = Table(
     Column("difficulty", Enum(Difficulty), nullable=False),
     Column("created_for", UUID(as_uuid=True), nullable=False),
     Column("updated_for", UUID(as_uuid=True), nullable=False),
+    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='CASCADE'), nullable=False),
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
-    Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
 )
 
 mapper_registry.map_imperatively(KibonDonjak, kibon_donjak)

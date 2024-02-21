@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from uuid import uuid4
-from sqlalchemy import Enum
+from sqlalchemy import Enum, ForeignKey
 
 from sqlalchemy import Table, Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
@@ -16,8 +16,9 @@ kicks = Table(
     Column("name", String[50], nullable=False, unique=True),
     Column("description", String[250], nullable=False),
     Column("difficulty", Enum(Difficulty), nullable=False),
+    Column('fk_band', UUID(as_uuid=True), ForeignKey("bands.id", ondelete='CASCADE'), nullable=False),
     Column("created_at", DateTime, default=datetime.now(timezone.utc)),
-    Column("updated_at", DateTime, onupdate=datetime.now(timezone.utc)),
+    Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
 )
 
 mapper_registry.map_imperatively(Kick, kicks)
