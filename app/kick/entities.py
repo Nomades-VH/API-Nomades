@@ -14,3 +14,4 @@ class Kick(Entity):
     description: str
     difficulty: Difficulty
     fk_band: UUID
+    # TODO: Adicionar "created_for" e "updated_for"

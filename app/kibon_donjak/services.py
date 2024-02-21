@@ -1,7 +1,8 @@
 # TODO: Create a service for get_all KibonDonjaks
 from dataclasses import asdict
 
-from app.kibon_donjak.entities import KibonDonjak
+from app.kibon_donjak.entities import KibonDonjak as KibonDonjakEntity
+from app.kibon_donjak.models import KibonDonjak as KibonDonjakModel
 from ports.uow import AbstractUow
 
 
@@ -21,7 +22,7 @@ def get_by_name(uow: AbstractUow, name):
 
 
 # TODO: Create a service for the post KiBonDonjak
-def add(uow: AbstractUow, kibondonjak: KibonDonjak):
+def add(uow: AbstractUow, kibondonjak: KibonDonjakEntity):
     with uow:
         uow.kibondonjak.add(kibondonjak)
 

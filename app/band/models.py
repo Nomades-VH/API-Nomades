@@ -1,5 +1,10 @@
+from typing import Optional, List
+
 from pydantic import BaseModel
 from app.band.entities import Band as BandEntity
+from app.kibon_donjak.models import KibonDonjak
+from app.kick.entities import Kick
+from app.poomsae.entities import Poomsae
 from app.user.entities import User
 
 
@@ -10,6 +15,9 @@ class Band(BaseModel):
     theory: str
     breakdown: str
     stretching: str
+    kicks: Optional[List[Kick]] = None
+    poomsaes: Optional[List[Poomsae]] = None
+    kibon_donjaks: Optional[List[KibonDonjak]] = None
 
     def to_create(self, user: User) -> BandEntity:
         return BandEntity(
@@ -22,13 +30,3 @@ class Band(BaseModel):
             created_for=user.id,
             updated_for=user.id
         )
-
-    def dict_to_model(self, data: dict) -> "Band":
-        self.gub = data.get("gub")
-        self.name = data.get("name")
-        self.meaning = data.get("meaning")
-        self.theory = data.get("theory")
-        self.breakdown = data.get("breakdown")
-        self.stretching = data.get("stretching")
-        return self
-
