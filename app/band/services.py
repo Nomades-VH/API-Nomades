@@ -2,13 +2,13 @@ import dataclasses
 from typing import Optional, List
 from uuid import UUID
 
-from app.band.entities import Band as BandEntity, Band
+from app.band.entities import Band as BandEntity
 from app.band.models import Band as BandModel
 from app.user.models import User
 from ports.uow import AbstractUow
 
 
-def get(uow: AbstractUow) -> List[Optional[Band]]:
+def get(uow: AbstractUow) -> List[Optional[BandModel]]:
     with uow:
         return uow.band.iter()
 
@@ -31,6 +31,16 @@ def get_by_gub(uow: AbstractUow, gub: int) -> Optional[BandEntity]:
 def get_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
     with uow:
         return uow.band.get_by_name(name)
+
+
+def get_minors_band(uow: AbstractUow, gub: int) -> Optional[List[BandModel]]:
+    bands = uow.band.iter()
+    minors: List[BandModel] = []
+    for band in bands:
+        if band.gub >= gub:
+            minors.append(band)
+
+    return minors
 
 
 def add(uow: AbstractUow, band: BandEntity) -> None:
@@ -57,26 +67,6 @@ def to_update(band_entity: BandEntity, band_model: BandModel, updated_for) -> di
     band_entity.stretching = band_model.stretching
     band_entity.updated_for = updated_for
     return exclude_classes(band_entity)
-
-
-def to_model(band_entity: BandEntity) -> BandModel:
-    return BandModel(
-        gub=band_entity.gub,
-        name=band_entity.name,
-        meaning=band_entity.meaning,
-        theory=band_entity.theory,
-        breakdown=band_entity.breakdown,
-        stretching=band_entity.stretching
-    )
-
-
-def to_model_dict(band_dict: dict) -> BandModel:
-    return BandModel(
-        gub=band_dict['gub'],
-        name=band_dict['name'],
-        meaning=band_dict['meaning'],
-        fk_theory=band_dict['fk_theory']
-    )
 
 
 def exclude_classes(band: BandEntity) -> dict:

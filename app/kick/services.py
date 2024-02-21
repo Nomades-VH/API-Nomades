@@ -1,5 +1,5 @@
 # TODO: Create a service for get_all kicks
-from app.kick.entities import Kick
+from app.kick.entities import Kick as KickEntity
 from ports.uow import AbstractUow
 
 
@@ -13,7 +13,7 @@ def get_kick():
 
 
 # TODO: Create a service for post kick
-def add(uow: AbstractUow, kick: Kick):
+def add(uow: AbstractUow, kick: KickEntity):
     with uow:
         uow.kick.add(kick)
 

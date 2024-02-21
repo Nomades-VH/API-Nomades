@@ -24,12 +24,12 @@ def get_controller(service):
             if response:
                 return response
 
-            entity = jsonable_encoder(service.get(uow))
+            entities = jsonable_encoder(service.get(uow))
 
-            if entity:
+            if entities:
                 return JSONResponse(
                     status_code=HTTPStatus.OK,
-                    content=entity
+                    content=entities
                 )
 
             return JSONResponse(

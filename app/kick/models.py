@@ -14,7 +14,7 @@ class Kick(BaseModel):
     difficulty: Difficulty
     fk_band: UUID
 
-    def to_create(self, user: User):
+    def to_create(self, user: User) -> KickEntity:
         return KickEntity(
             name=self.name,
             description=self.description,
