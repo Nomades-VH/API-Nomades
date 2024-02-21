@@ -15,6 +15,13 @@ def get_authorization_headers(client: TestClient):
     return {'Authorization': 'Bearer ' + token.json()['access_token']}
 
 
+def get_authorization_headers_invalid(client: TestClient):
+    data = get_authorization_headers(client)
+    data['Authorization'] = data['Authorization'][7:]
+    print(data)
+    return data
+
+
 def get_user_info(client: TestClient):
     return client.get('/user/', headers=get_authorization_headers(client)).json()[0]
 

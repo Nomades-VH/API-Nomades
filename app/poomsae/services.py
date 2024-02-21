@@ -40,6 +40,5 @@ def to_update(entity: PoomsaeEntity, model: PoomsaeModel, updated_for: UUID):
     entity.name = model.name
     entity.description = model.description
     entity.difficulty = model.difficulty
-    entity.fk_band = model.fk_band
     entity.updated_for = updated_for
     return entity

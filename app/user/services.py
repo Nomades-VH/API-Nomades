@@ -31,7 +31,7 @@ def get_user_by_username(uow: AbstractUow, username: str) -> Optional[User]:
 def create_new_user(uow: AbstractUow, user: User, current_user: User):
     if user.permission >= Permissions.table.value and current_user.permission < Permissions.vice_president.value:
         raise HTTPException(
-            status_code=401, detail="Você não possui permissão para cadastrar um usuário com permissão acima da mesa."
+            status_code=401, detail="Você não possui permissão para cadastrar um usuário da mesa."
         )
 
     if user.permission == Permissions.president.value and current_user.permission < Permissions.root.value:

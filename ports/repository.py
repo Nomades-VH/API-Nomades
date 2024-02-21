@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Iterator, Optional
+from typing import TypeVar, Generic, Iterator, Optional, List
 from uuid import UUID
 
 from ports.entity import Entity
@@ -28,5 +28,5 @@ class AbstractRepository(Generic[_T], ABC):
         pass
 
     @abstractmethod
-    def iter(self) -> Iterator[_T]:
+    def iter(self) -> List[_T]:
         pass
