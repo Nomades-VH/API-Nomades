@@ -19,14 +19,16 @@ class Band(Entity):
     stretching: str
     updated_for: UUID
     created_for: Optional[UUID] = None
-    kicks: List[Kick] = field(default_factory=list)
-    poomsaes: List[Poomsae] = field(default_factory=list)
-    kibon_donjaks: List[KibonDonjak] = field(default_factory=list)
+    kicks: Optional[List[Kick]] = field(default_factory=list)
+    poomsaes: Optional[List[Poomsae]] = field(default_factory=list)
+    kibon_donjaks: Optional[List[KibonDonjak]] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, data: dict, user: User) -> "Band":
+    def from_dict(cls, data: dict) -> "Band":
         return cls(
-            **data,
-            created_for=user.id,
-            updated_for=user.id
+            *data
         )
+
+    def __eq__(self, other):
+        return self.gub == other.gub and self.name == other.name and self.meaning == other.meaning and self.theory == other.theory \
+            and self.breakdown == other.breakdown and self.stretching == other.stretching

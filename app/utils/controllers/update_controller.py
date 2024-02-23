@@ -1,8 +1,10 @@
+from datetime import datetime
 from functools import wraps
 from http import HTTPStatus
 from typing import TypeVar
 from uuid import UUID
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.exc import IntegrityError
 from starlette.responses import JSONResponse
 
@@ -30,15 +32,22 @@ def update_controller(service):
             if response:
                 return response
 
-            entity = service.get_by_id(uow, uuid)
-            if not entity:
-                return JSONResponse(
-                    status_code=HTTPStatus.NOT_FOUND,
-                    content={"message": f"{message_error} ID não encontrado."}
-                )
-
             try:
-                entity = service.to_update(entity, model, current_user.id)
+                entity = service.get_by_id(uow, uuid)
+                if not entity:
+                    return JSONResponse(
+                        status_code=HTTPStatus.NOT_FOUND,
+                        content={"message": f"{message_error} ID não encontrado."}
+                    )
+
+                if entity == model:
+                    return JSONResponse(
+                        status_code=HTTPStatus.OK,
+                        content={"message": message_success}
+                    )
+                entity = service.to_update(entity, model)
+                entity.updated_for = current_user.id
+                entity.updated_at = datetime.now()
                 service.update(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,

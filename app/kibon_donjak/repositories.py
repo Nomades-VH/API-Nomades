@@ -1,6 +1,9 @@
+import dataclasses
 from abc import ABC
 from typing import Iterator, Optional
 from uuid import UUID
+
+from sqlalchemy import desc
 
 from app.kibon_donjak.entities import KibonDonjak
 from ports.repository import AbstractRepository
@@ -13,6 +16,7 @@ class AbstractKibonDonjakRepository(AbstractRepository[KibonDonjak], ABC):
 
 # TODO: Verificar todos os métodos
 class KibonDonjakRepository(AbstractKibonDonjakRepository):
+
     def get(self, uuid: UUID) -> Optional[KibonDonjak]:
         return self.session.query(KibonDonjak).filter(KibonDonjak.id == uuid).first()
 
@@ -28,7 +32,7 @@ class KibonDonjakRepository(AbstractKibonDonjakRepository):
     def update(self, kibon_donjak: KibonDonjak) -> None:
         self.session.query(KibonDonjak).filter(
             KibonDonjak.id == kibon_donjak.id
-        ).update(kibon_donjak)
+        ).update(dataclasses.asdict(kibon_donjak))
 
     def iter(self) -> Iterator[KibonDonjak]:
-        return self.session.query(KibonDonjak).all()
+        return self.session.query(KibonDonjak).order_by(KibonDonjak.created_at).all()

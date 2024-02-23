@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -11,7 +12,7 @@ class KibonDonjak(BaseModel):
     name: str
     description: str
     difficulty: Difficulty
-    fk_band: UUID
+    fk_band: Optional[UUID] = None
 
     def to_create(self, user: User) -> KibonDonjakEntity:
         return KibonDonjakEntity(

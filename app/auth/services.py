@@ -1,6 +1,5 @@
 import os
-from dataclasses import asdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Iterator
 from uuid import UUID
@@ -23,7 +22,7 @@ from ports.uow import AbstractUow
 from app.auth.entities import Auth
 
 _ALGORITHM = "HS256"
-_TOKEN_EXPIRE_MINUTES = 120
+_TOKEN_EXPIRE_MINUTES = 240
 _AUTH_SECRET = os.getenv("AUTH_SECRET")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
@@ -31,7 +30,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 # TODO: Melhorar todos os serviços de login, logout, refresh token e auto revoke token
 def _create_token(user_id: UUID) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now() + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
 
     return jwt.encode(
         {
@@ -94,16 +93,16 @@ def get_current_user(
     from app.user.services import get_by_id
     with uow:
         try:
-            auth = uow.auth.get_by_token(token)
-
-            if is_revoked_token(uow, auth):
-                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token revogado.")
-
-            payload = jwt.decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
+            payload = jwt.decode(token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
             user_id = payload.get("sub")
 
             if not user_id:
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
+
+            auth = uow.auth.get_by_user(user_id)
+
+            if is_revoked_token(uow, auth):
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token revogado.")
 
             user = get_by_id(uow, user_id)
             if user is None:
@@ -141,18 +140,16 @@ async def run_auto_revoke_token():
 
 def auto_revoke_token(uow: AbstractUow):
     with uow:
-        tokens = list(map(asdict, get(uow)))
+        tokens = uow.auth.iter()
+
         if not tokens:
             return
 
         for token in tokens:
-            token = Auth.from_dict(token)
-            if token.is_invalid:
-                return
             try:
                 if is_revoked_token(uow, token):
                     revoke_token(uow, token.access_token)
-            except ExpiredSignatureError as e:
+            except ExpiredSignatureError:
                 revoke_token(uow, token.access_token)
 
 

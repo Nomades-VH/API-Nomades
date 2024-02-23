@@ -1,6 +1,6 @@
 import dataclasses
 from abc import ABC
-from typing import Iterator, Optional
+from typing import Optional, List
 from uuid import UUID
 
 from sqlalchemy import and_
@@ -43,5 +43,5 @@ class AuthRepository(AbstractAuthRepository):
     def update_from_user(self, entity: Auth, user_id: UUID) -> None:
         self.session.query(Auth).filter(Auth.fk_user == user_id).update(dataclasses.asdict(entity))
 
-    def iter(self) -> Iterator[Auth]:
-        yield from self.session.query(Auth).filter().all()
+    def iter(self) -> List[Auth]:
+        return self.session.query(Auth).filter(Auth.is_invalid == False).all()

@@ -1,8 +1,9 @@
 import dataclasses
+from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
 
-from app.band.entities import Band as BandEntity
+from app.band.entities import Band as BandEntity, Band
 from app.band.models import Band as BandModel
 from app.user.models import User
 from ports.uow import AbstractUow
@@ -48,7 +49,7 @@ def add(uow: AbstractUow, band: BandEntity) -> None:
         uow.band.add(band)
 
 
-def update(uow: AbstractUow, band: dict) -> None:
+def update(uow: AbstractUow, band: Band) -> None:
     with uow:
         uow.band.update(band)
 
@@ -58,17 +59,11 @@ def delete(uow: AbstractUow, uuid: UUID):
         uow.band.remove(uuid)
 
 
-def to_update(band_entity: BandEntity, band_model: BandModel, updated_for) -> dict:
+def to_update(band_entity: BandEntity, band_model: BandModel) -> BandEntity:
     band_entity.gub = band_model.gub
     band_entity.name = band_model.name
     band_entity.meaning = band_model.meaning
     band_entity.theory = band_model.theory
     band_entity.breakdown = band_model.breakdown
     band_entity.stretching = band_model.stretching
-    band_entity.updated_for = updated_for
-    return exclude_classes(band_entity)
-
-
-def exclude_classes(band: BandEntity) -> dict:
-    return {k: v for k, v in dataclasses.asdict(band).items() if k not in ['kicks'] if k not in ['poomsaes'] if
-                     k not in ['kibon_donjaks']}
+    return band_entity

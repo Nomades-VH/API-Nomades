@@ -28,4 +28,4 @@ class KickRepository(AbstractKickRepository):
         self.session.query(Kick).filter(Kick.id == kick.id).update(kick)
 
     def iter(self) -> Iterator[Kick]:
-        return self.session.query(Kick).all()
+        return self.session.query(Kick).order_by(Kick.difficulty).all()
