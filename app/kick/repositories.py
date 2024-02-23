@@ -1,3 +1,4 @@
+import dataclasses
 from abc import ABC
 from typing import Iterator, Optional
 from uuid import UUID
@@ -25,7 +26,7 @@ class KickRepository(AbstractKickRepository):
         return self.session.query(Kick).filter(Kick.id == uuid).delete()
 
     def update(self, kick: Kick) -> None:
-        self.session.query(Kick).filter(Kick.id == kick.id).update(kick)
+        self.session.query(Kick).filter(Kick.id == kick.id).update(dataclasses.asdict(kick))
 
     def iter(self) -> Iterator[Kick]:
         return self.session.query(Kick).order_by(Kick.difficulty).all()
