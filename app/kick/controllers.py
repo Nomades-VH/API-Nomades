@@ -39,8 +39,7 @@ async def get(
             bands = sv_band.get_minors_band(uow, band.gub)
             kicks = {}
             for band in bands:
-                if len(band.kicks) > 0:
-                    kicks[band.name] = band.kicks
+                kicks[band.name] = band.kicks
 
             return JSONResponse(
                 status_code=HTTPStatus.OK,
@@ -70,7 +69,7 @@ async def get_by_id(
         try:
             band_user = sv_band.get_by_user(uow, current_user)
 
-            if not band_user:
+            if not band_user or band_user.id != param:
                 return JSONResponse(
                     status_code=HTTPStatus.FORBIDDEN,
                     content={"message": "Você não tem permissão para encontrar esse Kibon Don Jak."}

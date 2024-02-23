@@ -59,7 +59,7 @@ async def get_by_id(
     if current_user.permission.value < Permissions.table.value:
         band_user = sv_band.get_by_user(uow, current_user)
 
-        if not band_user:
+        if not band_user or band_user.id != param:
             return JSONResponse(
                 status_code=HTTPStatus.FORBIDDEN,
                 content={"message": "Você não tem permissão para encontrar esse Kibon Don Jak."}
