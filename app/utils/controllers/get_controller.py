@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from functools import wraps
 from http import HTTPStatus
 
@@ -17,8 +16,8 @@ def get_controller(service):
         @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 message_error: str,
-                uow: AbstractUow,
-                current_user: User
+                current_user: User,
+                uow: AbstractUow
         ) -> Response:
             response: JSONResponse = await func(message_error, current_user, uow)
             if response:

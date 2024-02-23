@@ -135,6 +135,7 @@ def test_update_band(client: TestClient):
     assert response.status_code == HTTPStatus.OK
     new_band_caught = client.get(f'{url}{band_caught.json()["id"]}', headers=authorization)
     assert new_band_caught.json()['name'] == band['name']
+    assert new_band_caught.json()['updated_at'] != band_caught.json()['updated_at']
 
 
 def test_delete_band_not_found(client: TestClient):

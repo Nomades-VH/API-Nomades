@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime, date
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime, Index
+from sqlalchemy import Table, Column, Integer, String, DateTime, Index
 from sqlalchemy.orm import relationship
 
 from app.band.entities import Band
@@ -24,8 +24,8 @@ bands = Table(
     Column("stretching", String(150), nullable=False),
     Column("created_for", UUID(as_uuid=True), nullable=False),
     Column("updated_for", UUID(as_uuid=True), nullable=False),
-    Column("created_at", DateTime, default=datetime.now(timezone.utc)),
-    Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
+    Column("created_at", DateTime, default=datetime.now()),
+    Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now),
 )
 
 created_updated_for_index = Index('idx_created_updated_for', bands.c.created_for, bands.c.updated_for)

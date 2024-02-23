@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -15,8 +15,8 @@ tokens = Table(
     Column("access_token", String(250), unique=True, nullable=False),
     Column("is_invalid", Boolean, nullable=False, default=False),
     Column("fk_user", UUID(as_uuid=True), ForeignKey("users.id"), default=uuid4),
-    Column("created_at", DateTime, default=datetime.now(timezone.utc)),
-    Column("updated_at", DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)),
+    Column("created_at", DateTime, default=datetime.now()),
+    Column("updated_at", DateTime, default=datetime.now, onupdate=datetime.now),
 )
 
 fk_user_index = Index('idx_fk_user', tokens.c.fk_user)

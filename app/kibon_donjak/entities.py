@@ -14,5 +14,5 @@ class KibonDonjak(Entity):
     description: str
     difficulty: Difficulty
     fk_band: UUID
-    created_for: UUID
     updated_for: UUID
+    created_for: Optional[UUID]

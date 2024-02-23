@@ -30,3 +30,7 @@ class Band(BaseModel):
             created_for=user.id,
             updated_for=user.id
         )
+
+    def __eq__(self, other):
+        return self.gub == other.gub and self.name == other.name and self.meaning == other.meaning and self.theory == other.theory \
+            and self.breakdown == other.breakdown and self.stretching == other.stretching
