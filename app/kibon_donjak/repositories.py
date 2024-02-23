@@ -1,6 +1,6 @@
 import dataclasses
 from abc import ABC
-from typing import Iterator, Optional
+from typing import Iterator, Optional, List
 from uuid import UUID
 
 from sqlalchemy import desc
@@ -34,5 +34,5 @@ class KibonDonjakRepository(AbstractKibonDonjakRepository):
             KibonDonjak.id == kibon_donjak.id
         ).update(dataclasses.asdict(kibon_donjak))
 
-    def iter(self) -> Iterator[KibonDonjak]:
+    def iter(self) -> List[KibonDonjak]:
         return self.session.query(KibonDonjak).order_by(KibonDonjak.created_at).all()

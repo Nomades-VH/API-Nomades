@@ -1,15 +1,20 @@
 # TODO: Create a service for get_all kicks
+from typing import List, Optional
+from uuid import UUID
+
 from app.kick.entities import Kick as KickEntity
+from app.kick.models import Kick as KickModel
 from ports.uow import AbstractUow
 
 
-def get_all_kicks():
-    pass
+def get(uow: AbstractUow) -> Optional[List[KickEntity]]:
+    with uow:
+        return uow.kick.iter()
 
 
-# TODO: Create a service for get kick
-def get_kick():
-    pass
+def get_by_id(uow: AbstractUow, uuid: UUID) -> Optional[KickEntity]:
+    with uow:
+        return uow.kick.get(uuid)
 
 
 # TODO: Create a service for post kick
@@ -23,12 +28,20 @@ def get_by_name(uow: AbstractUow, name: str):
         return uow.kick.get_by_name(name)
 
 
-
 # TODO: Create a service for put kick
-def put_kick():
-    pass
+def update(uow: AbstractUow, kick: KickEntity) -> None:
+    with uow:
+        return uow.kick.update(kick)
 
 
 # TODO: Create a service for delete kick
-def delete_kick():
-    pass
+def delete(uow: AbstractUow, uuid: UUID) -> None:
+    with uow:
+        return uow.kick.remove(uuid)
+
+
+def to_update(kick_entity: KickEntity, kick_model: KickModel) -> KickEntity:
+    kick_entity.name = kick_model.name
+    kick_entity.description = kick_model.description
+    kick_entity.difficulty = kick_model.difficulty
+    return kick_entity
