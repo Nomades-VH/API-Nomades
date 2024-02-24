@@ -31,25 +31,7 @@ async def get(
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response:
-    if current_user.permission.value < Permissions.table.value:
-        band = sv_band.get_by_user(uow, current_user)
-
-        if band:
-            bands = sv_band.get_minors_band(uow, band.gub)
-            poomsaes = {}
-
-            for band in bands:
-                poomsaes[band.name] = band.poomsaes
-
-            return JSONResponse(
-                status_code=HTTPStatus.OK,
-                content=jsonable_encoder(poomsaes)
-            )
-
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={"message": "Você não possui uma faixa. Procure mais informações com seu professor."}
-        )
+    ...
 
 
 # TODO: Create Get Method
@@ -64,7 +46,7 @@ async def get_by_id(
     if current_user.permission.value < Permissions.table.value:
         band_user = sv_band.get_by_user(uow, current_user)
 
-        if not band_user or band_user.id != param:
+        if not band_user:
             return JSONResponse(
                 status_code=HTTPStatus.FORBIDDEN,
                 content={"message": "Você não tem permissão para acessar esse Poomsae."}
