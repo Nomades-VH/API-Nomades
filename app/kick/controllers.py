@@ -27,33 +27,7 @@ async def get(
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
-    if current_user.permission.value < Permissions.table.value:
-        try:
-            band = sv_band.get_by_user(uow, current_user)
-            if not band:
-                return JSONResponse(
-                    status_code=HTTPStatus.FORBIDDEN,
-                    content={"message": "Você não possui uma faixa. Procure mais informações com seu professor."}
-                )
-
-            bands = sv_band.get_minors_band(uow, band.gub)
-            kicks = {}
-            for band in bands:
-                kicks[band.name] = band.kicks
-
-            return JSONResponse(
-                status_code=HTTPStatus.OK,
-                content=jsonable_encoder(kicks)
-            )
-
-        except Exception:
-            return JSONResponse(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                content={
-                    "message": "Ocorreu algum erro. Tente novamente em alguns minutos.",
-                    "to_do": "Caso o problema persista, favor comunicar seu professor."
-                }
-            )
+    ...
 
 
 # TODO: Create Get Method

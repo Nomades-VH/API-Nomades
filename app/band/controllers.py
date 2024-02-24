@@ -31,18 +31,7 @@ async def get(
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response:
-    if current_user.permission.value < Permissions.table.value:
-        band = sv.get_by_user(uow, current_user)
-        if band:
-            return JSONResponse(
-                status_code=HTTPStatus.OK,
-                content=jsonable_encoder(sv.get_minors_band(uow, band.gub))
-            )
-
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={"message": "Você não possui uma faixa. Procure mais informações com seu professor."}
-        )
+    ...
 
 
 @router.get("/me")
