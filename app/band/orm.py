@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID

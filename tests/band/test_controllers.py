@@ -10,10 +10,11 @@ invalid_uuid = "f7f00446-6d6a-417c-82e5-33a0698af17b"
 url = "/band/"
 
 
-def test_get_bands(client: TestClient):
+def test_get_bands_without_bands(client: TestClient):
     authorization = get_authorization_headers(client)
     response = client.get(url, headers=authorization)
-    assert response.status_code == HTTPStatus.OK
+    print(response.json(), response.status_code)
+    assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json()["message"] == "Não foram encontradas faixas."
 
 
@@ -24,6 +25,17 @@ def test_post_band(client: TestClient):
     assert response.status_code == HTTPStatus.OK
     band_created = get_band_by_gub(band['gub'], authorization, client)
     assert band_created['name'] == band['name']
+
+
+def test_get_bands(client: TestClient):
+    authorization = get_authorization_headers(client)
+    band = band_valid()
+    client.post(url, json=band, headers=authorization)
+    response = client.get(url, headers=authorization)
+    assert response.status_code == HTTPStatus.OK
+    assert type(response.json()) == list
+    assert len(response.json()) > 0
+    assert response.json()[0]['name'] == band['name']
 
 
 def test_post_existing_gub_band(client: TestClient):
@@ -153,4 +165,5 @@ def test_delete_band(client: TestClient):
     response = client.delete(f"{url}{uuid}", headers=autorization)
     assert response.status_code == HTTPStatus.OK
     response = client.get(url, headers=autorization).json()
+    print(response)
     assert response["message"] == "Não foram encontradas faixas."

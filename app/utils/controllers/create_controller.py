@@ -46,7 +46,7 @@ def create_controller(service):
                         "id": str(entity.id)
                     }
                 )
-            except Exception as e:
+            except Exception:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={

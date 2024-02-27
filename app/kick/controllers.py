@@ -1,8 +1,6 @@
-from http import HTTPStatus
 from uuid import UUID
 from fastapi import APIRouter, Depends
-from fastapi.encoders import jsonable_encoder
-from starlette.responses import JSONResponse, Response
+from starlette.responses import Response
 from app.auth.services import get_current_user_with_permission
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
@@ -15,7 +13,6 @@ from app.utils.controllers.get_controller import get_controller
 from app.utils.controllers.update_controller import update_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
-from app.band import services as sv_band
 
 router = APIRouter(prefix="/kick")
 
@@ -26,54 +23,24 @@ async def get(
         message_error: str = "Não foram encontrados chutes.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
-):
+) -> Response:
     ...
 
 
 # TODO: Create Get Method
 @router.get("/{param}")
-@get_by_controller(sv.get_by_id)
+@get_by_controller(sv.get_by_id, 'kicks')
 async def get_by_id(
         param: UUID,
         message_error: str = "Não foi possível encontrar esse chute",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.student))
-):
-    if current_user.permission.value < Permissions.table.value:
-        try:
-            band_user = sv_band.get_by_user(uow, current_user)
-
-            if not band_user or band_user.id != param:
-                return JSONResponse(
-                    status_code=HTTPStatus.FORBIDDEN,
-                    content={"message": "Você não tem permissão para encontrar esse Kibon Don Jak."}
-                )
-
-            minors_band = sv_band.get_minors_band(uow, band_user.gub)
-            for band in minors_band:
-                for kick in band.kicks:
-                    if kick.id == param:
-                        return JSONResponse(
-                            status_code=HTTPStatus.OK,
-                            content=jsonable_encoder(kick)
-                        )
-
-            return JSONResponse(
-                status_code=HTTPStatus.FORBIDDEN,
-                content={"message": "Você não pode acessar esse chute."}
-            )
-        except Exception:
-            return JSONResponse(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                content={
-                    "message": "Ocorreu algum erro. Tente novamente em alguns minutos.",
-                    "to_do": "Caso o problema persista, favor comunicar seu professor."
-                }
-            )
+) -> Response:
+    ...
 
 
 @router.get('/name/{param}')
-@get_by_controller(sv.get_by_name)
+@get_by_controller(sv.get_by_name, 'kicks')
 async def get_by_name(
         param: str,
         message_error: str = "Não foi possível encontrar esse chute",
@@ -92,7 +59,7 @@ async def post(
         message_error: str = "Chute não criado.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-):
+) -> Response:
     ...
 
 
@@ -106,7 +73,7 @@ async def put(
         message_error: str = "Não foi possível atualizar o chute.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-):
+) -> Response:
     ...
 
 
@@ -119,5 +86,5 @@ async def delete(
         message_error: str = "Não foi possivel deletar o chute.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-):
+) -> Response:
     ...
