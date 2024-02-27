@@ -5,7 +5,6 @@ from uuid import UUID
 from app.kibon_donjak.entities import KibonDonjak
 from app.kick.entities import Kick
 from app.poomsae.entities import Poomsae
-from app.user.entities import User
 from ports.entity import Entity
 
 

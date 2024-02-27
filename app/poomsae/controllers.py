@@ -1,14 +1,10 @@
-from http import HTTPStatus
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from fastapi import Response
-from fastapi.encoders import jsonable_encoder
-from starlette.responses import JSONResponse
 
 from app.auth.services import get_current_user_with_permission
 from app.poomsae import services as sv
-from app.band import services as sv_band
 from app.poomsae.models import Poomsae
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
@@ -29,42 +25,21 @@ router = APIRouter(prefix="/poomsae")
 async def get(
         message_error: str = "Não foi possível encontrar os poomsaes.",
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-    uow: AbstractUow = Depends(SqlAlchemyUow),
+        uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response:
     ...
 
 
 # TODO: Create Get Method
 @router.get("/{param}")
-@get_by_controller(sv.get_by_id)
+@get_by_controller(sv.get_by_id, 'poomsaes')
 async def get_by_id(
         param: UUID,
         message_error: str = "Não foi possível encontrar o Poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> Response:
-    if current_user.permission.value < Permissions.table.value:
-        band_user = sv_band.get_by_user(uow, current_user)
-
-        if not band_user:
-            return JSONResponse(
-                status_code=HTTPStatus.FORBIDDEN,
-                content={"message": "Você não tem permissão para acessar esse Poomsae."}
-            )
-
-        minors_band = sv_band.get_minors_band(uow, band_user.gub)
-        for band in minors_band:
-            for poomsae in band.poomsaes:
-                if poomsae.id == param:
-                    return JSONResponse(
-                        status_code=HTTPStatus.OK,
-                        content=jsonable_encoder(poomsae)
-                    )
-
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={"message": "Você não pode acessar esse Poomsae."}
-        )
+    ...
 
 
 # TODO: Create Post Method
@@ -90,7 +65,7 @@ async def put(
         message_error: str = "Não foi possível atualizar o Poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-):
+) -> Response:
     ...
 
 
@@ -103,5 +78,5 @@ async def delete(
         message_error: str = "Não foi possível deletar o poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.president))
-):
+) -> Response:
     ...

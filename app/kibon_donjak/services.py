@@ -1,10 +1,8 @@
 # TODO: Create a service for get_all KibonDonjaks
-import dataclasses
 from dataclasses import asdict
 from typing import List, Optional
 from uuid import UUID
 
-from app.band.entities import Band
 from app.kibon_donjak.entities import KibonDonjak as KibonDonjakEntity
 from app.kibon_donjak.models import KibonDonjak as KibonDonjakModel
 from ports.uow import AbstractUow

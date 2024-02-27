@@ -1,8 +1,9 @@
-from dataclasses import asdict
-from typing import Optional
+from http import HTTPStatus
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import JSONResponse, Response
 
 from app.auth.services import get_current_user, get_current_user_with_permission
 from app.uow import SqlAlchemyUow
@@ -24,20 +25,29 @@ async def create_user(
         user: ModelUser,
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
-) -> Optional[dict]:
+) -> Response:
     try:
         user = sv.change_user(user)
-        sv.verify_if_user_exists(uow, user)
-        sv.create_new_user(uow, user, current_user)
-        return {'user': user.id}
-    except UserException as e:
-        return {'status': e.status_code, 'message': e.message}
+        if not sv.verify_if_user_exists(uow, user):
+            sv.create_new_user(uow, user, current_user)
+            return JSONResponse(
+                status_code=HTTPStatus.OK,
+                content=jsonable_encoder(user)
+            )
+    except UserException:
+        return JSONResponse(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            content={"message": "Não foi possível criar usuário. Tente novamente mais tarde."}
+        )
 
 
 # TODO: Deve retornar também o token de acesso do usuário
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
-    return asdict(current_user)
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content=jsonable_encoder(current_user)
+    )
 
 
 # TODO: Update Get Method
@@ -56,7 +66,7 @@ async def update_user(
         current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
-    pass
+    ...
 
 
 # TODO: Create Delete Method

@@ -1,4 +1,3 @@
-# TODO: Create a service for get_all kicks
 from typing import List, Optional
 from uuid import UUID
 

@@ -1,8 +1,7 @@
 from http import HTTPStatus
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Depends
 from starlette.responses import Response
 from starlette.responses import JSONResponse
 
@@ -39,43 +38,22 @@ async def get_my_band(
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
 ):
-    if current_user.fk_band is None:
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={"message": "Você não possui uma faixa. Converse com seu professor para mais detalhes."}
-        )
-
-    band = sv.get_by_user(uow, current_user)
-
-    return band
+    ...
 
 
 @router.get("/{param}")
-@get_by_controller(sv.get_by_id)
+@get_by_controller(sv.get_by_id, '')
 async def get_by_id(
         param: UUID,
         message_error: str = "Faixa não encontrada.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.student))
 ) -> Response:
-    band = sv.get_by_id(uow, param)
-    band_user = sv.get_by_user(uow, current_user)
-
-    if band_user is None and current_user.permission.value < Permissions.table.value:
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={"message": "Você não possui uma faixa! Converse com seu professor para mais detalhes."}
-        )
-
-    if band and band_user and band_user.gub > band.gub and current_user.permission.value < Permissions.table.value:
-        return JSONResponse(
-            status_code=HTTPStatus.FORBIDDEN,
-            content={"message": "Você ainda não chegou nessa faixa."}
-        )
+    ...
 
 
 @router.get("/gub/{param}")
-@get_by_controller(sv.get_by_gub)
+@get_by_controller(sv.get_by_gub, '')
 async def get_by_gub(
         param: int,
         message_error: str = "Faixa não encontrada.",
@@ -104,7 +82,7 @@ async def post(
             get_current_user_with_permission(Permissions.table)
         )
 ) -> Response:
-    if sv.get_by_gub(uow, model.gub) is not None:
+    if sv.get_by_gub(uow, model.gub):
         return JSONResponse(
             status_code=HTTPStatus.BAD_REQUEST,
             content={"message": f"Gub {model.gub} já existe."}

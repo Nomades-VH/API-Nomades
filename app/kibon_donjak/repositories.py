@@ -1,9 +1,7 @@
 import dataclasses
 from abc import ABC
-from typing import Iterator, Optional, List
+from typing import Optional, List
 from uuid import UUID
-
-from sqlalchemy import desc
 
 from app.kibon_donjak.entities import KibonDonjak
 from ports.repository import AbstractRepository

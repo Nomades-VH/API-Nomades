@@ -53,12 +53,14 @@ def verify_if_user_exists(uow: AbstractUow, user: User):
     user_created = get_user_by_email(uow, user.email)
     if user_created:
         if user_created.email == user.email:
-            raise EmailAlreadyExists(email=user_created.email)
+            return True
 
     user_created = get_user_by_username(uow, user.username)
     if user_created:
         if user_created.username == user.username:
-            raise UserAlreadyExists(username=user_created.username)
+            return True
+
+    return False
 
 
 # TODO: Create a service to update user
