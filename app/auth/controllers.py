@@ -3,7 +3,6 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import JSONResponse
 
-from app.auth.exceptions import InvalidCredentials
 from app.auth.schemas import Credentials
 from app.auth.services import get_current_user_with_permission
 from app.uow import SqlAlchemyUow
@@ -12,6 +11,7 @@ from app.utils.controllers.get_controller import get_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth import services as sv
+from fastapi import Request
 
 router = APIRouter(prefix="/auth")
 
@@ -21,11 +21,12 @@ router = APIRouter(prefix="/auth")
 # use: password: str = Body(...) para sistemas fora do fastapi
 @router.post("")
 async def login(
+        request: Request,
         credentials: Credentials,
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
-        token = await sv.add(uow, credentials)
+        token = await sv.add(uow, credentials, request.client.host)
 
         return JSONResponse(
             status_code=HTTPStatus.OK,
@@ -34,7 +35,8 @@ async def login(
                 "token_type": "bearer"
             }
         )
-    except InvalidCredentials:
+    except Exception as e:
+        print(e)
         return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={"message": "Credenciais inválidas."})
 
 
@@ -59,17 +61,19 @@ async def logout(token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depe
 
 @router.put("/refresh-token")
 async def refresh_token(
-        current_user: User = Depends(sv.get_current_user),
+        request: Request,
+        token: str = Depends(sv.oauth2_scheme),
+        current_user: User = Depends(sv.get_current_user_with_permission(Permissions.user)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:
-        token = sv.refresh_token(uow=uow, user=current_user)
+        token = sv.refresh_token(uow=uow, token=token, user=current_user, ip_user=request.client.host)
 
         return JSONResponse(
             status_code=HTTPStatus.OK,
             content={
                 "access_token": token.access_token,
-                "token_type": "bearer"
+                "token_type": "Bearer"
             }
         )
     except HTTPException as e:

@@ -3,6 +3,7 @@ from http import HTTPStatus
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from app.band.controllers import router as band_router
@@ -14,6 +15,14 @@ from app.auth.controllers import router as auth_router
 
 app = FastAPI(
     title="Nômades",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 

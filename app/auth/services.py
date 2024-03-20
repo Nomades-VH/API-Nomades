@@ -20,6 +20,7 @@ from app.user import services as sv
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 from app.auth.entities import Auth
+from fastapi import Request
 
 _ALGORITHM = "HS256"
 _TOKEN_EXPIRE_MINUTES = 240
@@ -29,12 +30,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 
 # TODO: Melhorar todos os serviços de login, logout, refresh token e auto revoke token
-def _create_token(user_id: UUID) -> str:
+def _create_token(user_id: UUID, ip_user: str) -> str:
     expire = datetime.now() + timedelta(minutes=_TOKEN_EXPIRE_MINUTES)
 
     return jwt.encode(
         {
-            "sub": str(user_id),
+            "sub": str(user_id) + _ALGORITHM + ip_user,
             "exp": expire,
         },
         key=_AUTH_SECRET,
@@ -47,7 +48,7 @@ def get(uow: AbstractUow) -> Iterator[Auth]:
         yield from uow.auth.iter()
 
 
-def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
+def generate_token(username: str, password: str, uow: AbstractUow, ip_user: str) -> Auth:
     user = sv.get_user_by_username(uow, username)
     if not user:
         raise InvalidCredentials()
@@ -56,14 +57,14 @@ def generate_token(username: str, password: str, uow: AbstractUow) -> Auth:
         raise InvalidCredentials()
 
     return Auth(
-        access_token=_create_token(user.id),
+        access_token=_create_token(user.id, ip_user),
         fk_user=user.id
     )
 
 
 # É aceitavel que o login demore alguns ms a mais, por conta da segurança
 # Esses ms a mais servem para que um ataque de força bruta não funciona corretamente.
-async def add(uow: AbstractUow, credentials: Credentials) -> Auth:
+async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
     with uow:
         user = sv.get_user_by_email(uow, credentials.email) if credentials.email else sv.get_user_by_username(uow,
                                                                                                               credentials.username)
@@ -77,10 +78,10 @@ async def add(uow: AbstractUow, credentials: Credentials) -> Auth:
             return token
 
         if not token:
-            token = generate_token(credentials.username, credentials.password, uow)
+            token = generate_token(credentials.username, credentials.password, uow, ip_user)
             uow.auth.add(token)
         else:
-            token.access_token = _create_token(user.id)
+            token.access_token = _create_token(user.id, ip_user)
             token.is_invalid = False
             uow.auth.update(token)
 
@@ -88,18 +89,26 @@ async def add(uow: AbstractUow, credentials: Credentials) -> Auth:
 
 
 def get_current_user(
-        uow: AbstractUow = Depends(SqlAlchemyUow), token: str = Depends(oauth2_scheme)
+        ip_user: str,
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        token: str = Depends(oauth2_scheme),
 ) -> User:
     from app.user.services import get_by_id
     with uow:
         try:
             payload = jwt.decode(token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-            user_id = payload.get("sub")
+            user_id = payload.get("sub").split(_ALGORITHM)[0]
 
             if not user_id:
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
 
-            auth = uow.auth.get_by_user(user_id)
+            auth = uow.auth.get_by_token(token)
+            ip_user_auth = jwt \
+                .decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]).get("sub").split(_ALGORITHM)[1]
+
+            if ip_user_auth != ip_user:
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
+                                    detail="Você não tem permissão para acessar essa página.")
 
             if is_revoked_token(uow, auth):
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token revogado.")
@@ -116,9 +125,11 @@ def get_current_user(
 
 def get_current_user_with_permission(permission: Permissions):
     def _dependency(
-            uow: AbstractUow = Depends(SqlAlchemyUow), auth: str = Depends(oauth2_scheme)
+            request: Request,
+            uow: AbstractUow = Depends(SqlAlchemyUow),
+            auth: str = Depends(oauth2_scheme)
     ) -> User:
-        user = get_current_user(uow, auth)
+        user = get_current_user(request.client.host, uow, auth)
 
         if user.permission.value < permission.value:
             raise HTTPException(
@@ -201,6 +212,11 @@ def _is_token_expired(token: Auth):
         if expiration is None:
             raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
 
+        timing = expiration - datetime.now().timestamp()
+
+        if timing <= 0:
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token expirado")
+
         return False
     except ExpiredSignatureError:
         return True
@@ -214,7 +230,7 @@ def invalidate_token(uow: AbstractUow, auth: Auth):
         uow.auth.update(auth)
 
 
-def refresh_token(user: User, uow: AbstractUow) -> Auth:
+def refresh_token(user: User, token: str, uow: AbstractUow, ip_user: str) -> Auth:
     with uow:
         auth = uow.auth.get_by_user(user.id)
 
@@ -224,8 +240,11 @@ def refresh_token(user: User, uow: AbstractUow) -> Auth:
                 content={"message": "Não autenticado."}
             )
 
+        if auth.access_token != token and auth.fk_user == user.id:
+            return auth
+
         if not is_revoked_token(uow, auth):
-            auth.access_token = _create_token(user.id)
+            auth.access_token = _create_token(user.id, ip_user)
 
             uow.auth.update_from_user(auth, user.id)
 

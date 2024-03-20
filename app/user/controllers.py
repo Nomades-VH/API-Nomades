@@ -1,11 +1,11 @@
 from http import HTTPStatus
 from uuid import UUID
-
 from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse, Response
+from fastapi import Request
 
-from app.auth.services import get_current_user, get_current_user_with_permission
+from app.auth.services import get_current_user_with_permission, oauth2_scheme
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.user.exceptions import UserException
@@ -43,11 +43,24 @@ async def create_user(
 
 # TODO: Deve retornar também o token de acesso do usuário
 @router.get("/me")
-async def get_me(current_user: User = Depends(get_current_user)):
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content=jsonable_encoder(current_user)
-    )
+async def get_me(requests: Request, token: str = Depends(oauth2_scheme),
+                 current_user: User = Depends(get_current_user_with_permission(Permissions.user)),
+                 uow: AbstractUow = Depends(SqlAlchemyUow)):
+    print(f"IP DO USER: {requests.client.host}")
+    with uow:
+        auth = uow.auth.get_by_user(current_user.id)
+
+        if auth.access_token == token:
+            return JSONResponse(
+                status_code=HTTPStatus.OK,
+                content=jsonable_encoder(current_user)
+            )
+
+        else:
+            return JSONResponse(
+                status_code=HTTPStatus.FORBIDDEN,
+                content={"message": "Token antigo."}
+            )
 
 
 # TODO: Update Get Method
