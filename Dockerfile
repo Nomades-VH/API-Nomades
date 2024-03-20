@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DEFAULT_TIMEOUT=100 \
     # POETRY
     POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_VIRTUALENVS_IN_PROJECT=false \
     POETRY_NO_INTERACTION=1 \
     PYSETUP_PATH="/opt/pysetup" \
     VENV_PATH="/opt/pysetup/.venv"
@@ -25,7 +25,7 @@ RUN apt-get install -y curl
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 RUN poetry add psycopg2
-RUN poetry install
+RUN poetry install --no-root
 
 EXPOSE 8000
 
