@@ -1,8 +1,15 @@
 {
-  "builds": [
-    {
-      "src": "main.py",
-      "use": "@devjin8/vercel-poetry@latest"
-    }
-  ]
+    "devCommand": "uvicorn server:app --host 0.0.0.0 --port 8000",
+    "builds": [
+        {
+            "src": "./main.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "app/main.py"
+        }
+    ]
 }
