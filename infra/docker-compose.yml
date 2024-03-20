@@ -4,7 +4,7 @@ services:
 #    container_name: "postgres"
 #    image: postgres:latest
 #    env_file:
-#      - .env
+#      - ../.env
 #    restart: always
 #    networks:
 #      - nm-network
@@ -44,12 +44,12 @@ services:
     # Alterar esta linha para devsampaiodocker/nomades:main quando for subir para o servidor
     image: nomades:latest
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ../.env
 #    depends_on:
 #      - pgbouncer
 #    healthcheck:

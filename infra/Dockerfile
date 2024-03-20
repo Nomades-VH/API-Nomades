@@ -17,7 +17,7 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 WORKDIR /usr/src/app/
 
-COPY . .
+COPY ../.. .
 
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y curl
