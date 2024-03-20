@@ -73,6 +73,11 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
             raise InvalidCredentials()
 
         token = uow.auth.get_by_user(user.id)
+        payload = jwt.decode(token.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
+        ip_user_auth = payload.get("sub").split(_ALGORITHM)[1]
+
+        if ip_user_auth != ip_user:
+            raise InvalidCredentials()
 
         if token and not is_revoked_token(uow, token):
             return token

@@ -1,43 +1,43 @@
 version: "3.8"
 services:
-#  psql:
-#    container_name: "postgres"
-#    image: postgres:latest
-#    env_file:
-#      - ../.env
-#    restart: always
-#    networks:
-#      - nm-network
+  psql:
+    container_name: "postgres"
+    image: postgres:latest
+    env_file:
+      - ../.env
+    restart: always
+    networks:
+      - nm-network
 
-#  psql_test:
-#    container_name: "postgres_test"
-#    image: postgres:latest
-#    env_file:
-#      - ../.env
-#    ports:
-#      - "6432:5432"
-#    restart: always
-#
-#  pgbouncer:
-#    container_name: "pgbouncer"
-#    image: edoburu/pgbouncer
-#    ports:
-#      - "5432:5432"
-#    environment:
-#      - DB_HOST=psql
-#      - DB_USER=user
-#      - DB_PASSWORD=password
-#      - DB_DATABASE=nomades
-#      - ADMIN_USERS=postgres,admin
-#      - POOL_MODE=transaction
-#      - MAX_CLIENT_CONN=1000
-#      - DEFAULT_POOL_SIZE=20
-#      - SERVER_IDLE_TIMEOUT=100
-#      - MAX_CONNECTIONS=100
-#    networks:
-#      - nm-network
-#    depends_on:
-#      - psql
+  psql_test:
+    container_name: "postgres_test"
+    image: postgres:latest
+    env_file:
+      - ../.env
+    ports:
+      - "6432:5432"
+    restart: always
+
+  pgbouncer:
+    container_name: "pgbouncer"
+    image: edoburu/pgbouncer
+    ports:
+      - "5432:5432"
+    environment:
+      - DB_HOST=psql
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_DATABASE=nomades
+      - ADMIN_USERS=postgres,admin
+      - POOL_MODE=transaction
+      - MAX_CLIENT_CONN=1000
+      - DEFAULT_POOL_SIZE=20
+      - SERVER_IDLE_TIMEOUT=100
+      - MAX_CONNECTIONS=100
+    networks:
+      - nm-network
+    depends_on:
+      - psql
 
   nomades:
     container_name: "nomades"
@@ -50,14 +50,14 @@ services:
       - "8000:8000"
     env_file:
       - ../.env
-#    depends_on:
-#      - pgbouncer
-#    healthcheck:
-#      test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
-#      interval: 1m
-#      timeout: 15s
-#      retries: 2
-#      start_period: 20s
+    depends_on:
+      - pgbouncer
+    healthcheck:
+      test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
+      interval: 1m
+      timeout: 15s
+      retries: 2
+      start_period: 20s
     networks:
       - nm-network
     restart: always
