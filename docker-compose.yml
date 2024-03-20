@@ -1,13 +1,13 @@
 version: "3.8"
 services:
-  psql:
-    container_name: "postgres"
-    image: postgres:latest
-    env_file:
-      - ../.env
-    restart: always
-    networks:
-      - nm-network
+#  psql:
+#    container_name: "postgres"
+#    image: postgres:latest
+#    env_file:
+#      - .env
+#    restart: always
+#    networks:
+#      - nm-network
 
 #  psql_test:
 #    container_name: "postgres_test"
@@ -44,20 +44,20 @@ services:
     # Alterar esta linha para devsampaiodocker/nomades:main quando for subir para o servidor
     image: nomades:latest
     build:
-      context: ..
-      dockerfile: infra/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
-      - ../.env
-    depends_on:
-      - pgbouncer
-    healthcheck:
-      test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
-      interval: 1m
-      timeout: 15s
-      retries: 2
-      start_period: 20s
+      - .env
+#    depends_on:
+#      - pgbouncer
+#    healthcheck:
+#      test: ["CMD", "nc", "-v", "127.0.0.1", "5432"]
+#      interval: 1m
+#      timeout: 15s
+#      retries: 2
+#      start_period: 20s
     networks:
       - nm-network
     restart: always
