@@ -73,13 +73,14 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
             raise InvalidCredentials()
 
         token = uow.auth.get_by_user(user.id)
-        payload = jwt.decode(token.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-        ip_user_auth = payload.get("sub").split(_ALGORITHM)[1]
-
-        if ip_user_auth != ip_user:
-            raise InvalidCredentials()
 
         if token and not is_revoked_token(uow, token):
+            payload = jwt.decode(token.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
+            ip_user_auth = payload.get("sub").split(_ALGORITHM)[1]
+
+            if ip_user_auth != ip_user:
+                raise InvalidCredentials()
+
             return token
 
         if not token:
@@ -164,15 +165,14 @@ def auto_revoke_token(uow: AbstractUow):
         for token in tokens:
             try:
                 if is_revoked_token(uow, token):
-                    revoke_token(uow, token.access_token)
+                    invalidate_token(uow, token)
             except ExpiredSignatureError:
-                revoke_token(uow, token.access_token)
+                invalidate_token(uow, token)
 
 
-def revoke_token(uow: AbstractUow, token: str):
+def revoke_token(uow: AbstractUow, token: str, ip_user):
     with uow:
         auth = uow.auth.get_by_token(token)
-
         if not auth:
             return JSONResponse(
                 status_code=HTTPStatus.UNAUTHORIZED,
@@ -181,12 +181,18 @@ def revoke_token(uow: AbstractUow, token: str):
                 }
             )
 
+        payload = jwt.decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
+        ip_user_auth = payload.get("sub").split(_ALGORITHM)[1]
+
+        if ip_user_auth != ip_user:
+            return InvalidCredentials()
+
         if not is_revoked_token(uow, auth):
             invalidate_token(uow, auth)
         else:
             invalidate_token(uow, auth)
             return JSONResponse(
-                status_code=HTTPStatus.OK,
+                status_code=HTTPStatus.FORBIDDEN,
                 content={
                     'message': 'Token anulado.'
                 }
@@ -231,14 +237,15 @@ def _is_token_expired(token: Auth):
 
 def invalidate_token(uow: AbstractUow, auth: Auth):
     with uow:
-        uow.auth.remove(auth.id)
+        auth.is_invalid = True
+        uow.auth.update(auth)
 
 
 def refresh_token(user: User, token: str, uow: AbstractUow, ip_user: str) -> Auth:
     with uow:
         auth = uow.auth.get_by_user(user.id)
 
-        if not auth:
+        if not auth or auth.is_invalid:
             JSONResponse(
                 status_code=HTTPStatus.UNAUTHORIZED,
                 content={"message": "Não autenticado."}

@@ -51,8 +51,8 @@ async def get(
 
 
 @router.post("/logout")
-async def logout(token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depends(SqlAlchemyUow)):
-    response = sv.revoke_token(uow, token)
+async def logout(request: Request, token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depends(SqlAlchemyUow)):
+    response = sv.revoke_token(uow, token, request.client.host)
     if response:
         return response
 
