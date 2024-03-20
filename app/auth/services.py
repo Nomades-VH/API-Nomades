@@ -231,8 +231,7 @@ def _is_token_expired(token: Auth):
 
 def invalidate_token(uow: AbstractUow, auth: Auth):
     with uow:
-        auth.is_invalid = True
-        uow.auth.update(auth)
+        uow.auth.remove(auth.id)
 
 
 def refresh_token(user: User, token: str, uow: AbstractUow, ip_user: str) -> Auth:
