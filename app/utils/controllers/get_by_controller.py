@@ -46,7 +46,7 @@ def get_by_controller(get_service, entity_name: str):
 
             func_module_name = func.__module__.split('.')[1]
             if func_module_name in ModuleType:
-                band = sv_band.get_by_user(uow, current_user)
+                band = get_service(uow, param)
 
                 if not band:
                     return JSONResponse(

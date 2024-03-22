@@ -25,6 +25,7 @@ from fastapi import Request
 _ALGORITHM = "HS256"
 _TOKEN_EXPIRE_MINUTES = 240
 _AUTH_SECRET = os.getenv("AUTH_SECRET")
+_SEPARATE_TOKEN = os.getenv("SEPARATE_TOKEN")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
@@ -35,7 +36,7 @@ def _create_token(user_id: UUID, ip_user: str) -> str:
 
     return jwt.encode(
         {
-            "sub": str(user_id) + _ALGORITHM + ip_user,
+            "sub": str(user_id) + _SEPARATE_TOKEN + ip_user,
             "exp": expire,
         },
         key=_AUTH_SECRET,
@@ -66,6 +67,7 @@ def generate_token(username: str, password: str, uow: AbstractUow, ip_user: str)
 # Esses ms a mais servem para que um ataque de força bruta não funciona corretamente.
 async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
     with uow:
+        print(_SEPARATE_TOKEN)
         user = sv.get_user_by_email(uow, credentials.email) if credentials.email else sv.get_user_by_username(uow,
                                                                                                               credentials.username)
         # O ms a mais, vem da verificação de senha
@@ -76,7 +78,7 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
 
         if token and not is_revoked_token(uow, token):
             payload = jwt.decode(token.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-            ip_user_auth = payload.get("sub").split(_ALGORITHM)[1]
+            ip_user_auth = payload.get("sub").split(_SEPARATE_TOKEN)[1]
 
             if ip_user_auth != ip_user:
                 raise InvalidCredentials()
@@ -86,6 +88,7 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
         if not token:
             token = generate_token(credentials.username, credentials.password, uow, ip_user)
             uow.auth.add(token)
+            auth = uow.auth.get_by_token(token.access_token)
         else:
             token.access_token = _create_token(user.id, ip_user)
             token.is_invalid = False
@@ -103,14 +106,15 @@ def get_current_user(
     with uow:
         try:
             payload = jwt.decode(token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-            user_id = payload.get("sub").split(_ALGORITHM)[0]
+            user_id = payload.get("sub").split(_SEPARATE_TOKEN)[0]
 
             if not user_id:
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
 
             auth = uow.auth.get_by_token(token)
             ip_user_auth = jwt \
-                .decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]).get("sub").split(_ALGORITHM)[1]
+                .decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]).get("sub").split(_SEPARATE_TOKEN)[
+                1]
 
             if ip_user_auth != ip_user:
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
@@ -182,7 +186,7 @@ def revoke_token(uow: AbstractUow, token: str, ip_user):
             )
 
         payload = jwt.decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-        ip_user_auth = payload.get("sub").split(_ALGORITHM)[1]
+        ip_user_auth = payload.get("sub").split(_SEPARATE_TOKEN)[1]
 
         if ip_user_auth != ip_user:
             return InvalidCredentials()

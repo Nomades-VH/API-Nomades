@@ -2,6 +2,7 @@ from http import HTTPStatus
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from starlette.responses import Response
 from starlette.responses import JSONResponse
 
@@ -38,7 +39,19 @@ async def get_my_band(
         current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow),
 ):
-    ...
+    band = sv.get_by_user(uow, current_user)
+    if not band:
+        return JSONResponse(
+            status_code=HTTPStatus.FORBIDDEN,
+            content={
+                "message": "Você não tem uma faixa."
+            }
+        )
+
+    return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=jsonable_encoder(band)
+        )
 
 
 @router.get("/{param}")
