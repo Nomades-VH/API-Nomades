@@ -49,8 +49,8 @@ def get(uow: AbstractUow) -> Iterator[Auth]:
         yield from uow.auth.iter()
 
 
-def generate_token(username: str, password: str, uow: AbstractUow, ip_user: str) -> Auth:
-    user = sv.get_user_by_username(uow, username)
+def generate_token(email: str, password: str, uow: AbstractUow, ip_user: str) -> Auth:
+    user = sv.get_user_by_email(uow, email)
     if not user:
         raise InvalidCredentials()
 
@@ -67,12 +67,10 @@ def generate_token(username: str, password: str, uow: AbstractUow, ip_user: str)
 # Esses ms a mais servem para que um ataque de força bruta não funciona corretamente.
 async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
     with uow:
-        print(_SEPARATE_TOKEN)
-        user = sv.get_user_by_email(uow, credentials.email) if credentials.email else sv.get_user_by_username(uow,
-                                                                                                              credentials.username)
+        user = sv.get_user_by_email(uow, credentials.email)
         # O ms a mais, vem da verificação de senha
         if not user or not verify_password(credentials.password, user.password):
-            raise InvalidCredentials()
+            raise InvalidCredentials("Email ou senha incorretos.")
 
         token = uow.auth.get_by_user(user.id)
 
@@ -86,9 +84,8 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
             return token
 
         if not token:
-            token = generate_token(credentials.username, credentials.password, uow, ip_user)
+            token = generate_token(credentials.email, credentials.password, uow, ip_user)
             uow.auth.add(token)
-            auth = uow.auth.get_by_token(token.access_token)
         else:
             token.access_token = _create_token(user.id, ip_user)
             token.is_invalid = False
@@ -174,9 +171,9 @@ def auto_revoke_token(uow: AbstractUow):
                 invalidate_token(uow, token)
 
 
-def revoke_token(uow: AbstractUow, token: str, ip_user):
+def revoke_token(uow: AbstractUow, user: User, ip_user):
     with uow:
-        auth = uow.auth.get_by_token(token)
+        auth = uow.auth.get_by_user(user.id)
         if not auth:
             return JSONResponse(
                 status_code=HTTPStatus.UNAUTHORIZED,

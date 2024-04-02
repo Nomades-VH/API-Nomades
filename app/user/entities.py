@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 from uuid import UUID
 
+from general_enum.hubs import Hubs
 from general_enum.permissions import Permissions
 from ports.entity import Entity
 
@@ -12,6 +13,7 @@ class User(Entity):
     email: str
     password: str
     permission: Permissions
+    hub: Hubs
     fk_band: Optional[UUID] = None
 
     @classmethod

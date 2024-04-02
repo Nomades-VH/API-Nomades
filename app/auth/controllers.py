@@ -36,7 +36,6 @@ async def login(
             }
         )
     except Exception as e:
-        print(e)
         return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={"message": "Credenciais inválidas."})
 
 
@@ -51,8 +50,11 @@ async def get(
 
 
 @router.post("/logout")
-async def logout(request: Request, token: str = Depends(sv.oauth2_scheme), uow: AbstractUow = Depends(SqlAlchemyUow)):
-    response = sv.revoke_token(uow, token, request.client.host)
+async def logout(request: Request,
+                 current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+                 uow: AbstractUow = Depends(SqlAlchemyUow)):
+
+    response = sv.revoke_token(uow, current_user, request.client.host)
     if response:
         return response
 
@@ -63,7 +65,7 @@ async def logout(request: Request, token: str = Depends(sv.oauth2_scheme), uow: 
 async def refresh_token(
         request: Request,
         token: str = Depends(sv.oauth2_scheme),
-        current_user: User = Depends(sv.get_current_user_with_permission(Permissions.user)),
+        current_user: User = Depends(sv.get_current_user_with_permission(Permissions.student)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     try:

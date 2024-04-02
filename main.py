@@ -2,6 +2,8 @@ import sys
 
 from app.auth.hasher import hash_password
 from loguru import logger
+
+from general_enum.hubs import Hubs
 from ports.uow import AbstractUow
 from dotenv import load_dotenv
 from os import environ
@@ -31,6 +33,7 @@ def _create_root(uow: AbstractUow):
                 email=environ.get("ROOT_USER_EMAIL"),
                 password=hash_password(environ.get("ROOT_USER_PASSWORD")),
                 permission=Permissions.root,
+                hub=Hubs.SJBarreiro,
                 fk_band=None
             ))
 
@@ -45,6 +48,7 @@ def _create_student(uow: AbstractUow):
                 email=environ.get("STUDENT_USER_EMAIL"),
                 password=hash_password(environ.get("STUDENT_USER_PASSWORD")),
                 permission=Permissions.student,
+                hub=Hubs.SJBarreiro,
                 fk_band=None
             ))
 
@@ -59,6 +63,7 @@ def _create_table_user(uow: AbstractUow):
                 email=environ.get("TABLE_USER_EMAIL"),
                 password=hash_password(environ.get("TABLE_USER_PASSWORD")),
                 permission=Permissions.table,
+                hub=Hubs.SJBarreiro,
                 fk_band=None
             ))
 

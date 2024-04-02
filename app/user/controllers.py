@@ -3,9 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse, Response
-from fastapi import Request
 
-from app.auth.services import get_current_user_with_permission, oauth2_scheme
+from app.auth.services import get_current_user_with_permission
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
 from app.user.exceptions import UserException
@@ -23,16 +22,26 @@ router = APIRouter(prefix="/user")
 @router.post("/")
 async def create_user(
         user: ModelUser,
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
-        uow: AbstractUow = Depends(SqlAlchemyUow)
+        uow: AbstractUow = Depends(SqlAlchemyUow),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
 ) -> Response:
     try:
         user = sv.change_user(user)
         if not sv.verify_if_user_exists(uow, user):
+            if user.permission.value >= Permissions.table.value and current_user.permission.value < Permissions.root.value:
+                return JSONResponse(
+                    status_code=HTTPStatus.UNAUTHORIZED,
+                    content={"message": "Não é possível criar um usuário com essa permissão."}
+                )
             sv.create_new_user(uow, user, current_user)
             return JSONResponse(
                 status_code=HTTPStatus.OK,
                 content=jsonable_encoder(user)
+            )
+        else:
+            return JSONResponse(
+                status_code=HTTPStatus.BAD_REQUEST,
+                content={"message": "Esse usuário já existe."}
             )
     except UserException:
         return JSONResponse(
@@ -42,33 +51,16 @@ async def create_user(
 
 
 # TODO: Deve retornar também o token de acesso do usuário
-@router.get("/me")
-async def get_me(requests: Request, token: str = Depends(oauth2_scheme),
-                 current_user: User = Depends(get_current_user_with_permission(Permissions.user)),
-                 uow: AbstractUow = Depends(SqlAlchemyUow)):
-    print(f"IP DO USER: {requests.client.host}")
-    with uow:
-        auth = uow.auth.get_by_user(current_user.id)
-
-        if auth.access_token == token:
-            return JSONResponse(
-                status_code=HTTPStatus.OK,
-                content=jsonable_encoder(current_user)
-            )
-
-        else:
-            return JSONResponse(
-                status_code=HTTPStatus.FORBIDDEN,
-                content={"message": "Token antigo."}
-            )
+@router.get("/me/")
+async def get_me(current_user: User = Depends(get_current_user_with_permission(Permissions.student))):
+    return current_user
 
 
-# TODO: Update Get Method
 @router.get('/')
 @get_controller(sv)
 async def get(
         message_error: str = "Não foi possível pegar os usuários",
-        current_user: User = Depends(get_current_user_with_permission(Permissions.vice_president)),
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
         uow: AbstractUow = Depends(SqlAlchemyUow)
 ):
     ...

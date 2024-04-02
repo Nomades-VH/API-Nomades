@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 from app.band.entities import Band
 from app.user.entities import User, Exame
 from bootstrap.database import mapper_registry
+from general_enum.hubs import Hubs
 from general_enum.permissions import Permissions
 
 users = Table(
@@ -18,6 +19,7 @@ users = Table(
     Column("email", String(50), nullable=False, unique=True),
     Column("password", String(100), nullable=False),
     Column("permission", Enum(Permissions), nullable=False),
+    Column("hub", Enum(Hubs), nullable=False),
     Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='SET NULL')),
     Column("created_at", DateTime, default=datetime.now()),
     Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now),

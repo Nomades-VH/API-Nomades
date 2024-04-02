@@ -10,5 +10,3 @@ class Permissions(Enum):
     counselor = 4
     table = 3
     student = 2
-    user = 1
-    visitor = 0
