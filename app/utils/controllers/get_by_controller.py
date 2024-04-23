@@ -45,7 +45,7 @@ def get_by_controller(get_service, entity_name: str):
                 )
 
             func_module_name = func.__module__.split('.')[1]
-            if func_module_name in ModuleType:
+            if func_module_name in (item.value for item in ModuleType):
                 band = get_service(uow, param)
 
                 if not band:
