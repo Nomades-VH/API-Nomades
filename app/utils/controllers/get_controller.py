@@ -43,7 +43,7 @@ def get_controller(service):
             func_module_name = func.__module__.split('.')[1]
             print(func_module_name)
             if func_module_name in ModuleType:
-
+                print(f"Entrei no if: {func_module_name in ModuleType}")
                 band = sv_band.get_by_user(uow, current_user)
 
                 if band:
