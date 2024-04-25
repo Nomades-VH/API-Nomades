@@ -109,6 +109,10 @@ def get_current_user(
                 raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
 
             auth = uow.auth.get_by_token(token)
+
+            if not auth:
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido.")
+
             ip_user_auth = jwt \
                 .decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]).get("sub").split(_SEPARATE_TOKEN)[
                 1]

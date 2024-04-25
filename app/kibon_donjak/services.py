@@ -40,7 +40,6 @@ def update(uow: AbstractUow, kibon_donjak: KibonDonjakEntity):
 def to_update(entity: KibonDonjakEntity, model: KibonDonjakModel) -> KibonDonjakEntity:
     entity.name = model.name
     entity.description = model.description
-    entity.difficulty = model.difficulty
     return entity
 
 

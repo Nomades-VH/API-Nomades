@@ -39,5 +39,4 @@ def delete(uow: AbstractUow, uuid: UUID) -> None:
 def to_update(entity: PoomsaeEntity, model: PoomsaeModel):
     entity.name = model.name
     entity.description = model.description
-    entity.difficulty = model.difficulty
     return entity

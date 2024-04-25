@@ -29,4 +29,4 @@ class KickRepository(AbstractKickRepository):
         self.session.query(Kick).filter(Kick.id == kick.id).update(dataclasses.asdict(kick))
 
     def iter(self) -> Iterator[Kick]:
-        return self.session.query(Kick).order_by(Kick.difficulty).all()
+        return self.session.query(Kick).all()

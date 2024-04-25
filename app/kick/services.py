@@ -42,5 +42,4 @@ def delete(uow: AbstractUow, uuid: UUID) -> None:
 def to_update(kick_entity: KickEntity, kick_model: KickModel) -> KickEntity:
     kick_entity.name = kick_model.name
     kick_entity.description = kick_model.description
-    kick_entity.difficulty = kick_model.difficulty
     return kick_entity
