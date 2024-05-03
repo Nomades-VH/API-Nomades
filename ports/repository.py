@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Iterator, Optional, List
+from typing import TypeVar, Generic, Optional, List
 from uuid import UUID
 
 from ports.entity import Entity

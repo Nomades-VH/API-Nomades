@@ -34,7 +34,7 @@ def _create_root(uow: AbstractUow):
                 password=hash_password(environ.get("ROOT_USER_PASSWORD")),
                 permission=Permissions.root,
                 hub=Hubs.SJBarreiro,
-                fk_band=None
+                fk_band=None,
             ))
 
 
@@ -73,17 +73,19 @@ if __name__ == "__main__":
 
     logger = logger
     logger.remove()
-    logger.add(
-        sys.stderr,
-        format="<blue>{time:YYYY-MM-DD HH:mm:ss}</blue> | <b>{level}</b> | <cyan>{message}</cyan> | "
-               "<r>{extra[status_code]}</r> | <b>{extra[user_id]}</b>",
-        level='DEBUG'
-    )
+
+    # logger.add(
+    #     sys.stderr,
+    #     level='DEBUG',
+    #     format="<blue>{time:YYYY-MM-DD HH:mm:ss}</blue> | <b>{level}</b> | <cyan>{message}</cyan> | "
+    #            "<r>{extra[status_code]}</r> | <b>{extra[user_id]}</b>"
+    # )
     logger.add(
         'app.log',
+        level='INFO',
         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message} | "
                "{extra[status_code]} | {extra[user_id]}",
-        level='DEBUG'
+        enqueue=True
     )
 
     _load_env()

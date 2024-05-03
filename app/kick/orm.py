@@ -17,6 +17,8 @@ kicks = Table(
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("name", String[100], nullable=False, unique=True),
     Column("description", String[250], nullable=False),
+    Column("created_for", UUID(as_uuid=True), nullable=False),
+    Column("updated_for", UUID(as_uuid=True), nullable=False),
     Column("created_at", DateTime, default=datetime.now()),
     Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now),
 )

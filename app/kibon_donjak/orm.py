@@ -18,7 +18,6 @@ kibon_donjak = Table(
     Column("description", String(255), nullable=False),
     Column("created_for", UUID(as_uuid=True), nullable=False),
     Column("updated_for", UUID(as_uuid=True), nullable=False),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='CASCADE'), nullable=False),
     Column("created_at", DateTime, default=datetime.now()),
     Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now),
 )

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 from uuid import UUID
 
@@ -15,6 +15,8 @@ class User(Entity):
     permission: Permissions
     hub: Hubs
     fk_band: Optional[UUID] = None
+    created_for: Optional[UUID] = field(init=False)
+    updated_for: Optional[UUID] = field(init=False)
 
     @classmethod
     def to_dict(cls, user: "User") -> dict:

@@ -8,7 +8,6 @@ from fastapi.responses import JSONResponse
 
 from app.band import services as sv_band
 from app.user.entities import User
-from app.utils.Logs import Logs as Log
 from general_enum.ModuleType import ModuleType
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
@@ -19,7 +18,6 @@ T = TypeVar("T")
 def get_by_controller(get_service, entity_name: str):
     def inner(func):
         @wraps(func)
-        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 param: Any,
                 message_error: str,

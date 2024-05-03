@@ -1,11 +1,13 @@
 from typing import Optional, List
+from uuid import UUID
 
 from pydantic import BaseModel
 from app.band.entities import Band as BandEntity
-from app.kibon_donjak.models import KibonDonjak
-from app.kick.entities import Kick
-from app.poomsae.entities import Poomsae
 from app.user.entities import User
+from app.kick.services import get_by_id as get_kick_by_id
+from app.poomsae.services import get_by_id as get_poomsae_by_id
+from app.kibon_donjak.services import get_by_id as get_kibon_donjak_by_id
+from ports.uow import AbstractUow
 
 
 class Band(BaseModel):
@@ -15,9 +17,9 @@ class Band(BaseModel):
     theory: str
     breakdown: str
     stretching: str
-    kicks: Optional[List[Kick]] = None
-    poomsaes: Optional[List[Poomsae]] = None
-    kibon_donjaks: Optional[List[KibonDonjak]] = None
+    kicks: Optional[List[UUID]] = []
+    poomsaes: Optional[List[UUID]] = []
+    kibon_donjaks: Optional[List[UUID]] = []
 
     def to_create(self, user: User) -> BandEntity:
         return BandEntity(

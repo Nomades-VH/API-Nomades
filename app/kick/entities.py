@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
 from uuid import UUID
 
 from ports.entity import Entity
@@ -8,4 +9,5 @@ from ports.entity import Entity
 class Kick(Entity):
     name: str
     description: str
-    # TODO: Adicionar "created_for" e "updated_for"
+    created_for: UUID
+    updated_for: UUID

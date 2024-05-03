@@ -49,6 +49,6 @@ def delete(uow: AbstractUow, uuid: UUID):
         return uow.kibondonjak.remove(uuid)
 
 
-def get_by_id(uow: AbstractUow, uuid: UUID):
+def get_by_id(uow: AbstractUow, uuid: UUID) -> Optional[KibonDonjakEntity]:
     with uow:
         return uow.kibondonjak.get(uuid)

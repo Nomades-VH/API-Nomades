@@ -12,9 +12,11 @@ class Kick(BaseModel):
     name: str
     description: str
 
-    def to_create(self, user: User) -> KickEntity:
+    def to_create(self, user: User, uow=None) -> KickEntity:
         return KickEntity(
             name=self.name,
             description=self.description,
+            created_for=user.id,
+            updated_for=user.id
         )
 
