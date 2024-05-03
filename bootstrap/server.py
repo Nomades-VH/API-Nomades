@@ -6,12 +6,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
+from app.auth.services import get_current_user
 from app.band.controllers import router as band_router
 from app.kibon_donjak.controllers import router as kibon_donjak_router
 from app.kick.controllers import router as kick_router
 from app.poomsae.controllers import router as poomsae_router
+from app.uow import SqlAlchemyUow
 from app.user.controllers import router as user_router
 from app.auth.controllers import router as auth_router
+from loguru import logger
 
 app = FastAPI(
     title="Nômades",
@@ -43,6 +46,51 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             })
         )
 
+
+@app.middleware('http')
+async def log(request: Request, call_next):
+    uow = SqlAlchemyUow()
+
+    try:
+        user = get_current_user(request.client.host, uow, request.headers['authorization'][7:]).id
+    except Exception as e:
+        if request.headers.get('authorization'):
+            user = request.headers['authorization'][7:]
+        else:
+            user = None
+
+    response = await call_next(request)
+    status = HTTPStatus(response.status_code)
+
+    if status.is_client_error:
+        logger.warning(
+            f"{request.url} {request.method.upper()}",
+            status_code=int(response.status_code),
+            user_id=user if user else None,
+        )
+
+    elif status.is_server_error:
+        logger.critical(
+            f"{request.url} {request.method.upper()}",
+            status_code=int(response.status_code),
+            user_id=user if user else None,
+        )
+
+    elif status.is_success:
+        logger.success(
+            f"{request.url} {request.method.upper()}",
+            status_code=int(response.status_code),
+            user_id=user if user else None,
+        )
+
+    elif status.is_redirection:
+        logger.debug(
+            f"{request.url} {request.method.upper()}",
+            status_code=int(response.status_code),
+            user_id=user if user else None,
+        )
+
+    return response
 
 app.include_router(router=band_router)
 app.include_router(router=kibon_donjak_router)

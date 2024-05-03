@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 from uuid import UUID
 
@@ -9,7 +9,6 @@ from ports.entity import Entity
 class Poomsae(Entity):
     name: str
     description: str
+    created_for: UUID
     updated_for: UUID
-    fk_band: UUID
-    created_for: Optional[UUID] = None
 

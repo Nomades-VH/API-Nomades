@@ -256,9 +256,6 @@ def refresh_token(user: User, token: str, uow: AbstractUow, ip_user: str) -> Aut
                 content={"message": "Não autenticado."}
             )
 
-        if auth.access_token != token and auth.fk_user == user.id:
-            return auth
-
         if not is_revoked_token(uow, auth):
             auth.access_token = _create_token(user.id, ip_user)
 

@@ -10,13 +10,11 @@ from app.user.entities import User
 from general_enum.ModuleType import ModuleType
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
-from app.utils.Logs import Logs as Log
 
 
 def get_controller(service):
     def inner(func):
         @wraps(func)
-        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 message_error: str,
                 current_user: User,

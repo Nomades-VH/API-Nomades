@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse
 from starlette.responses import Response
 
 from app.user.entities import User
-from app.utils.Logs import Logs as Log
 from ports.uow import AbstractUow
 
 T = TypeVar("T")
@@ -16,7 +15,6 @@ T = TypeVar("T")
 def create_controller(service):
     def inner(func):
         @wraps(func)
-        @Log.decorators_log(func.__module__, func.__name__)
         async def wrapper(
                 model: T,
                 message_success: str,
@@ -46,7 +44,8 @@ def create_controller(service):
                         "id": str(entity.id)
                     }
                 )
-            except Exception:
+            except Exception as error:
+                print(error)
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={

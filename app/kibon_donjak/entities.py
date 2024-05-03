@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 from uuid import UUID
 from ports.entity import Entity
@@ -8,6 +8,5 @@ from ports.entity import Entity
 class KibonDonjak(Entity):
     name: str
     description: str
-    fk_band: UUID
+    created_for: UUID
     updated_for: UUID
-    created_for: Optional[UUID]

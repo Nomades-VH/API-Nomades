@@ -36,6 +36,7 @@ async def login(
             }
         )
     except Exception as e:
+        print("É aqui é?", e)
         return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={"message": "Credenciais inválidas."})
 
 
@@ -70,7 +71,6 @@ async def refresh_token(
 ):
     try:
         token = sv.refresh_token(uow=uow, token=token, user=current_user, ip_user=request.client.host)
-
         return JSONResponse(
             status_code=HTTPStatus.OK,
             content={
