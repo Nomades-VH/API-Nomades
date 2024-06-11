@@ -55,8 +55,8 @@ async def get_by_band(
 @create_controller(sv)
 async def post(
         model: KibonDonjak,
-        message_error: str = "Não foi possível criar Kinbo Don Jak.",
-        message_success: str = "Kinbo criado com sucesso.",
+        message_error: str = "Não foi possível criar Kinbo DonJak.",
+        message_success: str = "Kibon Donjak criado com sucesso.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
         current_user: User = Depends(get_current_user_with_permission(Permissions.table))
 ) -> Response:
