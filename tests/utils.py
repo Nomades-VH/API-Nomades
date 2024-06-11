@@ -2,15 +2,16 @@ import os
 
 from fastapi.testclient import TestClient
 
-username = os.environ.get("ROOT_USER")
+email = os.environ.get("ROOT_USER_EMAIL")
 password = os.environ.get("ROOT_USER_PASSWORD")
 
 
 def get_authorization_headers(client: TestClient):
     data = {
-        "username": username,
+        "email": email,
         "password": password
     }
+
     token = client.post('/auth', json=data)
     return {'Authorization': 'Bearer ' + token.json()['access_token']}
 
@@ -26,10 +27,8 @@ def get_user_info(client: TestClient):
 
 
 def user_valid() -> dict:
-    username = os.environ.get("ROOT_USER")
-    password = os.environ.get("ROOT_USER_PASSWORD")
     return {
-        "username": username,
+        "email": email,
         "password": password
     }
 
