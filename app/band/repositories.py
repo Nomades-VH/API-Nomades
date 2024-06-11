@@ -12,10 +12,7 @@ from ports.repository import AbstractRepository
 
 def convert_uuid_to_string(data):
     if isinstance(data, UUID):
-        print(type(str(data)))
-        print(data)
         dated = str(data)
-        print(type(dated))
         return dated
     elif isinstance(data, dict):
         return {k: convert_uuid_to_string(v) for k, v in data.items()}

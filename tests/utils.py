@@ -18,7 +18,6 @@ def get_authorization_headers(client: TestClient):
 def get_authorization_headers_invalid(client: TestClient):
     data = get_authorization_headers(client)
     data['Authorization'] = data['Authorization'][7:]
-    print(data)
     return data
 
 

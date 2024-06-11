@@ -13,7 +13,6 @@ url = "/band/"
 def test_get_bands_without_bands(client: TestClient):
     authorization = get_authorization_headers(client)
     response = client.get(url, headers=authorization)
-    print(response.json(), response.status_code)
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json()["message"] == "Não foram encontradas faixas."
 
@@ -165,5 +164,4 @@ def test_delete_band(client: TestClient):
     response = client.delete(f"{url}{uuid}", headers=autorization)
     assert response.status_code == HTTPStatus.OK
     response = client.get(url, headers=autorization).json()
-    print(response)
     assert response["message"] == "Não foram encontradas faixas."

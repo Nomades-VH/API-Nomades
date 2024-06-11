@@ -36,5 +36,4 @@ def test_logout_wrong_access_token(client: TestClient):
     data = get_authorization_headers_invalid(client)
     response = client.post(url + '/logout', headers=data)
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    print(response.json())
     assert response.json()["detail"] == "Not authenticated"
