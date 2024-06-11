@@ -22,8 +22,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["https://www.nomadesvalehistorico.com.br", "https://nomadesvalehistorico.com.br"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"]
 )
@@ -91,6 +91,7 @@ async def log(request: Request, call_next):
         )
 
     return response
+
 
 app.include_router(router=band_router)
 app.include_router(router=kibon_donjak_router)
