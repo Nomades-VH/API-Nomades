@@ -42,5 +42,4 @@
 #     entity = Band.from_dict(band, user)
 #     entity.id = uuid.uuid4()
 #     response = sv.add(uow, entity)
-#     print(response)
 #

@@ -45,7 +45,6 @@ def create_controller(service):
                     }
                 )
             except Exception as error:
-                print(error)
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={

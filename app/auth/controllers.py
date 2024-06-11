@@ -36,7 +36,6 @@ async def login(
             }
         )
     except Exception as e:
-        print("É aqui é?", e)
         return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={"message": "Credenciais inválidas."})
 
 
