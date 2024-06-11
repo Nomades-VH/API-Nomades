@@ -62,28 +62,28 @@ async def log(request: Request, call_next):
     response = await call_next(request)
     status = HTTPStatus(response.status_code)
 
-    if status.is_client_error:
+    if 400 <= status <= 499:
         logger.warning(
             f"{request.url} {request.method.upper()}",
             status_code=int(response.status_code),
             user_id=user if user else None,
         )
 
-    elif status.is_server_error:
+    elif 500 <= status <= 599:
         logger.critical(
             f"{request.url} {request.method.upper()}",
             status_code=int(response.status_code),
             user_id=user if user else None,
         )
 
-    elif status.is_success:
+    elif 200 <= status <= 299:
         logger.success(
             f"{request.url} {request.method.upper()}",
             status_code=int(response.status_code),
             user_id=user if user else None,
         )
 
-    elif status.is_redirection:
+    elif 300 <= status <= 399:
         logger.debug(
             f"{request.url} {request.method.upper()}",
             status_code=int(response.status_code),
