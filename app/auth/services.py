@@ -67,7 +67,8 @@ def generate_token(email: str, password: str, uow: AbstractUow, ip_user: str) ->
 # Esses ms a mais servem para que um ataque de força bruta não funciona corretamente.
 async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
     with uow:
-        user = sv.get_user_by_email(uow, credentials.email)
+        user = sv.get_user_by_email(uow, credentials.email) or sv.get_user_by_username(uow, credentials.username)
+
         # O ms a mais, vem da verificação de senha
         if not user or not verify_password(credentials.password, user.password):
             raise InvalidCredentials("Email ou senha incorretos.")

@@ -22,7 +22,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.nomadesvalehistorico.com.br", "https://nomadesvalehistorico.com.br"],
+    # allow_origins=["https://www.nomadesvalehistorico.com.br", "https://nomadesvalehistorico.com.br"],
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -77,6 +78,7 @@ async def log(request: Request, call_next):
         )
 
     elif 200 <= status <= 299:
+        print(request.url, request.method.upper(), response.status_code)
         logger.success(
             f"{request.url} {request.method.upper()}",
             status_code=int(response.status_code),
