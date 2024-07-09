@@ -61,6 +61,8 @@ services:
     networks:
       - nm-network
     restart: always
+    volumes:
+      - ../:/usr/src/app/
 
 networks:
   nm-network:

@@ -77,6 +77,6 @@ async def delete(
         message_success: str = "Poomsae deletado com sucesso.",
         message_error: str = "Não foi possível deletar o poomsae.",
         uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.president))
+        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
 ) -> Response:
     ...
