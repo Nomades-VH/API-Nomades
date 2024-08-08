@@ -45,10 +45,13 @@ def update_controller(service):
                             content={"message": message_success}
                         )
 
-                    entity = service.to_update(entity, model)
+                    entity = service.to_update(entity, model, uow)
+                    print('to update')
                     entity.updated_for = current_user.id
                     entity.updated_at = datetime.now()
+                    print('atualizou os dados de data e quem atualizou')
                     service.update(uow, entity)
+                    print("atualizou de fato")
                     return JSONResponse(
                         status_code=HTTPStatus.OK,
                         content={"message": f"{message_success}"}
@@ -58,7 +61,7 @@ def update_controller(service):
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
                     content={
-                        "message": f"Chave estrangeira inválida"
+                        "message": f"{e}"
                     }
                 )
             except Exception as e:
