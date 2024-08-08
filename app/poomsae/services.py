@@ -36,7 +36,7 @@ def delete(uow: AbstractUow, uuid: UUID) -> None:
         uow.poomsae.remove(uuid)
 
 
-def to_update(entity: PoomsaeEntity, model: PoomsaeModel):
+def to_update(entity: PoomsaeEntity, model: PoomsaeModel, uow: AbstractUow = None):
     entity.name = model.name
     entity.description = model.description
     return entity

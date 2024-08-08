@@ -89,6 +89,7 @@ def add_kibon_donjaks(
         kibon_donjaks: List[UUID],
         uow: AbstractUow
 ):
+    print('chamando add_entity')
     return add_entity(
         parent_id=uuid_band,
         entity_ids=kibon_donjaks,
@@ -167,11 +168,31 @@ def delete(uow: AbstractUow, uuid: UUID):
         uow.band.remove(uuid)
 
 
-def to_update(band_entity: BandEntity, band_model: BandModel) -> BandEntity:
+def to_update(band_entity: BandEntity, band_model: BandModel, uow: AbstractUow) -> BandEntity:
     band_entity.gub = band_model.gub
     band_entity.name = band_model.name
     band_entity.meaning = band_model.meaning
     band_entity.theory = band_model.theory
     band_entity.breakdown = band_model.breakdown
     band_entity.stretching = band_model.stretching
+
+    with uow:
+        for kibon_donjak in band_entity.kibon_donjaks:
+            if kibon_donjak.id not in band_model.kibon_donjaks:
+                delete_kibon_donjak(band_entity.id, kibon_donjak.id, uow)
+
+        add_kibon_donjaks(band_entity.id, band_model.kibon_donjaks, uow)
+
+        for poomsae in band_entity.poomsaes:
+            if poomsae.id not in band_model.poomsaes:
+                delete_poomsae(band_entity.id, poomsae.id, uow)
+
+        add_poomsaes(band_entity.id, band_model.poomsaes, uow)
+
+        for kick in band_entity.kicks:
+            if kick.id not in band_model.kicks:
+                delete_kick(band_entity.id, kick.id, uow)
+
+        add_kicks(band_entity.id, band_model.kicks, uow)
+
     return band_entity

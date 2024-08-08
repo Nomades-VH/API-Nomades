@@ -21,3 +21,9 @@ run-dev-server:
 
 down-server:
 	docker-compose -f infra/docker-compose.yml down
+
+down-app:
+	docker compose -f infra/docker-compose.yml down nomades
+
+down-pgbouncer:
+	docker-compose -f infra/docker-compose.yml down pgbouncer

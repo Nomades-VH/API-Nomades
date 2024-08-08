@@ -39,7 +39,7 @@ def delete(uow: AbstractUow, uuid: UUID) -> None:
         return uow.kick.remove(uuid)
 
 
-def to_update(kick_entity: KickEntity, kick_model: KickModel) -> KickEntity:
+def to_update(kick_entity: KickEntity, kick_model: KickModel, uow: AbstractUow = None) -> KickEntity:
     kick_entity.name = kick_model.name
     kick_entity.description = kick_model.description
     return kick_entity

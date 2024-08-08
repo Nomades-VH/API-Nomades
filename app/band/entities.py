@@ -29,5 +29,14 @@ class Band(Entity):
         )
 
     def __eq__(self, other):
-        return self.gub == other.gub and self.name == other.name and self.meaning == other.meaning and self.theory == other.theory \
-            and self.breakdown == other.breakdown and self.stretching == other.stretching
+        return (
+            self.gub == other.gub
+            and self.name == other.name
+            and self.meaning == other.meaning
+            and self.theory == other.theory
+            and self.breakdown == other.breakdown
+            and self.stretching == other.stretching
+            and self.poomsaes == other.poomsaes
+            and self.kibon_donjaks == other.kibon_donjaks
+            and self.kicks == other.kicks
+        )

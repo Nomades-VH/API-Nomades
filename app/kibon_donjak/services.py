@@ -37,7 +37,7 @@ def update(uow: AbstractUow, kibon_donjak: KibonDonjakEntity):
         return uow.kibondonjak.update(kibon_donjak)
 
 
-def to_update(entity: KibonDonjakEntity, model: KibonDonjakModel) -> KibonDonjakEntity:
+def to_update(entity: KibonDonjakEntity, model: KibonDonjakModel, uow: AbstractUow = None) -> KibonDonjakEntity:
     entity.name = model.name
     entity.description = model.description
     return entity
