@@ -40,10 +40,12 @@ def update_controller(service):
                         )
 
                     if entity == model:
+                        print('IGUAIS!!!')
                         return JSONResponse(
                             status_code=HTTPStatus.OK,
                             content={"message": message_success}
                         )
+                    print("Não iguais")
 
                     entity = service.to_update(entity, model, uow)
                     entity.updated_for = current_user.id
