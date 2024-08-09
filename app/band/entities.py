@@ -29,22 +29,18 @@ class Band(Entity):
         )
 
     def __eq__(self, other):
-        verify_poomsaes = True
-        verify_kibon_donjaks = True
-        verify_kicks = True
+        def verify_list_equality(self_list, list_ids):
+            self_list_ids = {item.id for item in self_list}
+            return len(self_list) == len(list_ids) and self_list_ids == set(list_ids)
 
-        for poomsae in self.poomsaes:
-            if poomsae.id not in other.poomsaes:
-                verify_poomsaes = False
+        if not verify_list_equality(self.poomsaes, other.poomsaes):
+            return False
 
-        for kick in self.kicks:
-            if kick.id not in other.kicks:
-                verify_kicks = False
+        if not verify_list_equality(self.kibon_donjaks, other.kibon_donjaks):
+            return False
 
-        for kibon_donjak in self.kibon_donjaks:
-            if kibon_donjak.id not in other.kibon_donjaks:
-                verify_kibon_donjaks = False
-
+        if not verify_list_equality(self.kicks, other.kicks):
+            return False
 
         return (
             self.gub == other.gub
@@ -53,7 +49,4 @@ class Band(Entity):
             and self.theory == other.theory
             and self.breakdown == other.breakdown
             and self.stretching == other.stretching
-            and verify_kicks
-            and verify_kibon_donjaks
-            and verify_poomsaes
         )
