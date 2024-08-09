@@ -46,12 +46,9 @@ def update_controller(service):
                         )
 
                     entity = service.to_update(entity, model, uow)
-                    print('to update')
                     entity.updated_for = current_user.id
                     entity.updated_at = datetime.now()
-                    print('atualizou os dados de data e quem atualizou')
                     service.update(uow, entity)
-                    print("atualizou de fato")
                     return JSONResponse(
                         status_code=HTTPStatus.OK,
                         content={"message": f"{message_success}"}

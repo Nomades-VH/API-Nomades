@@ -89,7 +89,6 @@ def add_kibon_donjaks(
         kibon_donjaks: List[UUID],
         uow: AbstractUow
 ):
-    print('chamando add_entity')
     return add_entity(
         parent_id=uuid_band,
         entity_ids=kibon_donjaks,
