@@ -1,9 +1,12 @@
+import os
 from logging.config import fileConfig
 from bootstrap.database import mapper_registry, ensure_all_entities
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
+from dotenv import load_dotenv
 from alembic import context
+
+load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -16,6 +19,12 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
+
+database_url = os.getenv('DATABASE_URI_ALEMBIC')
+if database_url:
+    config.set_main_option('sqlalchemy.url', database_url)
+else:
+    raise RuntimeError("Tente utilizar: export '$(cat .env | xargs)' ou atualizar o seu arquivo .env")
 
 # Será necessário alterar a URI no .env
 ensure_all_entities()
