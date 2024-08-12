@@ -93,8 +93,8 @@ if __name__ == "__main__":
 
     uow = SqlAlchemyUow()
     _create_root(uow)
-    _create_student(uow)
-    _create_table_user(uow)
+    # _create_student(uow)
+    # _create_table_user(uow)
 
     import uvicorn
 
