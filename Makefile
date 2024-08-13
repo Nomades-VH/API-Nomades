@@ -13,6 +13,8 @@ run-database-test:
 	docker-compose -f infra/docker-compose.yml up -d psql_test
 
 run-server:
+	docker-compose -f infra/docker-compose.yml up -d pgbouncer
+	alembic upgrade head
 	docker-compose -f infra/docker-compose.yml up nomades
 
 run-dev-server:
