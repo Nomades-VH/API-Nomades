@@ -49,17 +49,10 @@ def get(uow: AbstractUow) -> Iterator[Auth]:
         yield from uow.auth.iter()
 
 
-def generate_token(email: str, password: str, uow: AbstractUow, ip_user: str) -> Auth:
-    user = sv.get_user_by_email(uow, email)
-    if not user:
-        raise InvalidCredentials()
-
-    if not verify_password(password, user.password):
-        raise InvalidCredentials()
-
+def generate_token(user_id, email: str, password: str, uow: AbstractUow, ip_user: str) -> Auth:
     return Auth(
-        access_token=_create_token(user.id, ip_user),
-        fk_user=user.id
+        access_token=_create_token(user_id, ip_user),
+        fk_user=user_id
     )
 
 
@@ -85,7 +78,7 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
             return token
 
         if not token:
-            token = generate_token(credentials.email, credentials.password, uow, ip_user)
+            token = generate_token(user.id, credentials.email, credentials.password, uow, ip_user)
             uow.auth.add(token)
         else:
             token.access_token = _create_token(user.id, ip_user)

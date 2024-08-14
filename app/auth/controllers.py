@@ -3,6 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import JSONResponse
 
+from app.auth.exceptions import InvalidCredentials
 from app.auth.schemas import Credentials
 from app.auth.services import get_current_user_with_permission
 from app.uow import SqlAlchemyUow
@@ -35,8 +36,10 @@ async def login(
                 "token_type": "bearer"
             }
         )
-    except Exception as e:
+    except InvalidCredentials:
         return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={"message": "Credenciais inválidas."})
+    except Exception:
+        return JSONResponse(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content={"message": "Tente novamente mais tarde."})
 
 
 @router.get("/")
