@@ -28,7 +28,7 @@ class User(Entity):
             "permission": user.permission,
             "fk_band": user.fk_band,
             "created_at": user.created_at,
-            "updated_at": user.updated_at
+            "updated_at": user.updated_at,
         }
 
     @classmethod
@@ -37,7 +37,7 @@ class User(Entity):
             username=user_dict["username"],
             email=user_dict["email"],
             password=user_dict["password"],
-            permission=user_dict["permission"]
+            permission=user_dict["permission"],
         )
 
 

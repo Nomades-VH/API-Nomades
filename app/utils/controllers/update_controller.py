@@ -19,14 +19,16 @@ def update_controller(service):
     def inner(func):
         @wraps(func)
         async def wrapper(
-                uuid: UUID,
-                model: T,
-                message_success: str,
-                message_error: str,
-                uow: AbstractUow,
-                current_user: User
+            uuid: UUID,
+            model: T,
+            message_success: str,
+            message_error: str,
+            uow: AbstractUow,
+            current_user: User,
         ) -> Response:
-            response: JSONResponse = await func(uuid, model, message_success, message_error, uow, current_user)
+            response: JSONResponse = await func(
+                uuid, model, message_success, message_error, uow, current_user
+            )
             if response:
                 return response
 
@@ -36,13 +38,13 @@ def update_controller(service):
                     if not entity:
                         return JSONResponse(
                             status_code=HTTPStatus.NOT_FOUND,
-                            content={"message": f"{message_error} ID não encontrado."}
+                            content={"message": f"{message_error} ID não encontrado."},
                         )
 
                     if entity == model:
                         return JSONResponse(
                             status_code=HTTPStatus.OK,
-                            content={"message": message_success}
+                            content={"message": message_success},
                         )
 
                     entity = service.to_update(entity, model, uow)
@@ -51,23 +53,19 @@ def update_controller(service):
                     service.update(uow, entity)
                     return JSONResponse(
                         status_code=HTTPStatus.OK,
-                        content={"message": f"{message_success}"}
+                        content={"message": f"{message_success}"},
                     )
             except IntegrityError as e:
                 # TODO: IMPORTANTE Usar isso no sistema
                 return JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST,
-                    content={
-                        "message": f"{e}"
-                    }
+                    status_code=HTTPStatus.BAD_REQUEST, content={"message": f"{e}"}
                 )
             except Exception as e:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
-                    content={
-                        "message": f"{message_error}",
-                        "error": str(e)
-                    }
+                    content={"message": f"{message_error}", "error": str(e)},
                 )
+
         return wrapper
+
     return inner

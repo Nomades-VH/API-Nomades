@@ -8,8 +8,7 @@ from ports.repository import AbstractRepository
 
 
 class AbstractKibonDonjakRepository(AbstractRepository[KibonDonjak], ABC):
-    def get_by_name(self, name: str) -> Optional[KibonDonjak]:
-        ...
+    def get_by_name(self, name: str) -> Optional[KibonDonjak]: ...
 
 
 # TODO: Verificar todos os métodos

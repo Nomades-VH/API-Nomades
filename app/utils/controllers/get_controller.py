@@ -16,9 +16,7 @@ def get_controller(service):
     def inner(func):
         @wraps(func)
         async def wrapper(
-                message_error: str,
-                current_user: User,
-                uow: AbstractUow
+            message_error: str, current_user: User, uow: AbstractUow
         ) -> Response:
             response: JSONResponse = await func(message_error, current_user, uow)
             if response:
@@ -33,12 +31,9 @@ def get_controller(service):
                         content={"message": message_error},
                     )
 
-                return JSONResponse(
-                    status_code=HTTPStatus.OK,
-                    content=entity
-                )
+                return JSONResponse(status_code=HTTPStatus.OK, content=entity)
 
-            func_module_name = func.__module__.split('.')[1]
+            func_module_name = func.__module__.split(".")[1]
             if func_module_name in (item.value for item in ModuleType):
                 band = sv_band.get_by_user(uow, current_user)
 
@@ -46,8 +41,7 @@ def get_controller(service):
                     bands = sv_band.get_minors_band(uow, band.gub)
                     if func_module_name == ModuleType.BAND.value:
                         return JSONResponse(
-                            status_code=HTTPStatus.OK,
-                            content=jsonable_encoder(bands)
+                            status_code=HTTPStatus.OK, content=jsonable_encoder(bands)
                         )
 
                     entities = {}
@@ -61,12 +55,13 @@ def get_controller(service):
                 else:
                     return JSONResponse(
                         status_code=HTTPStatus.FORBIDDEN,
-                        content={"message": "Você não possui uma faixa. Procure mais informações com seu professor."}
+                        content={
+                            "message": "Você não possui uma faixa. Procure mais informações com seu professor."
+                        },
                     )
 
                 return JSONResponse(
-                    status_code=HTTPStatus.OK,
-                    content=jsonable_encoder(entities)
+                    status_code=HTTPStatus.OK, content=jsonable_encoder(entities)
                 )
 
         return wrapper

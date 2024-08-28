@@ -17,6 +17,5 @@ class Kick(BaseModel):
             name=self.name,
             description=self.description,
             created_for=user.id,
-            updated_for=user.id
+            updated_for=user.id,
         )
-

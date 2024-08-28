@@ -65,60 +65,69 @@ def add_kicks(uuid_band: UUID, kicks: List[UUID], uow: AbstractUow):
         parent_id=uuid_band,
         entity_ids=kicks,
         uow=uow,
-        entity_repo_name='kick',
-        relation_attr='kicks'
+        entity_repo_name="kick",
+        relation_attr="kicks",
     )
 
 
-def add_poomsaes(
-        uuid_band: UUID,
-        poomsaes: List[UUID],
-        uow: AbstractUow
-):
+def add_poomsaes(uuid_band: UUID, poomsaes: List[UUID], uow: AbstractUow):
     return add_entity(
         parent_id=uuid_band,
         entity_ids=poomsaes,
         uow=uow,
-        entity_repo_name='poomsae',
-        relation_attr='poomsaes'
+        entity_repo_name="poomsae",
+        relation_attr="poomsaes",
     )
 
 
-def add_kibon_donjaks(
-        uuid_band: UUID,
-        kibon_donjaks: List[UUID],
-        uow: AbstractUow
-):
+def add_kibon_donjaks(uuid_band: UUID, kibon_donjaks: List[UUID], uow: AbstractUow):
     return add_entity(
         parent_id=uuid_band,
         entity_ids=kibon_donjaks,
         uow=uow,
-        entity_repo_name='kibondonjak',
-        relation_attr='kibon_donjaks'
+        entity_repo_name="kibondonjak",
+        relation_attr="kibon_donjaks",
     )
 
 
 def delete_kick(uuid_band: UUID, uuid_kick: UUID, uow: AbstractUow):
-    return delete_entity(parent_id=uuid_band, entity_id=uuid_kick, uow=uow, entity_repository='kick',
-                         relation_attr='kicks')
+    return delete_entity(
+        parent_id=uuid_band,
+        entity_id=uuid_kick,
+        uow=uow,
+        entity_repository="kick",
+        relation_attr="kicks",
+    )
 
 
 def delete_poomsae(uuid_band: UUID, uuid_poomsae: UUID, uow: AbstractUow):
-    return delete_entity(parent_id=uuid_band, entity_id=uuid_poomsae, uow=uow, entity_repository='poomsae',
-                         relation_attr='poomsaes')
+    return delete_entity(
+        parent_id=uuid_band,
+        entity_id=uuid_poomsae,
+        uow=uow,
+        entity_repository="poomsae",
+        relation_attr="poomsaes",
+    )
 
 
-def delete_kibon_donjak(
-        uuid_band: UUID,
-        uuid_kibon_donjak: UUID,
-        uow: AbstractUow
+def delete_kibon_donjak(uuid_band: UUID, uuid_kibon_donjak: UUID, uow: AbstractUow):
+    return delete_entity(
+        parent_id=uuid_band,
+        entity_id=uuid_kibon_donjak,
+        uow=uow,
+        entity_repository="kibondonjak",
+        relation_attr="kibon_donjaks",
+    )
+
+
+def add_entity(
+    parent_id: UUID,
+    entity_ids: List[UUID],
+    uow: AbstractUow,
+    entity_repo_name: str,
+    relation_attr: str,
+    parent_repo_name: str = "band",
 ):
-    return delete_entity(parent_id=uuid_band, entity_id=uuid_kibon_donjak, uow=uow, entity_repository='kibondonjak',
-                         relation_attr='kibon_donjaks')
-
-
-def add_entity(parent_id: UUID, entity_ids: List[UUID], uow: AbstractUow,
-               entity_repo_name: str, relation_attr: str, parent_repo_name: str = "band"):
     with uow:
         parent = getattr(uow, parent_repo_name).get(parent_id)
         if not parent:
@@ -137,11 +146,14 @@ def add_entity(parent_id: UUID, entity_ids: List[UUID], uow: AbstractUow,
     return entity_ids
 
 
-def delete_entity(parent_id: UUID, entity_id: UUID, uow: AbstractUow,
-                  entity_repository: str,
-                  relation_attr: str,
-                  parent_repository: str = 'band'
-                  ) -> Optional[UUID]:
+def delete_entity(
+    parent_id: UUID,
+    entity_id: UUID,
+    uow: AbstractUow,
+    entity_repository: str,
+    relation_attr: str,
+    parent_repository: str = "band",
+) -> Optional[UUID]:
     with uow:
         parent = getattr(uow, parent_repository).get(parent_id)
         if not parent:
@@ -167,7 +179,9 @@ def delete(uow: AbstractUow, uuid: UUID):
         uow.band.remove(uuid)
 
 
-def to_update(band_entity: BandEntity, band_model: BandModel, uow: AbstractUow) -> BandEntity:
+def to_update(
+    band_entity: BandEntity, band_model: BandModel, uow: AbstractUow
+) -> BandEntity:
     band_entity.gub = band_model.gub
     band_entity.name = band_model.name
     band_entity.meaning = band_model.meaning

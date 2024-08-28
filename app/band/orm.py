@@ -28,52 +28,96 @@ bands = Table(
     Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now),
 )
 
-created_updated_for_index = Index('idx_created_updated_for', bands.c.created_for, bands.c.updated_for)
-gub_index = Index('idx_gub', bands.c.gub)
-created_updated_at_index = Index('idx_created_updated_at', bands.c.created_at, bands.c.updated_at)
+created_updated_for_index = Index(
+    "idx_created_updated_for", bands.c.created_for, bands.c.updated_for
+)
+gub_index = Index("idx_gub", bands.c.gub)
+created_updated_at_index = Index(
+    "idx_created_updated_at", bands.c.created_at, bands.c.updated_at
+)
 
 band_kick = Table(
     "band_kick",
     mapper_registry.metadata,
-    Column("band_id", UUID(as_uuid=True), ForeignKey("bands.id", ondelete="CASCADE"), primary_key=True, nullable=False),
-    Column("kick_id", UUID(as_uuid=True), ForeignKey("kicks.id", ondelete="CASCADE"), primary_key=True, nullable=False),
+    Column(
+        "band_id",
+        UUID(as_uuid=True),
+        ForeignKey("bands.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
+    Column(
+        "kick_id",
+        UUID(as_uuid=True),
+        ForeignKey("kicks.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
 )
 
 band_poomsae = Table(
     "band_poomsae",
     mapper_registry.metadata,
-    Column("band_id", UUID(as_uuid=True), ForeignKey("bands.id", ondelete="CASCADE"), primary_key=True, nullable=False),
-    Column("poomsae_id", UUID(as_uuid=True), ForeignKey("poomsaes.id", ondelete="CASCADE"), primary_key=True, nullable=False),
+    Column(
+        "band_id",
+        UUID(as_uuid=True),
+        ForeignKey("bands.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
+    Column(
+        "poomsae_id",
+        UUID(as_uuid=True),
+        ForeignKey("poomsaes.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
 )
 
 band_kibondonjak = Table(
     "band_kibondonjak",
     mapper_registry.metadata,
-    Column("band_id", UUID(as_uuid=True), ForeignKey("bands.id", ondelete="CASCADE"), primary_key=True, nullable=False),
-    Column("kibondonjak_id", UUID(as_uuid=True), ForeignKey("kibon_donjaks.id", ondelete="CASCADE"), primary_key=True, nullable=False),
+    Column(
+        "band_id",
+        UUID(as_uuid=True),
+        ForeignKey("bands.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
+    Column(
+        "kibondonjak_id",
+        UUID(as_uuid=True),
+        ForeignKey("kibon_donjaks.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
 )
 
-mapper_registry.map_imperatively(Band, bands, properties={
-    # Preciso criar uma relação com as tabelas kicks, poomsaes e kibon_donjaks
-    "kicks": relationship(
-        Kick,
-        secondary=band_kick,
-        back_populates="bands",
-        cascade="all, delete",
-        lazy='joined'
-    ),
-    "poomsaes": relationship(
-        Poomsae,
-        secondary=band_poomsae,
-        back_populates="bands",
-        cascade="all, delete",
-        lazy='joined'
-    ),
-    "kibon_donjaks": relationship(
-        KibonDonjak,
-        secondary=band_kibondonjak,
-        back_populates="bands",
-        cascade="all, delete",
-        lazy='joined'
-    )
-})
+mapper_registry.map_imperatively(
+    Band,
+    bands,
+    properties={
+        # Preciso criar uma relação com as tabelas kicks, poomsaes e kibon_donjaks
+        "kicks": relationship(
+            Kick,
+            secondary=band_kick,
+            back_populates="bands",
+            cascade="all, delete",
+            lazy="joined",
+        ),
+        "poomsaes": relationship(
+            Poomsae,
+            secondary=band_poomsae,
+            back_populates="bands",
+            cascade="all, delete",
+            lazy="joined",
+        ),
+        "kibon_donjaks": relationship(
+            KibonDonjak,
+            secondary=band_kibondonjak,
+            back_populates="bands",
+            cascade="all, delete",
+            lazy="joined",
+        ),
+    },
+)

@@ -24,11 +24,15 @@ poomsaes = Table(
 )
 
 
-mapper_registry.map_imperatively(Poomsae, poomsaes, properties={
-    "bands": relationship(
-        Band,
-        secondary=band_poomsae,
-        back_populates="poomsaes",
-        cascade="all, delete"
-    )
-})
+mapper_registry.map_imperatively(
+    Poomsae,
+    poomsaes,
+    properties={
+        "bands": relationship(
+            Band,
+            secondary=band_poomsae,
+            back_populates="poomsaes",
+            cascade="all, delete",
+        )
+    },
+)

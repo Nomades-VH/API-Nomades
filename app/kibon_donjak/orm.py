@@ -23,11 +23,15 @@ kibon_donjak = Table(
 )
 
 
-mapper_registry.map_imperatively(KibonDonjak, kibon_donjak, properties={
-    "bands": relationship(
-        Band,
-        secondary=band_kibondonjak,
-        back_populates="kibon_donjaks",
-        cascade="all, delete"
-    )
-})
+mapper_registry.map_imperatively(
+    KibonDonjak,
+    kibon_donjak,
+    properties={
+        "bands": relationship(
+            Band,
+            secondary=band_kibondonjak,
+            back_populates="kibon_donjaks",
+            cascade="all, delete",
+        )
+    },
+)

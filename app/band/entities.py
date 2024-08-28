@@ -24,9 +24,7 @@ class Band(Entity):
 
     @classmethod
     def from_dict(cls, data: dict) -> "Band":
-        return cls(
-            *data
-        )
+        return cls(*data)
 
     def __eq__(self, other):
         def verify_entities_list(first_list, second_list):

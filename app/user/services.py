@@ -29,20 +29,26 @@ def get_user_by_username(uow: AbstractUow, username: str) -> Optional[User]:
 
 
 def create_new_user(uow: AbstractUow, user: User, current_user: User):
-    if user.permission.value >= Permissions.table.value and current_user.permission.value < Permissions.vice_president.value:
+    if (
+        user.permission.value >= Permissions.table.value
+        and current_user.permission.value < Permissions.vice_president.value
+    ):
         raise HTTPException(
-            status_code=401, detail="Você não possui permissão para cadastrar um usuário da mesa."
+            status_code=401,
+            detail="Você não possui permissão para cadastrar um usuário da mesa.",
         )
 
-    if user.permission == Permissions.president.value and current_user.permission < Permissions.root.value:
+    if (
+        user.permission == Permissions.president.value
+        and current_user.permission < Permissions.root.value
+    ):
         raise HTTPException(
-            status_code=401, detail="Você não possui permissão para cadastrar um usuário Presidente."
+            status_code=401,
+            detail="Você não possui permissão para cadastrar um usuário Presidente.",
         )
 
     if current_user.permission.value < Permissions.table.value:
-        raise HTTPException(
-            status_code=401, detail="Você não pode criar um usuário."
-        )
+        raise HTTPException(status_code=401, detail="Você não pode criar um usuário.")
 
     with uow:
         user.password = hash_password(user.password)
@@ -77,7 +83,9 @@ def get(uow: AbstractUow):
 def change_user(user: User | ModelUser) -> ModelUser | User:
     if type(user) == User:
         return ModelUser(
-            credentials=Credentials(username=user.username, email=user.email, password=user.password),
+            credentials=Credentials(
+                username=user.username, email=user.email, password=user.password
+            ),
             permission=user.permission,
             hub=user.hub,
             fk_band=user.fk_band,
