@@ -29,17 +29,16 @@ class Band(Entity):
         )
 
     def __eq__(self, other):
-        def verify_list_equality(self_list, list_ids):
-            self_list_ids = {item.id for item in self_list}
-            return len(self_list) == len(list_ids) and self_list_ids == set(list_ids)
+        def verify_entities_list(first_list, second_list):
+            return len(first_list) == len(second_list) and first_list == second_list
 
-        if not verify_list_equality(self.poomsaes, other.poomsaes):
+        if not verify_entities_list(self.poomsaes, other.poomsaes):
             return False
 
-        if not verify_list_equality(self.kibon_donjaks, other.kibon_donjaks):
+        if not verify_entities_list(self.kibon_donjaks, other.kibon_donjaks):
             return False
 
-        if not verify_list_equality(self.kicks, other.kicks):
+        if not verify_entities_list(self.kicks, other.kicks):
             return False
 
         return (
