@@ -23,11 +23,12 @@ kicks = Table(
     Column("updated_at", DateTime, default=datetime.now(), onupdate=datetime.now),
 )
 
-mapper_registry.map_imperatively(Kick, kicks, properties={
-    "bands": relationship(
-        Band,
-        secondary=band_kick,
-        back_populates="kicks",
-        cascade="all, delete"
-    )
-})
+mapper_registry.map_imperatively(
+    Kick,
+    kicks,
+    properties={
+        "bands": relationship(
+            Band, secondary=band_kick, back_populates="kicks", cascade="all, delete"
+        )
+    },
+)

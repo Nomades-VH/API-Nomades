@@ -14,13 +14,18 @@ tokens = Table(
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid4),
     Column("access_token", String(250), unique=True, nullable=False),
     Column("is_invalid", Boolean, nullable=False, default=False),
-    Column("fk_user", UUID(as_uuid=True), ForeignKey("users.id", ondelete='CASCADE'), default=uuid4),
+    Column(
+        "fk_user",
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        default=uuid4,
+    ),
     Column("created_at", DateTime, default=datetime.now()),
     Column("updated_at", DateTime, default=datetime.now, onupdate=datetime.now),
 )
 
-fk_user_index = Index('idx_fk_user', tokens.c.fk_user)
-token_index = Index('idx_fk_token', tokens.c.access_token)
-is_invalid_index = Index('idx_fk_is_invalid', tokens.c.is_invalid)
+fk_user_index = Index("idx_fk_user", tokens.c.fk_user)
+token_index = Index("idx_fk_token", tokens.c.access_token)
+is_invalid_index = Index("idx_fk_is_invalid", tokens.c.is_invalid)
 
 mapper_registry.map_imperatively(Auth, tokens)

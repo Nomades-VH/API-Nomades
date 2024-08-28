@@ -1,7 +1,17 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Table, Column, String, ForeignKey, DateTime, Float, Integer, Enum, Index
+from sqlalchemy import (
+    Table,
+    Column,
+    String,
+    ForeignKey,
+    DateTime,
+    Float,
+    Integer,
+    Enum,
+    Index,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -20,7 +30,7 @@ users = Table(
     Column("password", String(100), nullable=False),
     Column("permission", Enum(Permissions), nullable=False),
     Column("hub", Enum(Hubs), nullable=False),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='SET NULL')),
+    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete="SET NULL")),
     Column("created_for", UUID(as_uuid=True), nullable=True),
     Column("updated_for", UUID(as_uuid=True), nullable=True),
     Column("created_at", DateTime, default=datetime.now()),
@@ -33,8 +43,18 @@ email_index = Index("email_index", users.c.email)
 exame = Table(
     "exame",
     mapper_registry.metadata,
-    Column("fk_user", UUID(as_uuid=True), ForeignKey("users.id", ondelete='CASCADE'), primary_key=True),
-    Column("fk_band", UUID(as_uuid=True), ForeignKey("bands.id", ondelete='CASCADE'), nullable=True),
+    Column(
+        "fk_user",
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "fk_band",
+        UUID(as_uuid=True),
+        ForeignKey("bands.id", ondelete="CASCADE"),
+        nullable=True,
+    ),
     Column("note_poomsae", Float),
     Column("note_kibondonjak", Float),
     Column("note_kick", Float),

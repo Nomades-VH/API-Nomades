@@ -15,5 +15,5 @@ class Auth(Entity):
         return cls(
             access_token=token_dict["access_token"],
             fk_user=token_dict["fk_user"],
-            is_invalid=token_dict["is_invalid"]
+            is_invalid=token_dict["is_invalid"],
         )

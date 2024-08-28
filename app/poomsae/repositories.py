@@ -8,8 +8,7 @@ from ports.repository import AbstractRepository
 
 
 class AbstractPoomsaeRepository(AbstractRepository[Poomsae], ABC):
-    def get_by_name(self, name: str) -> Optional[Poomsae]:
-        ...
+    def get_by_name(self, name: str) -> Optional[Poomsae]: ...
 
     pass
 
@@ -28,7 +27,9 @@ class PoomsaeRepository(AbstractPoomsaeRepository):
         return self.session.query(Poomsae).filter(Poomsae.id == uuid).delete()
 
     def update(self, poomsae: Poomsae) -> None:
-        self.session.query(Poomsae).filter(Poomsae.id == poomsae.id).update(dataclasses.asdict(poomsae))
+        self.session.query(Poomsae).filter(Poomsae.id == poomsae.id).update(
+            dataclasses.asdict(poomsae)
+        )
 
     def iter(self) -> Iterator[Poomsae]:
         return self.session.query(Poomsae).all()

@@ -50,8 +50,12 @@ class BandRepository(AbstractBandRepository):
         return self.session.query(Band).filter(Band.id == uuid).delete()
 
     def update(self, band: Band) -> None:
-        band = {k: v for k, v in dataclasses.asdict(band).items() if k not in ['kicks', 'poomsaes', 'kibon_donjaks']}
-        self.session.query(Band).filter(Band.id == band['id']).update(band)
+        band = {
+            k: v
+            for k, v in dataclasses.asdict(band).items()
+            if k not in ["kicks", "poomsaes", "kibon_donjaks"]
+        }
+        self.session.query(Band).filter(Band.id == band["id"]).update(band)
 
     def iter(self) -> List[Band]:
         return self.session.query(Band).order_by(desc(Band.gub)).all()

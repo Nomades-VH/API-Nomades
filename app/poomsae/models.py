@@ -10,11 +10,10 @@ class Poomsae(BaseModel):
     name: str
     description: str
 
-
     def to_create(self, user: User, uow=None) -> PoomsaeEntity:
         return PoomsaeEntity(
             name=self.name,
             description=self.description,
             created_for=user.id,
-            updated_for=user.id
+            updated_for=user.id,
         )

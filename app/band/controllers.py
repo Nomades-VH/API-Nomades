@@ -28,103 +28,92 @@ router = APIRouter(prefix="/band")
 @router.get("/")
 @get_controller(sv)
 async def get(
-        message_error: str = "Não foram encontradas faixas.",
-        current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> Response:
-    ...
+    message_error: str = "Não foram encontradas faixas.",
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+) -> Response: ...
 
 
 @router.get("/me")
 async def get_my_band(
-        current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-        uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
 ):
     band = sv.get_by_user(uow, current_user)
     if not band:
         return JSONResponse(
             status_code=HTTPStatus.FORBIDDEN,
-            content={
-                "message": "Você não tem uma faixa."
-            }
+            content={"message": "Você não tem uma faixa."},
         )
 
-    return JSONResponse(
-        status_code=HTTPStatus.OK,
-        content=jsonable_encoder(band)
-    )
+    return JSONResponse(status_code=HTTPStatus.OK, content=jsonable_encoder(band))
 
 
 @router.get("/{param}")
-@get_by_controller(sv.get_by_id, '')
+@get_by_controller(sv.get_by_id, "")
 async def get_by_id(
-        param: UUID,
-        message_error: str = "Faixa não encontrada.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.student))
-) -> Response:
-    ...
+    param: UUID,
+    message_error: str = "Faixa não encontrada.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+) -> Response: ...
 
 
 @router.get("/gub/{param}")
-@get_by_controller(sv.get_by_gub, '')
+@get_by_controller(sv.get_by_gub, "")
 async def get_by_gub(
-        param: int,
-        message_error: str = "Faixa não encontrada.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    param: int,
+    message_error: str = "Faixa não encontrada.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ) -> Response:
     band = sv.get_by_user(uow, current_user)
 
-    if band and current_user.permission.value < Permissions.table.value and band.gub > param:
+    if (
+        band
+        and current_user.permission.value < Permissions.table.value
+        and band.gub > param
+    ):
         return JSONResponse(
             status_code=HTTPStatus.FORBIDDEN,
-            content={
-                "message": "Você ainda não chegou nessa faixa."
-            }
+            content={"message": "Você ainda não chegou nessa faixa."},
         )
 
 
 @router.post("/")
 @create_controller(sv)
 async def post(
-        model: Band,
-        message_success: str = "Faixa criada com sucesso.",
-        message_error: str = "Erro ao criar a faixa.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(
-            get_current_user_with_permission(Permissions.table)
-        )
+    model: Band,
+    message_success: str = "Faixa criada com sucesso.",
+    message_error: str = "Erro ao criar a faixa.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
 ) -> Response:
     if sv.get_by_gub(uow, model.gub):
         return JSONResponse(
             status_code=HTTPStatus.BAD_REQUEST,
-            content={"message": f"Gub {model.gub} já existe."}
+            content={"message": f"Gub {model.gub} já existe."},
         )
 
 
 @router.put("/{uuid}")
 @update_controller(sv)
 async def put(
-        uuid: UUID,
-        model: Band,
-        message_success: str = "Faixa atualizada.",
-        message_error: str = "Faixa não atualizada.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(
-            get_current_user_with_permission(Permissions.table)
-        )
-):
-    ...
+    uuid: UUID,
+    model: Band,
+    message_success: str = "Faixa atualizada.",
+    message_error: str = "Faixa não atualizada.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+): ...
 
 
 @router.delete("/{uuid}")
 @delete_controller(sv)
 async def delete(
-        uuid: UUID,
-        message_success: str = "Faixa deletada.",
-        message_error: str = "Faixa não encontrada.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-) -> Response:
-    ...
+    uuid: UUID,
+    message_success: str = "Faixa deletada.",
+    message_error: str = "Faixa não encontrada.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+) -> Response: ...

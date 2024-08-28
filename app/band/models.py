@@ -54,5 +54,5 @@ class Band(BaseModel):
             poomsaes=poomsaes,
             kibon_donjaks=kibon_donjaks,
             created_for=user.id,
-            updated_for=user.id
+            updated_for=user.id,
         )

@@ -23,60 +23,55 @@ router = APIRouter(prefix="/poomsae")
 @router.get("/")
 @get_controller(sv)
 async def get(
-        message_error: str = "Não foi possível encontrar os poomsaes.",
-        current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> Response:
-    ...
+    message_error: str = "Não foi possível encontrar os poomsaes.",
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+) -> Response: ...
 
 
 # TODO: Create Get Method
 @router.get("/{param}")
-@get_by_controller(sv.get_by_id, 'poomsaes')
+@get_by_controller(sv.get_by_id, "poomsaes")
 async def get_by_id(
-        param: UUID,
-        message_error: str = "Não foi possível encontrar o Poomsae.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.student))
-) -> Response:
-    ...
+    param: UUID,
+    message_error: str = "Não foi possível encontrar o Poomsae.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+) -> Response: ...
 
 
 # TODO: Create Post Method
 @router.post("/")
 @create_controller(sv)
 async def post(
-        model: Poomsae,
-        message_success: str = "Poomsae criado com sucesso.",
-        message_error: str = "Não foi possível criar o Poomsae.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-) -> Response:
-    ...
+    model: Poomsae,
+    message_success: str = "Poomsae criado com sucesso.",
+    message_error: str = "Não foi possível criar o Poomsae.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+) -> Response: ...
 
 
 # TODO: Create Put Method
 @router.put("/{uuid}")
 @update_controller(sv)
 async def put(
-        uuid: UUID,
-        model: Poomsae,
-        message_success: str = "Poomsae atualizado com sucesso.",
-        message_error: str = "Não foi possível atualizar o Poomsae.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-) -> Response:
-    ...
+    uuid: UUID,
+    model: Poomsae,
+    message_success: str = "Poomsae atualizado com sucesso.",
+    message_error: str = "Não foi possível atualizar o Poomsae.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+) -> Response: ...
 
 
 # TODO: Create Delete Method
 @router.delete("/{uuid}")
 @delete_controller(sv)
 async def delete(
-        uuid: UUID,
-        message_success: str = "Poomsae deletado com sucesso.",
-        message_error: str = "Não foi possível deletar o poomsae.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-) -> Response:
-    ...
+    uuid: UUID,
+    message_success: str = "Poomsae deletado com sucesso.",
+    message_error: str = "Não foi possível deletar o poomsae.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+) -> Response: ...

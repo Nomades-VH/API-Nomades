@@ -11,4 +11,3 @@ class Poomsae(Entity):
     description: str
     created_for: UUID
     updated_for: UUID
-

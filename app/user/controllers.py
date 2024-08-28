@@ -21,67 +21,72 @@ router = APIRouter(prefix="/user")
 # TODO: Verify methods
 @router.post("/")
 async def create_user(
-        user: ModelUser,
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
+    user: ModelUser,
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
 ) -> Response:
     try:
         user = sv.change_user(user)
         if not sv.verify_if_user_exists(uow, user):
-            if user.permission.value >= Permissions.table.value and current_user.permission.value < Permissions.root.value:
+            if (
+                user.permission.value >= Permissions.table.value
+                and current_user.permission.value < Permissions.root.value
+            ):
                 return JSONResponse(
                     status_code=HTTPStatus.UNAUTHORIZED,
-                    content={"message": "Não é possível criar um usuário com essa permissão."}
+                    content={
+                        "message": "Não é possível criar um usuário com essa permissão."
+                    },
                 )
             sv.create_new_user(uow, user, current_user)
             return JSONResponse(
-                status_code=HTTPStatus.OK,
-                content=jsonable_encoder(user)
+                status_code=HTTPStatus.OK, content=jsonable_encoder(user)
             )
         else:
             return JSONResponse(
                 status_code=HTTPStatus.BAD_REQUEST,
-                content={"message": "Esse usuário já existe."}
+                content={"message": "Esse usuário já existe."},
             )
     except UserException:
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={"message": "Não foi possível criar usuário. Tente novamente mais tarde."}
+            content={
+                "message": "Não foi possível criar usuário. Tente novamente mais tarde."
+            },
         )
 
 
 # TODO: Deve retornar também o token de acesso do usuário
 @router.get("/me/")
-async def get_me(current_user: User = Depends(get_current_user_with_permission(Permissions.student))):
+async def get_me(
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+):
     return current_user
 
 
-@router.get('/')
+@router.get("/")
 @get_controller(sv)
 async def get(
-        message_error: str = "Não foi possível pegar os usuários",
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
-        uow: AbstractUow = Depends(SqlAlchemyUow)
-):
-    ...
+    message_error: str = "Não foi possível pegar os usuários",
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+): ...
 
 
 # TODO: Create Update Method
 async def update_user(
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
-        uow: AbstractUow = Depends(SqlAlchemyUow)
-):
-    ...
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+): ...
 
 
 # TODO: Create Delete Method
-@router.delete('/{uuid}')
+@router.delete("/{uuid}")
 @delete_controller(sv)
 async def delete_user(
-        uuid: UUID,
-        message_success: str = "Usuário deletado com sucesso.",
-        message_error: str = "Não foi possível deletar o usuário.",
-        uow: AbstractUow = Depends(SqlAlchemyUow),
-        current_user: User = Depends(get_current_user_with_permission(Permissions.table))
-):
-    ...
+    uuid: UUID,
+    message_success: str = "Usuário deletado com sucesso.",
+    message_error: str = "Não foi possível deletar o usuário.",
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+): ...

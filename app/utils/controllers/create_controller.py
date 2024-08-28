@@ -16,13 +16,15 @@ def create_controller(service):
     def inner(func):
         @wraps(func)
         async def wrapper(
-                model: T,
-                message_success: str,
-                message_error: str,
-                uow: AbstractUow,
-                current_user: User
+            model: T,
+            message_success: str,
+            message_error: str,
+            uow: AbstractUow,
+            current_user: User,
         ) -> Response:
-            response: JSONResponse = await func(model, message_success, message_error, uow, current_user)
+            response: JSONResponse = await func(
+                model, message_success, message_error, uow, current_user
+            )
             if response:
                 return response
 
@@ -30,7 +32,7 @@ def create_controller(service):
                 if service.get_by_name(uow, model.name) is not None:
                     return JSONResponse(
                         status_code=HTTPStatus.BAD_REQUEST,
-                        content={"message": f"{model.name} já existe."}
+                        content={"message": f"{model.name} já existe."},
                     )
 
                 entity = model.to_create(current_user)
@@ -39,17 +41,14 @@ def create_controller(service):
                 service.add(uow, entity)
                 return JSONResponse(
                     status_code=HTTPStatus.OK,
-                    content={
-                        "message": f"{message_success}",
-                        "id": str(entity.id)
-                    }
+                    content={"message": f"{message_success}", "id": str(entity.id)},
                 )
             except Exception as error:
                 return JSONResponse(
                     status_code=HTTPStatus.BAD_REQUEST,
-                    content={
-                        "message": f"{message_error}"
-                    }
+                    content={"message": f"{message_error}"},
                 )
+
         return wrapper
+
     return inner
