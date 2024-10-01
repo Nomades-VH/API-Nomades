@@ -2,16 +2,17 @@ import os
 import sys
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import registry, sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.declarative import declarative_base
 
-mapper_registry = registry()
+Base = declarative_base()
 
 _URI = None
 
 if "pytest" in sys.modules:
     _URI = os.environ.get('DATABASE_URI_TEST')
 elif "alembic" in sys.modules:
-    _URI = os.environ.get('DATABASE_URI_ALEMBIC')
+    _URI = os.environ.get('DATABASE_URI_ALEMBIC_DEV')
 
 if not _URI:
     _URI = os.environ.get('DATABASE_URI')
@@ -21,30 +22,34 @@ if not _URI:
 
 
 _engine = create_engine(_URI)
-_Session = sessionmaker(bind=_engine)
+_Session = scoped_session(sessionmaker(bind=_engine, autoflush=True, expire_on_commit=False))
 
 
 def session_maker() -> _Session:
-    return _Session(autoflush=True, expire_on_commit=False)
+    return _Session()
 
 
 def ensure_all_entities():
     # noinspection PyUnresolvedReferences
-    import app.band.orm
+    import app.band.entities
 
     # noinspection PyUnresolvedReferences
-    import app.kibon_donjak.orm
+    import app.kibon_donjak.entities
 
     # noinspection PyUnresolvedReferences
-    import app.kick.orm
+    import app.kick.entities
 
     # noinspection PyUnresolvedReferences
-    import app.poomsae.orm
+    import app.poomsae.entities
 
     # noinspection PyUnresolvedReferences
-    import app.user.orm
+    import app.user.entities
 
     # noinspection PyUnresolvedReferences
-    import app.auth.orm
+    import app.auth.entities
 
-    mapper_registry.metadata.reflect(bind=_engine)
+    Base.metadata.create_all(bind=_engine)
+
+    print('INICIANDO')
+    for table in Base.metadata.tables.keys():
+        print(f"value>: {table}")

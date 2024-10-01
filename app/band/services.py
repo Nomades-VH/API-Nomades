@@ -41,11 +41,12 @@ def get_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
 
 
 def get_minors_band(uow: AbstractUow, gub: int) -> Optional[List[BandModel]]:
-    bands = uow.band.iter()
-    minors: List[BandModel] = []
-    for band in bands:
-        if band.gub >= gub:
-            minors.append(band)
+    with uow:
+        bands = uow.band.iter()
+        minors: List[BandModel] = []
+        for band in bands:
+            if band.gub >= gub:
+                minors.append(band)
 
     return minors
 

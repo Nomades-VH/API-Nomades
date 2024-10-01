@@ -15,9 +15,11 @@ from app.uow import SqlAlchemyUow
 from app.user.controllers import router as user_router
 from app.auth.controllers import router as auth_router
 from loguru import logger
+from time import sleep
 
 app = FastAPI(
     title="Nômades",
+    # root_path='/nomades'
 )
 
 app.add_middleware(

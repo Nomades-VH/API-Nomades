@@ -82,10 +82,9 @@ if __name__ == "__main__":
     # )
     logger.add(
         'app.log',
-        level='INFO',
+        level='TRACE',
         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message} | "
-               "{extra[status_code]} | {extra[user_id]}",
-        enqueue=True
+               "{extra[status_code]} | {extra[user_id]}"
     )
 
     _load_env()
@@ -98,4 +97,4 @@ if __name__ == "__main__":
 
     import uvicorn
 
-    uvicorn.run(app="bootstrap.server:app", host="0.0.0.0", port=8000)
+    uvicorn.run(app="bootstrap.server:app", host="0.0.0.0", port=8000, workers=6)

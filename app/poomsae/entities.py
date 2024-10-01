@@ -1,13 +1,25 @@
-from dataclasses import dataclass, field
-from typing import Optional
-from uuid import UUID
+from typing import List
+
+from sqlalchemy import Column, String, UUID as SQLUUID, ForeignKey
+from uuid import UUID as PyUUID
+from sqlalchemy.orm import relationship, Mapped
 
 from ports.entity import Entity
 
 
-@dataclass
 class Poomsae(Entity):
-    name: str
-    description: str
-    created_for: UUID
-    updated_for: UUID
+    __tablename__ = "poomsaes"
+    name: Mapped[str] = Column(String(50), unique=True, nullable=False)
+    description: Mapped[str] = Column(String(600), nullable=False)
+
+    bands: Mapped["Band"] = relationship(
+        secondary="band_poomsae",
+        back_populates="poomsaes"
+    )
+
+
+class BandPoomsae(Entity):
+    __tablename__ = 'band_poomsae'
+
+    band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id'), primary_key=True)
+    poomsae_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('poomsaes.id'), primary_key=True)
