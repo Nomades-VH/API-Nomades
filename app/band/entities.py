@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
 from typing import Optional, List
-from uuid import UUID
+
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship, Mapped
 
 from app.kibon_donjak.entities import KibonDonjak
 from app.kick.entities import Kick
@@ -8,19 +9,31 @@ from app.poomsae.entities import Poomsae
 from ports.entity import Entity
 
 
-@dataclass
 class Band(Entity):
-    gub: int
-    name: str
-    meaning: str
-    theory: str
-    breakdown: str
-    stretching: str
-    updated_for: UUID
-    created_for: Optional[UUID] = None
-    kicks: Optional[List[Kick]] = field(default_factory=list)
-    poomsaes: Optional[List[Poomsae]] = field(default_factory=list)
-    kibon_donjaks: Optional[List[KibonDonjak]] = field(default_factory=list)
+    __tablename__ = 'bands'  # Nome da tabela
+    gub: Mapped[int] = Column(Integer, unique=True, nullable=False)
+    name: Mapped[str] = Column(String(50), unique=True, nullable=False)
+    meaning: Mapped[str] = Column(String(600), nullable=False)
+    theory: Mapped[str] = Column(String(600), nullable=False)
+    breakdown: Mapped[str] = Column(String(600), nullable=False)
+    stretching: Mapped[str] = Column(String(600), nullable=False)
+
+    users = relationship("User", back_populates='band')
+    kibon_donjaks: Mapped[Optional[List[KibonDonjak]]] = relationship(
+        secondary="band_kibon_donjak",
+        back_populates="bands"
+    )
+
+    kicks: Mapped[Optional[List[Kick]]] = relationship(
+        secondary="band_kick",
+        back_populates="bands"
+    )
+
+    poomsaes: Mapped[Optional[List[Poomsae]]] = relationship(
+        secondary="band_poomsae",
+        back_populates="bands"
+    )
+
 
     @classmethod
     def from_dict(cls, data: dict) -> "Band":

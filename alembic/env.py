@@ -1,6 +1,6 @@
 import os
 from logging.config import fileConfig
-from bootstrap.database import mapper_registry, ensure_all_entities
+from bootstrap.database import Base, ensure_all_entities
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from dotenv import load_dotenv
@@ -20,16 +20,14 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 
-database_url = os.getenv('DATABASE_URI_ALEMBIC')
+database_url = os.getenv('DATABASE_URI_ALEMBIC_DEV')
 if database_url:
     config.set_main_option('sqlalchemy.url', database_url)
 else:
     raise RuntimeError("Tente utilizar: export '$(cat .env | xargs)' ou atualizar o seu arquivo .env")
 
-# Será necessário alterar a URI no .env
 ensure_all_entities()
-
-target_metadata = mapper_registry.metadata
+target_metadata = Base.metadata
 # target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
@@ -50,6 +48,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
+    from app.auth.entities import Auth
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,

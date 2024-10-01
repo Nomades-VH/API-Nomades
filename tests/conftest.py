@@ -7,11 +7,9 @@ from sqlalchemy.orm import sessionmaker, close_all_sessions
 from app.uow import SqlAlchemyUow
 from bootstrap.server import app
 import pytest
-from bootstrap.database import mapper_registry
+from bootstrap.database import Base
 from main import _create_root
 from ports.uow import AbstractUow
-
-base = mapper_registry
 
 
 @pytest.fixture(scope="session")
@@ -39,25 +37,25 @@ def create_db() -> AbstractUow:
     _Session = sessionmaker(bind=engine)
 
     # noinspection PyUnresolvedReferences
-    import app.band.orm
+    import app.band.entities
 
     # noinspection PyUnresolvedReferences
-    import app.kibon_donjak.orm
+    import app.kibon_donjak.entities
 
     # noinspection PyUnresolvedReferences
-    import app.kick.orm
+    import app.kick.entities
 
     # noinspection PyUnresolvedReferences
-    import app.poomsae.orm
+    import app.poomsae.entities
 
     # noinspection PyUnresolvedReferences
-    import app.user.orm
+    import app.user.entities
 
     # noinspection PyUnresolvedReferences
-    import app.auth.orm
-    base.metadata.create_all(engine)
+    import app.auth.entities
+    Base.metadata.create_all(engine)
 
     yield _Session(autoflush=True, expire_on_commit=False)
 
     close_all_sessions()
-    base.metadata.drop_all(bind=engine)
+    Base.metadata.drop_all(bind=engine)

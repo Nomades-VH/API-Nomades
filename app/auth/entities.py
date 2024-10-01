@@ -1,19 +1,13 @@
-from dataclasses import dataclass
-from uuid import UUID
-
+from uuid import UUID as PyUUID
+from sqlalchemy import Column, String, ForeignKey, Boolean, UUID as SQLUUID
+from sqlalchemy.orm import relationship
 from ports.entity import Entity
 
-
-@dataclass
 class Auth(Entity):
-    access_token: str
-    fk_user: UUID
-    is_invalid: bool = False
+    __tablename__ = 'tokens'  # Nome da tabela
+    access_token: str = Column(String, unique=True, nullable=False)
+    fk_user: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    is_invalid: bool = Column(Boolean, nullable=False, default=False)
 
-    @classmethod
-    def from_dict(cls, token_dict: dict) -> "Auth":
-        return cls(
-            access_token=token_dict["access_token"],
-            fk_user=token_dict["fk_user"],
-            is_invalid=token_dict["is_invalid"],
-        )
+    user = relationship("User", back_populates="tokens", uselist=False)
+
