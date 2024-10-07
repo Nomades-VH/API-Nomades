@@ -21,5 +21,5 @@ class Poomsae(Entity):
 class BandPoomsae(Entity):
     __tablename__ = 'band_poomsae'
 
-    band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id'), primary_key=True)
-    poomsae_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('poomsaes.id'), primary_key=True)
+    band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id', ondelete='CASCADE'), primary_key=True)
+    poomsae_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('poomsaes.id', ondelete='CASCADE'), primary_key=True)

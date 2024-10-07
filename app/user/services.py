@@ -1,13 +1,11 @@
-from dataclasses import asdict
 from typing import Optional
 from uuid import UUID
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 
 from app.auth.hasher import hash_password
 from app.auth.schemas import Credentials
 from app.user.entities import User
-from app.user.exceptions import UserAlreadyExists, EmailAlreadyExists
 from app.user.models import User as ModelUser
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow

@@ -34,14 +34,14 @@ class AuthRepository(AbstractAuthRepository):
     def remove(self, token: str) -> Optional[Auth]: ...
 
     def update(self, entity: Auth) -> None:
-        self.session.query(Auth).filter(and_(Auth.id == entity.id)).update(
-            dataclasses.asdict(entity)
-        )
+        update_data = {key: value for key, value in entity.__dict__.items() if not key.startswith('_')}
+
+        self.session.query(Auth).filter(Auth.id == entity.id).update(update_data)
 
     def update_from_user(self, entity: Auth, user_id: UUID) -> None:
-        self.session.query(Auth).filter(Auth.fk_user == user_id).update(
-            dataclasses.asdict(entity)
-        )
+        update_data = {key: value for key, value in entity.__dict__.items() if not key.startswith('_')}
+
+        self.session.query(Auth).filter(Auth.fk_user == user_id).update(update_data)
 
     def iter(self) -> List[Auth]:
         return self.session.query(Auth).filter(Auth.is_invalid == False).all()

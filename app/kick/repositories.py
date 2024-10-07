@@ -25,8 +25,9 @@ class KickRepository(AbstractKickRepository):
         return self.session.query(Kick).filter(Kick.id == uuid).delete()
 
     def update(self, kick: Kick) -> None:
+        update_data = {key: value for key, value in kick.__dict__.items() if not key.startswith('_')}
         self.session.query(Kick).filter(Kick.id == kick.id).update(
-            dataclasses.asdict(kick)
+            update_data
         )
 
     def iter(self) -> Iterator[Kick]:

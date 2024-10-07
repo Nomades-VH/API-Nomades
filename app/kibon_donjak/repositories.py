@@ -27,9 +27,11 @@ class KibonDonjakRepository(AbstractKibonDonjakRepository):
         return self.session.query(KibonDonjak).filter(KibonDonjak.id == uuid).delete()
 
     def update(self, kibon_donjak: KibonDonjak) -> None:
+        update_data = {key: value for key, value in kibon_donjak.__dict__.items() if not key.startswith('_')}
+
         self.session.query(KibonDonjak).filter(
             KibonDonjak.id == kibon_donjak.id
-        ).update(dataclasses.asdict(kibon_donjak))
+        ).update(update_data)
 
     def iter(self) -> List[KibonDonjak]:
         return self.session.query(KibonDonjak).order_by(KibonDonjak.created_at).all()

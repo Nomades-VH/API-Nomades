@@ -20,5 +20,5 @@ class KibonDonjak(Entity):
 class BandKibonDonjak(Entity):
     __tablename__ = 'band_kibon_donjak'
 
-    band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id'), primary_key=True)
-    kibon_donjak_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('kibon_donjaks.id'), primary_key=True)
+    band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id', ondelete='CASCADE'), primary_key=True)
+    kibon_donjak_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('kibon_donjaks.id', ondelete='CASCADE'), primary_key=True)

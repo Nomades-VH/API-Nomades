@@ -27,8 +27,9 @@ class PoomsaeRepository(AbstractPoomsaeRepository):
         return self.session.query(Poomsae).filter(Poomsae.id == uuid).delete()
 
     def update(self, poomsae: Poomsae) -> None:
+        update_data = {key: value for key, value in poomsae.__dict__.items() if not key.startswith('_')}
         self.session.query(Poomsae).filter(Poomsae.id == poomsae.id).update(
-            dataclasses.asdict(poomsae)
+            update_data
         )
 
     def iter(self) -> Iterator[Poomsae]:
