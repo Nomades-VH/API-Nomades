@@ -73,6 +73,7 @@ if __name__ == "__main__":
 
     logger = logger
     logger.remove()
+    logger.remove()
 
     # logger.add(
     #     sys.stderr,
@@ -80,12 +81,12 @@ if __name__ == "__main__":
     #     format="<blue>{time:YYYY-MM-DD HH:mm:ss}</blue> | <b>{level}</b> | <cyan>{message}</cyan> | "
     #            "<r>{extra[status_code]}</r> | <b>{extra[user_id]}</b>"
     # )
-    logger.add(
-        'app.log',
-        level='TRACE',
-        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message} | "
-               "{extra[status_code]} | {extra[user_id]}"
-    )
+    # logger.add(
+    #     'app.log',
+    #     level='TRACE',
+    #     format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message} | "
+    #            "{extra[status_code]} | {extra[user_id]}"
+    # )
 
     _load_env()
     _create_tables()
