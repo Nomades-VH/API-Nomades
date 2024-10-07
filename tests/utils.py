@@ -43,6 +43,12 @@ def band_valid() -> dict:
         "stretching": "string"
     }
 
+def poomsae_valid() -> dict:
+    return {
+        "name": "Saju Ap Tchagui",
+        "description": "Ri (CALOR E BRILHO)"
+    }
+
 
 def band_invalid() -> dict:
     return {
