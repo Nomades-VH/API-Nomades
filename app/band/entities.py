@@ -21,23 +21,21 @@ class Band(Entity):
     users = relationship("User", back_populates='band')
     kibon_donjaks: Mapped[Optional[List[KibonDonjak]]] = relationship(
         secondary="band_kibon_donjak",
-        back_populates="bands"
+        back_populates="bands",
+        lazy="joined"
     )
 
     kicks: Mapped[Optional[List[Kick]]] = relationship(
         secondary="band_kick",
-        back_populates="bands"
+        back_populates="bands",
+        lazy="joined"
     )
 
     poomsaes: Mapped[Optional[List[Poomsae]]] = relationship(
         secondary="band_poomsae",
-        back_populates="bands"
+        back_populates="bands",
+        lazy="joined"
     )
-
-
-    @classmethod
-    def from_dict(cls, data: dict) -> "Band":
-        return cls(*data)
 
     def __eq__(self, other):
         def verify_entities_list(first_list, second_list):

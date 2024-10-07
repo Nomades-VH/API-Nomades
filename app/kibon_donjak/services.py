@@ -1,5 +1,4 @@
 # TODO: Create a service for get_all KibonDonjaks
-from dataclasses import asdict
 from typing import List, Optional
 from uuid import UUID
 
@@ -10,7 +9,7 @@ from ports.uow import AbstractUow
 
 def get(uow: AbstractUow):
     with uow:
-        return list(map(asdict, uow.kibondonjak.iter()))
+        return uow.kibondonjak.iter()
 
 
 def get_by_band(uow: AbstractUow, uuid: UUID) -> Optional[List[KibonDonjakEntity]]:

@@ -209,4 +209,6 @@ def to_update(
 
         add_kicks(band_entity.id, band_model.kicks, uow)
 
+    print(band_entity)
+
     return band_entity

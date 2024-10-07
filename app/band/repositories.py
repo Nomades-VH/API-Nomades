@@ -4,6 +4,7 @@ from typing import Optional, List
 from uuid import UUID
 
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 
 from app.band.entities import Band
 from app.kibon_donjak.entities import KibonDonjak
@@ -34,8 +35,9 @@ class AbstractBandRepository(AbstractRepository[Band], ABC):
 
 
 class BandRepository(AbstractBandRepository):
-    def get(self, id: UUID):
-        return self.session.query(Band).filter(Band.id == id).first()
+    def get(self, band_id: UUID):
+        return (self.session.query(Band)
+                .filter_by(id=band_id).one_or_none())
 
     def get_by_gub(self, gub: int) -> Optional[Band]:
         return self.session.query(Band).filter(Band.gub == gub).first()
@@ -52,8 +54,8 @@ class BandRepository(AbstractBandRepository):
     def update(self, band: Band) -> None:
         band = {
             k: v
-            for k, v in dataclasses.asdict(band).items()
-            if k not in ["kicks", "poomsaes", "kibon_donjaks"]
+            for k, v in band.__dict__.items()
+            if k not in ["kicks", "poomsaes", "kibon_donjaks", "_sa_instance_state"]
         }
         self.session.query(Band).filter(Band.id == band["id"]).update(band)
 

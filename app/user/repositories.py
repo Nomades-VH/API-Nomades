@@ -22,6 +22,7 @@ class UserRepository(AbstractUserRepository):
         self.session.add(user)
 
     def update(self, user: User) -> None:
+        update_data = {key: value for key, value in user.__dict__.items() if not key.startswith('_')}
         self.session.query(User).filter(User.id == user.id).update(user)
 
     def remove(self, uuid: UUID) -> Optional[User]:

@@ -21,5 +21,18 @@ class Kick(Entity):
 class BandKick(Entity):
     __tablename__ = 'band_kick'
 
-    band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id'), primary_key=True)
-    kick_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('kicks.id'), primary_key=True)
+    band_id: PyUUID = Column(
+        SQLUUID(as_uuid=True),
+        ForeignKey(
+            'bands.id',
+            ondelete='CASCADE'
+        ),
+        primary_key=True,
+        nullable=False
+    )
+    kick_id: PyUUID = Column(
+        SQLUUID(as_uuid=True),
+        ForeignKey('kicks.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False
+    )

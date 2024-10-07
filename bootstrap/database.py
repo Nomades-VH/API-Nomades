@@ -48,8 +48,4 @@ def ensure_all_entities():
     # noinspection PyUnresolvedReferences
     import app.auth.entities
 
-    Base.metadata.create_all(bind=_engine)
-
-    print('INICIANDO')
-    for table in Base.metadata.tables.keys():
-        print(f"value>: {table}")
+    Base.metadata.reflect(bind=_engine)
