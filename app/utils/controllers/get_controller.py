@@ -37,28 +37,28 @@ def get_controller(service):
             if func_module_name in (item.value for item in ModuleType):
                 band = sv_band.get_by_user(uow, current_user)
 
-                if band:
-                    bands = sv_band.get_minors_band(uow, band.gub)
-                    if func_module_name == ModuleType.BAND.value:
-                        return JSONResponse(
-                            status_code=HTTPStatus.OK, content=jsonable_encoder(bands)
-                        )
-
-                    entities = {}
-                    for band in bands:
-                        if func_module_name == ModuleType.KIBON_DONJAK.value:
-                            entities[band.name] = band.kibon_donjaks
-                        elif func_module_name == ModuleType.KICK.value:
-                            entities[band.name] = band.kicks
-                        elif func_module_name == ModuleType.POOMSAE.value:
-                            entities[band.name] = band.poomsaes
-                else:
+                if not band:
                     return JSONResponse(
                         status_code=HTTPStatus.FORBIDDEN,
                         content={
                             "message": "Você não possui uma faixa. Procure mais informações com seu professor."
                         },
                     )
+
+                bands = sv_band.get_minors_band(uow, band.gub)
+                if func_module_name == ModuleType.BAND.value:
+                    return JSONResponse(
+                        status_code=HTTPStatus.OK, content=jsonable_encoder(bands)
+                    )
+
+                entities = {}
+                for band in bands:
+                    if func_module_name == ModuleType.KIBON_DONJAK.value:
+                        entities[band.name] = band.kibon_donjaks
+                    elif func_module_name == ModuleType.KICK.value:
+                        entities[band.name] = band.kicks
+                    elif func_module_name == ModuleType.POOMSAE.value:
+                        entities[band.name] = band.poomsaes
 
                 return JSONResponse(
                     status_code=HTTPStatus.OK, content=jsonable_encoder(entities)

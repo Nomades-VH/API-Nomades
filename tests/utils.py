@@ -2,35 +2,30 @@ import os
 
 from fastapi.testclient import TestClient
 
-email = os.environ.get("ROOT_USER_EMAIL")
-password = os.environ.get("ROOT_USER_PASSWORD")
+email_root = os.environ.get("ROOT_USER_EMAIL")
+password_root = os.environ.get("ROOT_USER_PASSWORD")
+invalid_uuid = "f7f00446-6d6a-417c-82e5-33a0698af17b"
 
 
-def get_authorization_headers(client: TestClient):
-    data = {
-        "email": email,
-        "password": password
-    }
+def get_authorization(client: TestClient):
+    data = {"email": email_root, "password": password_root}
 
-    token = client.post('/auth', json=data)
-    return {'Authorization': 'Bearer ' + token.json()['access_token']}
+    token = client.post("/auth", json=data)
+    return {"Authorization": "Bearer " + token.json()["access_token"]}
 
 
 def get_authorization_headers_invalid(client: TestClient):
-    data = get_authorization_headers(client)
-    data['Authorization'] = data['Authorization'][7:]
+    data = get_authorization(client)
+    data["Authorization"] = data["Authorization"][7:]
     return data
 
 
 def get_user_info(client: TestClient):
-    return client.get('/user/', headers=get_authorization_headers(client)).json()[0]
+    return client.get("/user/", headers=get_authorization(client)).json()[0]
 
 
 def user_valid() -> dict:
-    return {
-        "email": email,
-        "password": password
-    }
+    return {"email": email_root, "password": password_root}
 
 
 def band_valid() -> dict:
@@ -40,14 +35,12 @@ def band_valid() -> dict:
         "meaning": "string",
         "theory": "string",
         "breakdown": "string",
-        "stretching": "string"
+        "stretching": "string",
     }
 
+
 def poomsae_valid() -> dict:
-    return {
-        "name": "Saju Ap Tchagui",
-        "description": "Ri (CALOR E BRILHO)"
-    }
+    return {"name": "Saju Ap Tchagui", "description": "Ri (CALOR E BRILHO)"}
 
 
 def band_invalid() -> dict:
@@ -57,9 +50,13 @@ def band_invalid() -> dict:
         "meaning": "string",
         "theory": "string",
         "breakdown": "string",
-        "stretching": "string"
+        "stretching": "string",
     }
 
 
-def get_band_by_gub(gub: int, auth, client: TestClient) -> dict:
-    return client.get(url=f"/band/gub/{gub}", headers=auth).json()
+def get_band_by_gub(gub: int, client: TestClient) -> dict:
+    return client.get(url=f"/band/gub/{gub}").json()
+
+
+def get_poomsae_by_id(id: str, client: TestClient) -> dict:
+    return client.get(url=f"/poomsae/{id}").json()

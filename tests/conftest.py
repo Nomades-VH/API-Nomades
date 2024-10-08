@@ -10,11 +10,13 @@ import pytest
 from bootstrap.database import Base
 from main import _create_root
 from ports.uow import AbstractUow
+from tests.utils import get_authorization
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def client() -> Generator:
     with TestClient(app) as c:
+        c.headers = get_authorization(c)
         yield c
 
 
@@ -53,6 +55,7 @@ def create_db() -> AbstractUow:
 
     # noinspection PyUnresolvedReferences
     import app.auth.entities
+
     Base.metadata.create_all(engine)
 
     yield _Session(autoflush=True, expire_on_commit=False)

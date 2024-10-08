@@ -23,7 +23,7 @@ router = APIRouter(prefix="/poomsae")
 @router.get("/")
 @get_controller(sv)
 async def get(
-    message_error: str = "Não foi possível encontrar os poomsaes.",
+    message_error: str = "Não foram encontrados poomsaes.",
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response: ...
@@ -34,7 +34,7 @@ async def get(
 @get_by_controller(sv.get_by_id, "poomsaes")
 async def get_by_id(
     param: UUID,
-    message_error: str = "Não foi possível encontrar o Poomsae.",
+    message_error: str = "Não foi encontrado o poomsae.",
     uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ) -> Response: ...
