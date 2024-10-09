@@ -10,6 +10,7 @@ url = "/band/"
 
 
 class TestBand:
+
     def test_get_bands_without_bands(self, client: TestClient):
         response = client.get(url)
         assert response.status_code == HTTPStatus.NOT_FOUND

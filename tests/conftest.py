@@ -1,5 +1,4 @@
 import os
-from typing import Generator
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, close_all_sessions
@@ -14,7 +13,7 @@ from tests.utils import get_authorization
 
 
 @pytest.fixture(scope="class")
-def client() -> Generator:
+def client() -> TestClient:
     with TestClient(app) as c:
         c.headers = get_authorization(c)
         yield c
@@ -58,7 +57,9 @@ def create_db() -> AbstractUow:
 
     Base.metadata.create_all(engine)
 
-    yield _Session(autoflush=True, expire_on_commit=False)
+    session = _Session(autoflush=True, expire_on_commit=False)
 
-    close_all_sessions()
+    yield session
+
+    session.close()
     Base.metadata.drop_all(bind=engine)
