@@ -42,6 +42,13 @@ def band_valid() -> dict:
 def poomsae_valid() -> dict:
     return {"name": "Saju Ap Tchagui", "description": "Ri (CALOR E BRILHO)"}
 
+def kick_valid() -> dict:
+    return {"name": "Bandal Tchagui", "description": "Chute lateral na linha de cintura"}
+
+def kibon_donjak_valid() -> dict:
+    return {"name": "Ap Kubi Are Makgi", "description": "Defesa baixo"}
+
+
 
 def band_invalid() -> dict:
     return {
@@ -57,6 +64,11 @@ def band_invalid() -> dict:
 def get_band_by_gub(gub: int, client: TestClient) -> dict:
     return client.get(url=f"/band/gub/{gub}").json()
 
+def get_kick_by_id(id: str, client: TestClient) -> dict:
+    return client.get(url=f"/kick/{id}").json()
 
 def get_poomsae_by_id(id: str, client: TestClient) -> dict:
     return client.get(url=f"/poomsae/{id}").json()
+
+def get_kibon_donjak_by_id(id: str, client: TestClient) -> dict:
+    return client.get(url=f"/kibon_donjak/{id}").json()
