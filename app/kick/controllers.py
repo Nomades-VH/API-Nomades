@@ -31,7 +31,7 @@ async def get(
 @get_by_controller(sv.get_by_id, "kicks")
 async def get_by_id(
     param: UUID,
-    message_error: str = "Não foi possível encontrar esse chute",
+    message_error: str = "Não foi possível encontrar esse chute.",
     uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ) -> Response: ...
@@ -41,7 +41,7 @@ async def get_by_id(
 @get_by_controller(sv.get_by_name, "kicks")
 async def get_by_name(
     param: str,
-    message_error: str = "Não foi possível encontrar esse chute",
+    message_error: str = "Não foi possível encontrar esse chute.",
     uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ) -> Response: ...
@@ -78,7 +78,7 @@ async def put(
 async def delete(
     uuid: UUID,
     message_success: str = "Chute deletado com sucesso.",
-    message_error: str = "Não foi possivel deletar o chute.",
+    message_error: str = "Não foi possível deletar o chute.",
     uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
 ) -> Response: ...
