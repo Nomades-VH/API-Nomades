@@ -48,12 +48,6 @@ def kick_valid() -> dict:
 def kibon_donjak_valid() -> dict:
     return {"name": "Ap Kubi Are Makgi", "description": "Defesa baixo"}
 
-
-
-def poomsae_valid() -> dict:
-    return {"name": "Saju Ap Tchagui", "description": "Ri (CALOR E BRILHO)"}
-
-
 def band_invalid() -> dict:
     return {
         "gub": "string",
@@ -76,3 +70,7 @@ def get_poomsae_by_id(id: str, client: TestClient) -> dict:
 
 def get_kibon_donjak_by_id(id: str, client: TestClient) -> dict:
     return client.get(url=f"/kibon_donjak/{id}").json()
+<<<<<<< HEAD
+=======
+  
+>>>>>>> a25cf50868bac54300feadf0be74e595f596b178
