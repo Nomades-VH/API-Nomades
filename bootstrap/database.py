@@ -48,12 +48,4 @@ def ensure_all_entities():
     # noinspection PyUnresolvedReferences
     import app.auth.entities
 
-<<<<<<< HEAD
     Base.metadata.reflect(bind=_engine)
-=======
-    Base.metadata.create_all(bind=_engine)
-
-    print('INICIANDO')
-    for table in Base.metadata.tables.keys():
-        print(f"value>: {table}")
->>>>>>> e59a013 (Updated entities but no finally)

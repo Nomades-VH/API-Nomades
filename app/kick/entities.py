@@ -36,3 +36,4 @@ class BandKick(Entity):
         primary_key=True,
         nullable=False
     )
+
