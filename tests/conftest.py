@@ -62,4 +62,5 @@ def create_db() -> AbstractUow:
     yield session
 
     session.close()
+
     Base.metadata.drop_all(bind=engine)

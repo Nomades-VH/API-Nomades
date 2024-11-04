@@ -10,3 +10,4 @@ class Auth(Entity):
     is_invalid: bool = Column(Boolean, nullable=False, default=False)
 
     user = relationship("User", back_populates="tokens", uselist=False)
+
