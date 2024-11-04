@@ -70,7 +70,3 @@ def get_poomsae_by_id(id: str, client: TestClient) -> dict:
 
 def get_kibon_donjak_by_id(id: str, client: TestClient) -> dict:
     return client.get(url=f"/kibon_donjak/{id}").json()
-<<<<<<< HEAD
-=======
-  
->>>>>>> a25cf50868bac54300feadf0be74e595f596b178
