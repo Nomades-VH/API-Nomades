@@ -28,6 +28,7 @@ class KickRepository(AbstractKickRepository):
         update_data = {key: value for key, value in kick.__dict__.items() if not key.startswith('_')}
         self.session.query(Kick).filter(Kick.id == kick.id).update(
             update_data
+
         )
 
     def iter(self) -> Iterator[Kick]:

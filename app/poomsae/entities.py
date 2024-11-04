@@ -23,3 +23,4 @@ class BandPoomsae(Entity):
 
     band_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('bands.id', ondelete='CASCADE'), primary_key=True)
     poomsae_id: PyUUID = Column(SQLUUID(as_uuid=True), ForeignKey('poomsaes.id', ondelete='CASCADE'), primary_key=True)
+

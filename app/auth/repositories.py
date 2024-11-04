@@ -43,5 +43,6 @@ class AuthRepository(AbstractAuthRepository):
 
         self.session.query(Auth).filter(Auth.fk_user == user_id).update(update_data)
 
+
     def iter(self) -> List[Auth]:
         return self.session.query(Auth).filter(Auth.is_invalid == False).all()
