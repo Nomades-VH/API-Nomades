@@ -23,6 +23,7 @@ router = APIRouter(prefix="/kibon_donjak")
 @get_controller(sv)
 async def get(
     message_error: str = "Não foram encontrados kibon donjaks.",
+
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ) -> Response: ...
@@ -77,6 +78,7 @@ async def delete(
     uuid: UUID,
     message_success: str = "Kibon Donjak deletado com sucesso.",
     message_error: str = "Não foi possível deletar esse Kibon Donhak",
+
     uow: AbstractUow = Depends(SqlAlchemyUow),
     current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
 ) -> Response: ...
