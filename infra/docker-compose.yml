@@ -7,6 +7,8 @@ services:
     restart: always
     networks:
       - nm-network
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
 
   psql_test:
     container_name: "postgres_test"
