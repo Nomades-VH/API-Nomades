@@ -15,6 +15,7 @@ class User(Entity):
     email: str = Column(String, unique=True, nullable=False)
     password: str = Column(String, unique=False, nullable=False)
     permission: Permissions = Column(Enum(Permissions), nullable=False)
+    src_profile: str = Column(String, unique=True, nullable=True)
     fk_band: Optional[PyUUID] = Column(SQLUUID(as_uuid=True), ForeignKey("bands.id", ondelete="SET NULL"), nullable=True)
     hub: Hubs = Column(Enum(Hubs), nullable=False)
 
