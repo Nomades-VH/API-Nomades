@@ -86,6 +86,7 @@ def change_user(user: User | ModelUser) -> ModelUser | User:
             ),
             permission=user.permission,
             hub=user.hub,
+            src_profile=user.src_profile,
             fk_band=user.fk_band,
         )
     return User(
@@ -94,5 +95,6 @@ def change_user(user: User | ModelUser) -> ModelUser | User:
         password=user.credentials.password,
         permission=user.permission,
         hub=user.hub,
+        src_profile=user.src_profile,
         fk_band=user.fk_band,
     )
