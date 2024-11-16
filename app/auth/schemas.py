@@ -7,3 +7,4 @@ class Credentials(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     password: str
+    confirmPassword: str = None

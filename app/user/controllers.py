@@ -1,8 +1,12 @@
 from http import HTTPStatus
+from io import BytesIO
 from uuid import UUID
-from fastapi import APIRouter, Depends
+
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.encoders import jsonable_encoder
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse, Response, StreamingResponse
 
 from app.auth.services import get_current_user_with_permission
 from app.uow import SqlAlchemyUow
@@ -11,6 +15,7 @@ from app.user.exceptions import UserException
 from app.user.models import User as ModelUser
 from app.user import services as sv
 from app.utils.controllers.delete_controller import delete_controller
+from app.utils.controllers.get_by_controller import get_by_controller
 from app.utils.controllers.get_controller import get_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
@@ -23,22 +28,19 @@ router = APIRouter(prefix="/user")
 async def create_user(
     user: ModelUser,
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
 ) -> Response:
     try:
+        if user.credentials.password != user.credentials.confirmPassword:
+            return JSONResponse(
+                status_code=HTTPStatus.UNAUTHORIZED,
+                content={
+                    "message": "Não foi possível criar um usuário. Senhas não coincidem."
+                },
+            )
+
         user = sv.change_user(user)
         if not sv.verify_if_user_exists(uow, user):
-            if (
-                user.permission.value >= Permissions.table.value
-                and current_user.permission.value < Permissions.root.value
-            ):
-                return JSONResponse(
-                    status_code=HTTPStatus.UNAUTHORIZED,
-                    content={
-                        "message": "Não é possível criar um usuário com essa permissão."
-                    },
-                )
-            sv.create_new_user(uow, user, current_user)
+            sv.create_new_user(uow, user)
             return JSONResponse(
                 status_code=HTTPStatus.OK, content=jsonable_encoder(user)
             )
@@ -55,13 +57,64 @@ async def create_user(
             },
         )
 
+# TODO: Criar entrypoint de envio de imagem do perfil do usuário
+@router.put('/profile')
+async def upload_image_profile(
+    profile: UploadFile = File(...),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(get_current_user_with_permission(Permissions.student))
+):
+    upload_dir = Path("uploads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    profile.filename = current_user.username + profile.filename.replace(" ", "")
+
+    filename = f"{current_user.username}_{profile.filename}"
+
+    file_location = upload_dir / filename
+
+    with open(file_location, "wb") as f:
+        f.write(await profile.read())
+
+    with uow:
+        current_user.src_profile = str(file_location)
+        sv.update_user(uow, current_user)
+
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content={
+                "message": "Upload realizado."
+            },
+        )
+
+
+
+# TODO: Criar o entrypoint para confirmar a criação do usuário
+@router.post('/confirm-creation-user')
+async def accept_new_user(current_user: User = Depends(get_current_user_with_permission(Permissions.table))):
+    ...
+
 
 # TODO: Deve retornar também o token de acesso do usuário
 @router.get("/me/")
 async def get_me(
     current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
 ):
-    return current_user
+    return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=jsonable_encoder(current_user)
+        )
+
+@router.get('/profile')
+async def get_profile(
+        current_user: User = Depends(get_current_user_with_permission(Permissions.student))
+):
+    image_path = Path(current_user.src_profile)
+
+    with open(image_path, "rb") as img_file:
+        image_data = BytesIO(img_file.read())
+
+    return StreamingResponse(image_data, media_type="image/*")
 
 
 @router.get("/")
@@ -71,6 +124,18 @@ async def get(
     current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ): ...
+
+
+@router.get('/deactivates')
+async def get_with_deactivates(
+    message_error: str = "Não foi possível pegar os usuários",
+    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+):
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content=jsonable_encoder(sv.get_with_deactivates(uow))
+    )
 
 
 # TODO: Create Update Method

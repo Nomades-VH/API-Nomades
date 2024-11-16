@@ -26,28 +26,7 @@ def get_user_by_username(uow: AbstractUow, username: str) -> Optional[User]:
         return uow.user.get_by_username(username)
 
 
-def create_new_user(uow: AbstractUow, user: User, current_user: User):
-    if (
-        user.permission.value >= Permissions.table.value
-        and current_user.permission.value < Permissions.vice_president.value
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Você não possui permissão para cadastrar um usuário da mesa.",
-        )
-
-    if (
-        user.permission == Permissions.president.value
-        and current_user.permission < Permissions.root.value
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Você não possui permissão para cadastrar um usuário Presidente.",
-        )
-
-    if current_user.permission.value < Permissions.table.value:
-        raise HTTPException(status_code=401, detail="Você não pode criar um usuário.")
-
+def create_new_user(uow: AbstractUow, user: User):
     with uow:
         user.password = hash_password(user.password)
         uow.user.add(user)
@@ -63,8 +42,9 @@ def verify_if_user_exists(uow: AbstractUow, user: User):
 
 
 # TODO: Create a service to update user
-def update_user():
-    pass
+def update_user(uow: AbstractUow, user):
+    with uow:
+        uow.user.update(user)
 
 
 # TODO: Create a service to delete user
@@ -76,6 +56,11 @@ def delete(uow: AbstractUow, user_id: UUID):
 def get(uow: AbstractUow):
     with uow:
         yield from uow.user.iter()
+
+
+def get_with_deactivates(uow: AbstractUow):
+    with uow:
+        yield from uow.user.iter_include_inactive()
 
 
 def change_user(user: User | ModelUser) -> ModelUser | User:

@@ -11,6 +11,6 @@ from general_enum.permissions import Permissions
 class User(BaseModel):
     credentials: Credentials
     permission: Permissions
-    src_profile: str
+    src_profile: str = None
     hub: Hubs
     fk_band: Optional[UUID] = None
