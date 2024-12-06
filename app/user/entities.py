@@ -1,7 +1,8 @@
 from typing import Optional
 from uuid import UUID as PyUUID
 
-from sqlalchemy import Column, String, Enum, UUID as SQLUUID, ForeignKey
+from sqlalchemy import UUID as SQLUUID
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from general_enum.hubs import Hubs
@@ -16,33 +17,41 @@ class User(Entity):
     password: str = Column(String, unique=False, nullable=False)
     permission: Permissions = Column(Enum(Permissions), nullable=False)
     src_profile: str = Column(String, unique=True, nullable=True)
-    fk_band: Optional[PyUUID] = Column(SQLUUID(as_uuid=True), ForeignKey("bands.id", ondelete="SET NULL"), nullable=True)
+    is_active: bool = Column(Boolean, nullable=False, default=False)
     hub: Hubs = Column(Enum(Hubs), nullable=False)
+    fk_band: Optional[PyUUID] = Column(
+        SQLUUID(as_uuid=True),
+        ForeignKey('bands.id', ondelete='SET NULL'),
+        nullable=True,
+    )
 
-    band = relationship("Band", back_populates="users")
-    tokens = relationship("Auth", back_populates="user", uselist=False)
+    band = relationship('Band', back_populates='users')
+    tokens = relationship('Auth', back_populates='user', uselist=False)
 
     @classmethod
-    def to_dict(cls, user: "User") -> dict:
+    def to_dict(cls, user: 'User') -> dict:
         return {
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "password": user.password,
-            "permission": user.permission,
-            "fk_band": user.fk_band,
-            "created_at": user.created_at,
-            "updated_at": user.updated_at,
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'password': user.password,
+            'permission': user.permission,
+            'fk_band': user.fk_band,
+            'src_profile': user.src_profile,
+            'is_active': user.is_active,
+            'created_at': user.created_at,
+            'updated_at': user.updated_at,
         }
 
     @classmethod
-    def from_dict(cls, user_dict: dict) -> "User":
+    def from_dict(cls, user_dict: dict) -> 'User':
         return cls(
-            username=user_dict["username"],
-            email=user_dict["email"],
-            password=user_dict["password"],
-            permission=user_dict["permission"],
+            username=user_dict['username'],
+            email=user_dict['email'],
+            password=user_dict['password'],
+            permission=user_dict['permission'],
         )
+
 
 #
 # @dataclass

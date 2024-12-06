@@ -25,6 +25,7 @@ RUN apt-get install -y curl
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 RUN poetry add psycopg2
+RUN poetry add python-multipart
 RUN poetry install --no-root
 
 EXPOSE 8000

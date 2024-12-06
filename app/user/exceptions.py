@@ -13,12 +13,12 @@ class UserException(NomadesExceptions):
 class UserAlreadyExists(UserException):
     def __init__(self, *, username: str):
         self.username = username
-        self.message = f"Usuário com o username {username} já existe."
+        self.message = f'Usuário com o username {username} já existe.'
         super().__init__(self.message)
 
 
 class EmailAlreadyExists(UserException):
     def __init__(self, *, email: str):
         self.email = email
-        self.message = f"Usuário com o email {email} já existe."
+        self.message = f'Usuário com o email {email} já existe.'
         super().__init__(self.message)

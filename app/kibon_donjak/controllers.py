@@ -16,67 +16,85 @@ from app.utils.controllers.update_controller import update_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
-router = APIRouter(prefix="/kibon_donjak")
+router = APIRouter(prefix='/kibon_donjak')
 
 
-@router.get("/")
+@router.get('/')
 @get_controller(sv)
 async def get(
-    message_error: str = "Não foram encontrados Kibon Donjaks.",
-    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    message_error: str = 'Não foram encontrados Kibon Donjaks.',
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.student)
+    ),
     uow: AbstractUow = Depends(SqlAlchemyUow),
-) -> Response: ...
+) -> Response:
+    ...
 
 
-@router.get("/{param}")
-@get_by_controller(sv.get_by_id, "kibon_donjaks")
+@router.get('/{param}')
+@get_by_controller(sv.get_by_id, 'kibon_donjaks')
 async def get_by_id(
     param: UUID,
-    message_error: str = "Não foi encontrado o Kibon Donjak.",
+    message_error: str = 'Não foi encontrado o Kibon Donjak.',
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-) -> Response: ...
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.student)
+    ),
+) -> Response:
+    ...
 
 
-@router.get("/band/{param}")
-@get_by_controller(sv.get_by_band, "kibon_donjaks")
+@router.get('/band/{param}')
+@get_by_controller(sv.get_by_band, 'kibon_donjaks')
 async def get_by_band(
     param: UUID,
-    message_error: str = "Não foi possível encontrar os Kibon Donjaks dessa faixa.",
+    message_error: str = 'Não foi possível encontrar os Kibon Donjaks dessa faixa.',
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
-) -> Response: ...
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.student)
+    ),
+) -> Response:
+    ...
 
 
-@router.post("/")
+@router.post('/')
 @create_controller(sv)
 async def post(
     model: KibonDonjak,
-    message_error: str = "Não foi possível criar Kinbo DonJak.",
-    message_success: str = "Kibon Donjak criado com sucesso.",
+    message_error: str = 'Não foi possível criar Kinbo DonJak.',
+    message_success: str = 'Kibon Donjak criado com sucesso.',
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
-) -> Response: ...
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.table)
+    ),
+) -> Response:
+    ...
 
 
-@router.put("/{uuid}")
+@router.put('/{uuid}')
 @update_controller(sv)
 async def put(
     uuid: UUID,
     model: KibonDonjak,
-    message_success: str = "Kibon Donjak atualizado com sucesso.",
-    message_error: str = "Não foi possível atualizar o Kibon Donjak.",
+    message_success: str = 'Kibon Donjak atualizado com sucesso.',
+    message_error: str = 'Não foi possível atualizar o Kibon Donjak.',
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
-) -> Response: ...
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.table)
+    ),
+) -> Response:
+    ...
 
 
-@router.delete("/{uuid}")
+@router.delete('/{uuid}')
 @delete_controller(sv)
 async def delete(
     uuid: UUID,
-    message_success: str = "Kibon Donjak deletado com sucesso.",
-    message_error: str = "Não foi possível deletar o Kibon Donjak.",
+    message_success: str = 'Kibon Donjak deletado com sucesso.',
+    message_error: str = 'Não foi possível deletar o Kibon Donjak.',
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.table)),
-) -> Response: ...
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.table)
+    ),
+) -> Response:
+    ...

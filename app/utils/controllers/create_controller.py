@@ -4,12 +4,13 @@ from http import HTTPStatus
 from typing import TypeVar
 
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.responses import Response
 
 from app.user.entities import User
 from ports.uow import AbstractUow
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 def create_controller(service):
@@ -31,8 +32,8 @@ def create_controller(service):
             try:
                 if service.get_by_name(uow, model.name) is not None:
                     return JSONResponse(
-                        status_code=HTTPStatus.BAD_REQUEST,
-                        content={"message": f"{model.name} já existe."},
+                        status_code=HTTPStatus.CONFLICT,
+                        content={'message': f'{model.name} já existe.'},
                     )
 
                 entity = model.to_create(current_user)
@@ -40,13 +41,16 @@ def create_controller(service):
 
                 service.add(uow, entity)
                 return JSONResponse(
-                    status_code=HTTPStatus.OK,
-                    content={"message": f"{message_success}", "id": str(entity.id)},
+                    status_code=HTTPStatus.CREATED,
+                    content={
+                        'message': f'{message_success}',
+                        'id': str(entity.id),
+                    },
                 )
-            except Exception as error:
+            except SQLAlchemyError:
                 return JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": f"{message_error}"},
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    content={'message': f'{message_error}'},
                 )
 
         return wrapper

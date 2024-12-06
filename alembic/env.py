@@ -1,10 +1,11 @@
 import os
 from logging.config import fileConfig
-from bootstrap.database import Base, ensure_all_entities
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+
 from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
+
 from alembic import context
+from bootstrap.database import Base, ensure_all_entities
 
 load_dotenv()
 
@@ -24,7 +25,9 @@ database_url = os.getenv('DATABASE_URI_ALEMBIC_DEV')
 if database_url:
     config.set_main_option('sqlalchemy.url', database_url)
 else:
-    raise RuntimeError("Tente utilizar: export '$(cat .env | xargs)' ou atualizar o seu arquivo .env")
+    raise RuntimeError(
+        "Tente utilizar: export '$(cat .env | xargs)' ou atualizar o seu arquivo .env"
+    )
 
 ensure_all_entities()
 target_metadata = Base.metadata
@@ -49,12 +52,13 @@ def run_migrations_offline() -> None:
 
     """
     from app.auth.entities import Auth
-    url = config.get_main_option("sqlalchemy.url")
+
+    url = config.get_main_option('sqlalchemy.url')
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={'paramstyle': 'named'},
     )
 
     with context.begin_transaction():
@@ -70,7 +74,7 @@ def run_migrations_online() -> None:
     """
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+        prefix='sqlalchemy.',
         poolclass=pool.NullPool,
     )
 

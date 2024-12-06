@@ -21,12 +21,34 @@ requests = "^2.31.0"
 pytest = "^7.4.4"
 httpx = "^0.26.0"
 beautifulsoup4 = "^4.12.3"
+python-multipart = "^0.0.17"
+taskipy = "^1.14.0"
+blue = "^0.9.1"
+isort = "^5.13.2"
+pytest-cov = "^6.0.0"
 
-
-[tool.poetry.group.dev.dependencies]
-black = "^24.8.0"
 
 [build-system]
 requires = ["poetry-core"]
 package-mode = false
 build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+lint = "blue app --check --diff . && isort app --check --diff ."
+apply-lint = "blue app bootstrap general_enum ports && isort app bootstrap general_enum ports"
+apply-lint-test = "blue tests && isort tests"
+
+pre_run-dev = "docker compose -f infra/docker-compose.yml up -d pgbouncer"
+run-dev = "uvicorn bootstrap.server:app --reload"
+
+pre_run = "docker compose -f infra/docker-compose.yml up -d pgbouncer && alembic upgrade head"
+run = "docker compose -f infra/docker-compose.yml up -d nomades"
+
+pre_run-watch = "docker compose -f infra/docker-compose.yml up -d pgbouncer && alembic upgrade head"
+run-watch = "docker compose -f infra/docker-compose.yml up nomades"
+
+stop = "docker compose -f infra/docker-compose.yml down"
+
+pre_test = "docker compose -f infra/docker-compose.yml up -d psql_test"
+test = "pytest tests -s -x -vv --cov=app"
+post_test = "coverage html && docker compose -f infra/docker-compose.yml stop psql_test"

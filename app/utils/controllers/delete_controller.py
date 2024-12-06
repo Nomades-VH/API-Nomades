@@ -2,8 +2,9 @@ from functools import wraps
 from http import HTTPStatus
 from uuid import UUID
 
-from starlette.responses import Response
 from fastapi.responses import JSONResponse
+from starlette.responses import Response
+
 from app.user.entities import User
 from ports.uow import AbstractUow
 
@@ -28,13 +29,11 @@ def delete_controller(service):
             if not model:
                 return JSONResponse(
                     status_code=HTTPStatus.NOT_FOUND,
-                    content={"message": f"{message_error}"},
+                    content={'message': f'{message_error} ID não encontrado.'},
                 )
 
             service.delete(uow, model.id)
-            return JSONResponse(
-                status_code=HTTPStatus.OK, content={"message": f"{message_success}"}
-            )
+            return Response(status_code=HTTPStatus.NO_CONTENT)
 
         return wrapper
 

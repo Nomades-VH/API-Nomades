@@ -12,7 +12,9 @@ def get(uow: AbstractUow):
         return uow.kibondonjak.iter()
 
 
-def get_by_band(uow: AbstractUow, uuid: UUID) -> Optional[List[KibonDonjakEntity]]:
+def get_by_band(
+    uow: AbstractUow, uuid: UUID
+) -> Optional[List[KibonDonjakEntity]]:
     with uow:
         band = uow.band.get(uuid)
         if band:

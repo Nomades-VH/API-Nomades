@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Optional, List
+from typing import Generic, List, Optional, TypeVar
 from uuid import UUID
 
 from ports.entity import Entity
 
-_T = TypeVar("_T", bound=Entity)
+_T = TypeVar('_T', bound=Entity)
 
 
 class AbstractRepository(Generic[_T], ABC):

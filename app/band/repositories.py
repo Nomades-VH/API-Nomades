@@ -1,6 +1,6 @@
 import dataclasses
 from abc import ABC
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import desc
@@ -36,8 +36,7 @@ class AbstractBandRepository(AbstractRepository[Band], ABC):
 
 class BandRepository(AbstractBandRepository):
     def get(self, band_id: UUID):
-        return (self.session.query(Band)
-                .filter_by(id=band_id).one_or_none())
+        return self.session.query(Band).filter_by(id=band_id).one_or_none()
 
     def get_by_gub(self, gub: int) -> Optional[Band]:
         return self.session.query(Band).filter(Band.gub == gub).first()
@@ -55,9 +54,10 @@ class BandRepository(AbstractBandRepository):
         band = {
             k: v
             for k, v in band.__dict__.items()
-            if k not in ["kicks", "poomsaes", "kibon_donjaks", "_sa_instance_state"]
+            if k
+            not in ['kicks', 'poomsaes', 'kibon_donjaks', '_sa_instance_state']
         }
-        self.session.query(Band).filter(Band.id == band["id"]).update(band)
+        self.session.query(Band).filter(Band.id == band['id']).update(band)
 
     def iter(self) -> List[Band]:
         return self.session.query(Band).order_by(desc(Band.gub)).all()

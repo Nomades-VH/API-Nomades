@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 from uuid import UUID
 
@@ -26,28 +27,7 @@ def get_user_by_username(uow: AbstractUow, username: str) -> Optional[User]:
         return uow.user.get_by_username(username)
 
 
-def create_new_user(uow: AbstractUow, user: User, current_user: User):
-    if (
-        user.permission.value >= Permissions.table.value
-        and current_user.permission.value < Permissions.vice_president.value
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Você não possui permissão para cadastrar um usuário da mesa.",
-        )
-
-    if (
-        user.permission == Permissions.president.value
-        and current_user.permission < Permissions.root.value
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Você não possui permissão para cadastrar um usuário Presidente.",
-        )
-
-    if current_user.permission.value < Permissions.table.value:
-        raise HTTPException(status_code=401, detail="Você não pode criar um usuário.")
-
+def create_new_user(uow: AbstractUow, user: User):
     with uow:
         user.password = hash_password(user.password)
         uow.user.add(user)
@@ -62,9 +42,26 @@ def verify_if_user_exists(uow: AbstractUow, user: User):
     return False
 
 
+async def create_src_profile(profile, user):
+    upload_dir = Path('uploads')
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    profile.filename = user.username + profile.filename.replace(' ', '')
+
+    filename = f'{user.username}_{profile.filename}'
+
+    file_location = upload_dir / filename
+
+    with open(file_location, 'wb') as f:
+        f.write(await profile.read())
+
+    return file_location
+
+
 # TODO: Create a service to update user
-def update_user():
-    pass
+def update_user(uow: AbstractUow, user):
+    with uow:
+        uow.user.update(user)
 
 
 # TODO: Create a service to delete user
@@ -73,16 +70,34 @@ def delete(uow: AbstractUow, user_id: UUID):
         uow.user.remove(user_id)
 
 
+def activate_users(uow: AbstractUow, users):
+    for user in users:
+        user.is_active = True
+        update_user(uow, user)
+
+
 def get(uow: AbstractUow):
     with uow:
         yield from uow.user.iter()
+
+
+def get_with_deactivates(uow: AbstractUow):
+    with uow:
+        return uow.user.iter_include_inactive()
+
+
+def get_deactivates(uow: AbstractUow):
+    with uow:
+        return uow.user.iter_only_deactivates()
 
 
 def change_user(user: User | ModelUser) -> ModelUser | User:
     if type(user) == User:
         return ModelUser(
             credentials=Credentials(
-                username=user.username, email=user.email, password=user.password
+                username=user.username,
+                email=user.email,
+                password=user.password,
             ),
             permission=user.permission,
             hub=user.hub,

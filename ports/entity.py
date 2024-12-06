@@ -4,10 +4,11 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import Column, DateTime
-from sqlalchemy.ext.declarative import as_declarative
 from sqlalchemy.dialects.postgresql import UUID as SQLUUID
-from sqlalchemy.orm import declared_attr
+from sqlalchemy.orm import as_declarative, declared_attr
+
 from bootstrap.database import Base
+
 
 @as_declarative()
 class Entity(Base):
@@ -32,7 +33,9 @@ class Entity(Base):
 
     @declared_attr
     def updated_at(cls):
-        return Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+        return Column(
+            DateTime, default=datetime.now(), onupdate=datetime.now()
+        )
 
     @declared_attr
     def created_for(cls):
@@ -53,5 +56,5 @@ class Entity(Base):
 
     def __init_subclass__(cls):
         super().__init_subclass__()
-        if cls.__name__ != "Entity":
+        if cls.__name__ != 'Entity':
             cls.metadata = Base.metadata
