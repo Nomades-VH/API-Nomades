@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from app.user.entities import User
 from app.kibon_donjak.entities import KibonDonjak as KibonDonjakEntity
+from app.user.entities import User
 
 
 class KibonDonjak(BaseModel):

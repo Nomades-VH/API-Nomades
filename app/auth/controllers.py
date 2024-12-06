@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from starlette.responses import JSONResponse
 
+from app.auth import services as sv
 from app.auth.exceptions import InvalidCredentials
 from app.auth.schemas import Credentials
 from app.auth.services import get_current_user_with_permission
@@ -11,16 +12,14 @@ from app.user.models import User
 from app.utils.controllers.get_controller import get_controller
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
-from app.auth import services as sv
-from fastapi import Request
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix='/auth')
 
 
 # use: form_data: OAuth2PasswordRequestForm = Depends(), para testar no docs fastapi
 # use: username: str = Body(...),
 # use: password: str = Body(...) para sistemas fora do fastapi
-@router.post("")
+@router.post('')
 async def login(
     request: Request,
     credentials: Credentials,
@@ -30,34 +29,42 @@ async def login(
         token = await sv.add(uow, credentials, request.client.host)
 
         return JSONResponse(
-            status_code=HTTPStatus.OK,
-            content={"access_token": token.access_token, "token_type": "bearer"},
+            status_code=HTTPStatus.CREATED,
+            content={
+                'access_token': token.access_token,
+                'token_type': 'bearer',
+            },
         )
-    except InvalidCredentials:
+    except InvalidCredentials as error:
         return JSONResponse(
             status_code=HTTPStatus.UNAUTHORIZED,
-            content={"message": "Credenciais inválidas."},
+            content={'message': 'Credenciais inválidas.', 'error': error.args},
         )
     except Exception:
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={"message": "Tente novamente mais tarde."},
+            content={'message': 'Tente novamente mais tarde.'},
         )
 
 
-@router.get("/")
+@router.get('/')
 @get_controller(sv)
 async def get(
-    message_error: str = "Tokens não encontrados.",
+    message_error: str = 'Tokens não encontrados.',
     uow: AbstractUow = Depends(SqlAlchemyUow),
-    current_user: User = Depends(get_current_user_with_permission(Permissions.root)),
-): ...
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.root)
+    ),
+):
+    ...
 
 
-@router.post("/logout")
+@router.post('/logout')
 async def logout(
     request: Request,
-    current_user: User = Depends(get_current_user_with_permission(Permissions.student)),
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.student)
+    ),
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ):
 
@@ -66,11 +73,12 @@ async def logout(
         return response
 
     return JSONResponse(
-        status_code=HTTPStatus.OK, content={"message": "Logout realizado com sucesso."}
+        status_code=HTTPStatus.OK,
+        content={'message': 'Logout realizado com sucesso.'},
     )
 
 
-@router.put("/refresh-token")
+@router.put('/refresh-token')
 async def refresh_token(
     request: Request,
     token: str = Depends(sv.oauth2_scheme),
@@ -81,11 +89,17 @@ async def refresh_token(
 ):
     try:
         token = sv.refresh_token(
-            uow=uow, token=token, user=current_user, ip_user=request.client.host
+            uow=uow,
+            token=token,
+            user=current_user,
+            ip_user=request.client.host,
         )
         return JSONResponse(
             status_code=HTTPStatus.OK,
-            content={"access_token": token.access_token, "token_type": "Bearer"},
+            content={
+                'access_token': token.access_token,
+                'token_type': 'Bearer',
+            },
         )
     except HTTPException as e:
         return e

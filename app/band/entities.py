@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import Mapped, relationship
 
 from app.kibon_donjak.entities import KibonDonjak
 from app.kick.entities import Kick
@@ -18,28 +18,25 @@ class Band(Entity):
     breakdown: Mapped[str] = Column(String(600), nullable=False)
     stretching: Mapped[str] = Column(String(600), nullable=False)
 
-    users = relationship("User", back_populates='band')
+    users = relationship('User', back_populates='band')
     kibon_donjaks: Mapped[Optional[List[KibonDonjak]]] = relationship(
-        secondary="band_kibon_donjak",
-        back_populates="bands",
-        lazy="joined"
+        secondary='band_kibon_donjak', back_populates='bands', lazy='joined'
     )
 
     kicks: Mapped[Optional[List[Kick]]] = relationship(
-        secondary="band_kick",
-        back_populates="bands",
-        lazy="joined"
+        secondary='band_kick', back_populates='bands', lazy='joined'
     )
 
     poomsaes: Mapped[Optional[List[Poomsae]]] = relationship(
-        secondary="band_poomsae",
-        back_populates="bands",
-        lazy="joined"
+        secondary='band_poomsae', back_populates='bands', lazy='joined'
     )
 
     def __eq__(self, other):
         def verify_entities_list(first_list, second_list):
-            return len(first_list) == len(second_list) and first_list == second_list
+            return (
+                len(first_list) == len(second_list)
+                and first_list == second_list
+            )
 
         if not verify_entities_list(self.poomsaes, other.poomsaes):
             return False

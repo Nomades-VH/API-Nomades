@@ -1,4 +1,4 @@
-from bcrypt import hashpw, gensalt, checkpw
+from bcrypt import checkpw, gensalt, hashpw
 
 
 def hash_password(password: str) -> str:

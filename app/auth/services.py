@@ -5,29 +5,28 @@ from typing import Iterator
 from uuid import UUID
 
 from aiocron import crontab
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError, ExpiredSignatureError
+from jose import ExpiredSignatureError, JWTError, jwt
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_403_FORBIDDEN
 
+from app.auth.entities import Auth
 from app.auth.exceptions import InvalidCredentials
 from app.auth.hasher import verify_password
 from app.auth.schemas import Credentials
 from app.uow import SqlAlchemyUow
-from app.user.entities import User
 from app.user import services as sv
+from app.user.entities import User
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
-from app.auth.entities import Auth
-from fastapi import Request
 
-_ALGORITHM = "HS256"
+_ALGORITHM = 'HS256'
 _TOKEN_EXPIRE_MINUTES = 240
-_AUTH_SECRET = os.getenv("AUTH_SECRET")
-_SEPARATE_TOKEN = os.getenv("SEPARATE_TOKEN")
+_AUTH_SECRET = os.getenv('AUTH_SECRET')
+_SEPARATE_TOKEN = os.getenv('SEPARATE_TOKEN')
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth')
 
 
 # TODO: Melhorar todos os serviços de login, logout, refresh token e auto revoke token
@@ -36,8 +35,8 @@ def _create_token(user_id: UUID, ip_user: str) -> str:
 
     return jwt.encode(
         {
-            "sub": str(user_id) + _SEPARATE_TOKEN + ip_user,
-            "exp": expire,
+            'sub': str(user_id) + _SEPARATE_TOKEN + ip_user,
+            'exp': expire,
         },
         key=_AUTH_SECRET,
         algorithm=_ALGORITHM,
@@ -57,15 +56,19 @@ def generate_token(
 
 # É aceitavel que o login demore alguns ms a mais, por conta da segurança
 # Esses ms a mais servem para que um ataque de força bruta não funciona corretamente.
-async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
+async def add(
+    uow: AbstractUow, credentials: Credentials, ip_user: str
+) -> Auth:
     with uow:
-        user = sv.get_user_by_email(uow, credentials.email) or sv.get_user_by_username(
-            uow, credentials.username
-        )
+        user = sv.get_user_by_email(
+            uow, credentials.email
+        ) or sv.get_user_by_username(uow, credentials.username)
 
         # O ms a mais, vem da verificação de senha
-        if not user or not verify_password(credentials.password, user.password):
-            raise InvalidCredentials("Email ou senha incorretos.")
+        if not user or not verify_password(
+            credentials.password, user.password
+        ):
+            raise InvalidCredentials('Email ou senha incorretos.')
 
         token = uow.auth.get_by_user(user.id)
 
@@ -73,7 +76,7 @@ async def add(uow: AbstractUow, credentials: Credentials, ip_user: str) -> Auth:
             payload = jwt.decode(
                 token.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]
             )
-            ip_user_auth = payload.get("sub").split(_SEPARATE_TOKEN)[1]
+            ip_user_auth = payload.get('sub').split(_SEPARATE_TOKEN)[1]
 
             if ip_user_auth != ip_user:
                 raise InvalidCredentials()
@@ -102,47 +105,57 @@ def get_current_user(
 
     with uow:
         try:
-            payload = jwt.decode(token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-            user_id = payload.get("sub").split(_SEPARATE_TOKEN)[0]
+            payload = jwt.decode(
+                token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]
+            )
+            user_id = payload.get('sub').split(_SEPARATE_TOKEN)[0]
 
             if not user_id:
                 raise HTTPException(
-                    status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido."
+                    status_code=HTTPStatus.UNAUTHORIZED,
+                    detail='Token inválido.',
                 )
 
             auth = uow.auth.get_by_token(token)
 
             if not auth:
                 raise HTTPException(
-                    status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido."
+                    status_code=HTTPStatus.UNAUTHORIZED,
+                    detail='Token inválido.',
                 )
 
             ip_user_auth = (
-                jwt.decode(auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM])
-                .get("sub")
+                jwt.decode(
+                    auth.access_token,
+                    key=_AUTH_SECRET,
+                    algorithms=[_ALGORITHM],
+                )
+                .get('sub')
                 .split(_SEPARATE_TOKEN)[1]
             )
 
             if ip_user_auth != ip_user:
                 raise HTTPException(
                     status_code=HTTPStatus.UNAUTHORIZED,
-                    detail="Você não tem permissão para acessar essa página.",
+                    detail='Você não tem permissão para acessar essa página.',
                 )
 
             if is_revoked_token(uow, auth):
                 raise HTTPException(
-                    status_code=HTTPStatus.UNAUTHORIZED, detail="Token revogado."
+                    status_code=HTTPStatus.UNAUTHORIZED,
+                    detail='Token revogado.',
                 )
 
             user = get_by_id(uow, user_id)
             if user is None:
                 raise HTTPException(
-                    status_code=HTTPStatus.NOT_FOUND, detail="Esse usuário não existe."
+                    status_code=HTTPStatus.NOT_FOUND,
+                    detail='Usuário não encontrado.',
                 )
 
         except JWTError:
             raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED, detail="Token inválido."
+                status_code=HTTPStatus.UNAUTHORIZED, detail='Token inválido.'
             )
 
         return user
@@ -159,7 +172,7 @@ def get_current_user_with_permission(permission: Permissions):
         if user.permission.value < permission.value:
             raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED,
-                detail=f"Você não tem autorização para acessar essa página.",
+                detail=f'Você não tem autorização para acessar essa página.',
             )
 
         return user
@@ -167,7 +180,7 @@ def get_current_user_with_permission(permission: Permissions):
     return _dependency
 
 
-@crontab("*/1 * * * *")
+@crontab('*/1 * * * *')
 async def run_auto_revoke_token():
     uow: AbstractUow = SqlAlchemyUow()
     with uow:
@@ -195,13 +208,13 @@ def revoke_token(uow: AbstractUow, user: User, ip_user):
         if not auth:
             return JSONResponse(
                 status_code=HTTPStatus.UNAUTHORIZED,
-                content={"message": "Você não está autenticado."},
+                content={'message': 'Você não está autenticado.'},
             )
 
         payload = jwt.decode(
             auth.access_token, key=_AUTH_SECRET, algorithms=[_ALGORITHM]
         )
-        ip_user_auth = payload.get("sub").split(_SEPARATE_TOKEN)[1]
+        ip_user_auth = payload.get('sub').split(_SEPARATE_TOKEN)[1]
 
         if ip_user_auth != ip_user:
             return InvalidCredentials()
@@ -211,7 +224,8 @@ def revoke_token(uow: AbstractUow, user: User, ip_user):
         else:
             invalidate_token(uow, auth)
             return JSONResponse(
-                status_code=HTTPStatus.FORBIDDEN, content={"message": "Token anulado."}
+                status_code=HTTPStatus.FORBIDDEN,
+                content={'message': 'Token anulado.'},
             )
 
 
@@ -232,27 +246,33 @@ def _is_token_expired(token: Auth):
     try:
         if not token:
             raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN, detail="Você não está logado"
+                status_code=HTTP_403_FORBIDDEN, detail='Você não está logado'
             )
 
         payload = jwt.decode(
             token.access_token, algorithms=_ALGORITHM, key=_AUTH_SECRET
         )
-        expiration = payload.get("exp")
+        expiration = payload.get('exp')
 
         if expiration is None:
-            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail='Token inválido'
+            )
 
         timing = expiration - datetime.now().timestamp()
 
         if timing <= 0:
-            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token expirado")
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail='Token expirado'
+            )
 
         return False
     except ExpiredSignatureError:
         return True
     except JWTError:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token inválido")
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail='Token inválido'
+        )
 
 
 def invalidate_token(uow: AbstractUow, auth: Auth):
@@ -261,14 +281,16 @@ def invalidate_token(uow: AbstractUow, auth: Auth):
         uow.auth.update(auth)
 
 
-def refresh_token(user: User, token: str, uow: AbstractUow, ip_user: str) -> Auth:
+def refresh_token(
+    user: User, token: str, uow: AbstractUow, ip_user: str
+) -> Auth:
     with uow:
         auth = uow.auth.get_by_user(user.id)
 
         if not auth or auth.is_invalid:
             JSONResponse(
                 status_code=HTTPStatus.UNAUTHORIZED,
-                content={"message": "Não autenticado."},
+                content={'message': 'Não autenticado.'},
             )
 
         if not is_revoked_token(uow, auth):
@@ -278,4 +300,6 @@ def refresh_token(user: User, token: str, uow: AbstractUow, ip_user: str) -> Aut
 
             return auth
         else:
-            HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Token revogado.")
+            HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail='Token revogado.'
+            )

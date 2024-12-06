@@ -4,7 +4,6 @@ from typing import Any
 
 from app.auth.repositories import AbstractAuthRepository
 from app.band.repositories import AbstractBandRepository
-
 from app.kibon_donjak.repositories import AbstractKibonDonjakRepository
 from app.kick.repositories import AbstractKickRepository
 from app.poomsae.repositories import AbstractPoomsaeRepository

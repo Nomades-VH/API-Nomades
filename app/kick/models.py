@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from app.user.entities import User
 from app.kick.entities import Kick as KickEntity
+from app.user.entities import User
 
 
 # TODO: Create a model for the kick

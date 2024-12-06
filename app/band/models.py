@@ -1,13 +1,14 @@
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+
 from app.band.entities import Band as BandEntity
-from app.uow import SqlAlchemyUow
-from app.user.entities import User
+from app.kibon_donjak.services import get_by_id as get_kibon_donjak_by_id
 from app.kick.services import get_by_id as get_kick_by_id
 from app.poomsae.services import get_by_id as get_poomsae_by_id
-from app.kibon_donjak.services import get_by_id as get_kibon_donjak_by_id
+from app.uow import SqlAlchemyUow
+from app.user.entities import User
 
 
 class Band(BaseModel):

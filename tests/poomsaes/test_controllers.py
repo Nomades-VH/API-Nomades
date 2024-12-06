@@ -3,31 +3,30 @@ from http import HTTPStatus
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.utils import poomsae_valid, get_poomsae_by_id, invalid_uuid
+from tests.utils import get_poomsae_by_id, invalid_uuid, poomsae_valid
 
-message_get_error = "Não foi encontrado o poomsae."
-message_update_error = "Não foi possível atualizar o Poomsae."
-message_delete_error = "Não foi possível deletar o poomsae."
+message_get_error = 'Não foi encontrado o poomsae.'
+message_update_error = 'Não foi possível atualizar o Poomsae.'
+message_delete_error = 'Não foi possível deletar o poomsae.'
 
-url = "/poomsae/"
+url = '/poomsae/'
 
 
 class TestPoomsae:
-
-    @pytest.fixture(scope="function")
+    @pytest.fixture(scope='function')
     def poomsae(self):
         return poomsae_valid()  # Retorna a variável poomsae
 
     def test_get_poomsaes_without_poomsaes(self, client: TestClient):
         response = client.get(url)
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json()["message"] == "Não foram encontrados poomsaes."
+        assert response.json()['message'] == 'Não foram encontrados poomsaes.'
 
     def test_post_poomsae(self, client: TestClient, poomsae):
         response = client.post(url, json=poomsae)
-        assert response.status_code == HTTPStatus.OK
-        poomsae_created = get_poomsae_by_id(response.json()["id"], client)
-        assert poomsae_created["name"] == poomsae["name"]
+        assert response.status_code == HTTPStatus.CREATED
+        poomsae_created = get_poomsae_by_id(response.json()['id'], client)
+        assert poomsae_created['name'] == poomsae['name']
 
     def test_get_poomsaes(self, client: TestClient, poomsae):
         client.post(url, json=poomsae)
@@ -35,38 +34,40 @@ class TestPoomsae:
         assert response.status_code == HTTPStatus.OK
         assert type(response.json()) == list
         assert len(response.json()) > 0
-        assert response.json()[0]["name"] == poomsae["name"]
+        assert response.json()[0]['name'] == poomsae['name']
 
     def test_post_poomsae_existing_name(self, client: TestClient, poomsae):
         client.post(url, json=poomsae)
         response = client.post(url, json=poomsae)
-        assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.json()["message"] == f"{poomsae['name']} já existe."
+        assert response.status_code == HTTPStatus.CONFLICT
+        assert response.json()['message'] == f"{poomsae['name']} já existe."
 
     def test_post_poomsae_with_wrong_name(self, client: TestClient, poomsae):
-        poomsae["name"] = None
+        poomsae['name'] = None
         response = client.post(url, json=poomsae)
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         assert (
-            response.json()["message"]
-            == "Argumento inválido ou ausência de argumentos.: name"
+            response.json()['message']
+            == 'Argumento inválido ou ausência de argumentos.: name'
         )
 
-    def test_post_poomsae_with_wrong_meaning(self, client: TestClient, poomsae):
-        poomsae["description"] = None
+    def test_post_poomsae_with_wrong_meaning(
+        self, client: TestClient, poomsae
+    ):
+        poomsae['description'] = None
         response = client.post(url, json=poomsae)
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         assert (
-            response.json()["message"]
-            == "Argumento inválido ou ausência de argumentos.: description"
+            response.json()['message']
+            == 'Argumento inválido ou ausência de argumentos.: description'
         )
 
     def test_post_band_without_arguments(self, client: TestClient):
         response = client.post(url, json={})
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         assert (
-            response.json()["message"]
-            == "Argumento inválido ou ausência de argumentos.: name"
+            response.json()['message']
+            == 'Argumento inválido ou ausência de argumentos.: name'
         )
 
     def test_get_by_id(self, client: TestClient, poomsae):
@@ -78,38 +79,38 @@ class TestPoomsae:
 
     def test_get_by_id_not_found(self, client: TestClient, poomsae):
         client.post(url, json=poomsae)
-        response = client.get(f"{url}{invalid_uuid}")
+        response = client.get(f'{url}{invalid_uuid}')
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json()["message"] == message_get_error
+        assert response.json()['message'] == message_get_error
 
     def test_update_band_not_found(self, client: TestClient, poomsae):
-        response = client.put(f"{url}{invalid_uuid}", json=poomsae)
+        response = client.put(f'{url}{invalid_uuid}', json=poomsae)
         assert response.status_code == HTTPStatus.NOT_FOUND
         assert (
-            response.json()["message"]
-            == message_update_error + " ID não encontrado."
+            response.json()['message']
+            == message_update_error + ' ID não encontrado.'
         )
 
     def test_update_band(self, client: TestClient, poomsae):
         client.post(url, json=poomsae)
         poomsae_caught = client.get(url).json()[0]
-        poomsae["name"] = "new name"
+        poomsae['name'] = 'new name'
         response = client.put(f"{url}{poomsae_caught['id']}", json=poomsae)
         assert response.status_code == HTTPStatus.OK
         new_poomsae_caught = client.get(f'{url}{poomsae_caught["id"]}')
-        assert new_poomsae_caught.json()["name"] == poomsae["name"]
+        assert new_poomsae_caught.json()['name'] == poomsae['name']
         assert (
-            new_poomsae_caught.json()["updated_at"] != poomsae_caught["updated_at"]
+            new_poomsae_caught.json()['updated_at']
+            != poomsae_caught['updated_at']
         )
 
     def test_delete_poomsae_not_found(self, client: TestClient):
-        response = client.delete(f"{url}{invalid_uuid}")
+        response = client.delete(f'{url}{invalid_uuid}')
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json()["message"] == message_delete_error
+        assert response.json()['message'] == message_delete_error + ' ID não encontrado.'
 
     def test_delete_poomsae(self, client: TestClient, poomsae):
         response = client.post(url, json=poomsae)
-        assert response.status_code == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.CREATED
         response = client.delete(f"{url}{response.json()['id']}")
-        assert response.status_code == HTTPStatus.OK
-        assert response.json()["message"] == "Poomsae deletado com sucesso."
+        assert response.status_code == HTTPStatus.NO_CONTENT

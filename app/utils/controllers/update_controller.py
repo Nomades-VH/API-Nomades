@@ -6,13 +6,12 @@ from uuid import UUID
 
 from sqlalchemy.event import listens_for
 from sqlalchemy.exc import IntegrityError
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from app.user.entities import User
 from ports.uow import AbstractUow
-from starlette.responses import Response
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 def update_controller(service):
@@ -36,15 +35,14 @@ def update_controller(service):
                 with uow:
                     entity = service.get_by_id(uow, uuid)
                     if not entity:
-                        return JSONResponse(
-                            status_code=HTTPStatus.NOT_FOUND,
-                            content={"message": f"{message_error} ID não encontrado."},
-                        )
+                        return JSONResponse(status_code=HTTPStatus.NOT_FOUND, content={
+                            'message': f"{message_error} ID não encontrado."
+                        })
 
                     if entity == model:
                         return JSONResponse(
                             status_code=HTTPStatus.OK,
-                            content={"message": message_success},
+                            content={'message': message_success},
                         )
 
                     entity = service.to_update(entity, model, uow)
@@ -53,17 +51,18 @@ def update_controller(service):
                     service.update(uow, entity)
                     return JSONResponse(
                         status_code=HTTPStatus.OK,
-                        content={"message": f"{message_success}"},
+                        content={'message': f'{message_success}'},
                     )
             except IntegrityError as e:
                 # TODO: IMPORTANTE Usar isso no sistema
                 return JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST, content={"message": f"{e}"}
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    content={'message': 'Email ou username já existentes.'},
                 )
             except Exception as e:
                 return JSONResponse(
-                    status_code=HTTPStatus.BAD_REQUEST,
-                    content={"message": f"{message_error}", "error": str(e)},
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    content={'message': f'{message_error}', 'error': str(e)},
                 )
 
         return wrapper
