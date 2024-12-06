@@ -34,7 +34,10 @@ def get_by_controller(get_service, entity_name: str):
                 entity = jsonable_encoder(get_service(uow, param))
 
                 if not entity:
-                    return JSONResponse(status_code=HTTPStatus.NOT_FOUND, content={'message': message_error})
+                    return JSONResponse(
+                        status_code=HTTPStatus.NOT_FOUND,
+                        content={'message': message_error},
+                    )
 
                 return JSONResponse(status_code=HTTPStatus.OK, content=entity)
 

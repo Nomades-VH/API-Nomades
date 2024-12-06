@@ -69,6 +69,7 @@ def delete(uow: AbstractUow, user_id: UUID):
     with uow:
         uow.user.remove(user_id)
 
+
 def activate_users(uow: AbstractUow, users):
     for user in users:
         user.is_active = True
@@ -83,6 +84,7 @@ def get(uow: AbstractUow):
 def get_with_deactivates(uow: AbstractUow):
     with uow:
         return uow.user.iter_include_inactive()
+
 
 def get_deactivates(uow: AbstractUow):
     with uow:

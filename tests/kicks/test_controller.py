@@ -104,7 +104,10 @@ class TestKick:
     def test_delete_kick_not_found(self, client: TestClient):
         response = client.delete(f'{url}{invalid_uuid}')
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json()['message'] == message_delete_error + ' ID não encontrado.'
+        assert (
+            response.json()['message']
+            == message_delete_error + ' ID não encontrado.'
+        )
 
     def test_delete_kick(self, client: TestClient, kick):
         response = client.post(url, json=kick)

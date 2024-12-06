@@ -29,7 +29,7 @@ def delete_controller(service):
             if not model:
                 return JSONResponse(
                     status_code=HTTPStatus.NOT_FOUND,
-                    content={"message": f"{message_error} ID não encontrado."},
+                    content={'message': f'{message_error} ID não encontrado.'},
                 )
 
             service.delete(uow, model.id)

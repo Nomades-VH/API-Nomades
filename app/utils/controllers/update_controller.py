@@ -35,9 +35,12 @@ def update_controller(service):
                 with uow:
                     entity = service.get_by_id(uow, uuid)
                     if not entity:
-                        return JSONResponse(status_code=HTTPStatus.NOT_FOUND, content={
-                            'message': f"{message_error} ID não encontrado."
-                        })
+                        return JSONResponse(
+                            status_code=HTTPStatus.NOT_FOUND,
+                            content={
+                                'message': f'{message_error} ID não encontrado.'
+                            },
+                        )
 
                     if entity == model:
                         return JSONResponse(

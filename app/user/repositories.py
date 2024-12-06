@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Iterator, Optional, List
+from typing import Iterator, List, Optional
 from uuid import UUID
 
 from sqlalchemy import and_

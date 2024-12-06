@@ -123,7 +123,10 @@ class TestKibonDonjak:
     def test_delete_kibon_donjak_not_found(self, client: TestClient):
         response = client.delete(f'{url}{invalid_uuid}')
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json()['message'] == message_delete_error + ' ID não encontrado.'
+        assert (
+            response.json()['message']
+            == message_delete_error + ' ID não encontrado.'
+        )
 
     def test_delete_kibon_donjak(self, client: TestClient, kibon_donjak):
         response = client.post(url, json=kibon_donjak)

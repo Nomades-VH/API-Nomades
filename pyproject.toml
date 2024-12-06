@@ -35,7 +35,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.taskipy.tasks]
 lint = "blue app --check --diff . && isort app --check --diff ."
-apply-lint = "blue app . && isort app ."
+apply-lint = "blue app bootstrap general_enum ports && isort app bootstrap general_enum ports"
+apply-lint-test = "blue tests && isort tests"
 
 pre_run-dev = "docker compose -f infra/docker-compose.yml up -d pgbouncer"
 run-dev = "uvicorn bootstrap.server:app --reload"

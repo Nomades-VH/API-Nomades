@@ -5,7 +5,8 @@ from typing import Optional
 from uuid import UUID
 
 from click import confirm
-from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, Request
+from fastapi import (APIRouter, Depends, File, Form, HTTPException, Request,
+                     UploadFile)
 from fastapi.encoders import jsonable_encoder
 from pydantic import EmailStr
 from sqlalchemy.exc import SQLAlchemyError
@@ -84,9 +85,7 @@ async def create_user(
     except UserException as error:
         return JSONResponse(
             status_code=HTTPStatus.CONFLICT,
-            content={
-                'message': jsonable_encoder(error.message)
-            },
+            content={'message': jsonable_encoder(error.message)},
         )
 
 
@@ -148,25 +147,17 @@ async def update_user(
                 content={
                     'message': 'Usuário atualizado com sucesso.',
                     'data': jsonable_encoder(to_update_user),
-                }
+                },
             )
     except UserException as error:
         return JSONResponse(
-            status_code=HTTPStatus.CONFLICT,
-            content={
-                'message': error.message
-            }
+            status_code=HTTPStatus.CONFLICT, content={'message': error.message}
         )
     except SQLAlchemyError:
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={
-                'message': 'Erro interno do servidor.'
-            }
+            content={'message': 'Erro interno do servidor.'},
         )
-
-
-
 
 
 # TODO: Criar o entrypoint para confirmar a criação do usuário
@@ -209,11 +200,10 @@ async def get_profile(
         image = Path(current_user.src_profile)
 
         if not image.exists() or not image.is_file():
-            return Response(
-                status_code=HTTPStatus.NOT_FOUND)
+            return Response(status_code=HTTPStatus.NOT_FOUND)
         return StreamingResponse(
             file_iterator(image),
-            media_type="image/jpeg",
+            media_type='image/jpeg',
             status_code=HTTPStatus.OK,
         )
 
@@ -249,7 +239,7 @@ async def activate_users(
                     content={
                         'message': 'Usuários não encontrados',
                         'data': jsonable_encoder(users),
-                    }
+                    },
                 )
 
             sv.activate_users(uow, users_getted)
@@ -259,15 +249,13 @@ async def activate_users(
                 content={
                     'message': 'Usuários ativados com sucesso.',
                     'data': jsonable_encoder(users),
-                }
+                },
             )
 
     except SQLAlchemyError:
         return JSONResponse(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            content={
-                'message': 'Erro interno do servidor.'
-            }
+            content={'message': 'Erro interno do servidor.'},
         )
 
 

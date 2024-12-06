@@ -107,7 +107,10 @@ class TestPoomsae:
     def test_delete_poomsae_not_found(self, client: TestClient):
         response = client.delete(f'{url}{invalid_uuid}')
         assert response.status_code == HTTPStatus.NOT_FOUND
-        assert response.json()['message'] == message_delete_error + ' ID não encontrado.'
+        assert (
+            response.json()['message']
+            == message_delete_error + ' ID não encontrado.'
+        )
 
     def test_delete_poomsae(self, client: TestClient, poomsae):
         response = client.post(url, json=poomsae)

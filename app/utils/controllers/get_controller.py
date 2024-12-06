@@ -33,7 +33,9 @@ def get_controller(service):
                         content={'message': message_error},
                     )
 
-                return JSONResponse(status_code=HTTPStatus.OK, content=jsonable_encoder(entity))
+                return JSONResponse(
+                    status_code=HTTPStatus.OK, content=jsonable_encoder(entity)
+                )
 
             func_module_name = func.__module__.split('.')[1]
             if func_module_name in (item.value for item in ModuleType):
