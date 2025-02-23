@@ -109,7 +109,6 @@ async def upload_image_profile(
             content={'message': 'Upload realizado.'},
         )
 
-
 @router.put('/')
 async def update_user(
     uuid: UUID,
@@ -158,16 +157,6 @@ async def update_user(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             content={'message': 'Erro interno do servidor.'},
         )
-
-
-# TODO: Criar o entrypoint para confirmar a criação do usuário
-@router.post('/confirm-creation-user')
-async def accept_new_user(
-    current_user: User = Depends(
-        get_current_user_with_permission(Permissions.table)
-    ),
-):
-    ...
 
 
 # TODO: Deve retornar também o token de acesso do usuário
@@ -226,12 +215,11 @@ async def activate_users(
         users_getted = []
 
         with uow:
-            deactivates = sv.get_deactivates(uow)
+            getteds = sv.get(uow)
             for user in users:
-
-                for deactivate in deactivates:
-                    if user == deactivate.id:
-                        users_getted.append(deactivate)
+                for getted in getteds:
+                    if user == getted.id:
+                        users_getted.append(getted)
 
             if not users_getted:
                 return JSONResponse(
@@ -242,7 +230,7 @@ async def activate_users(
                     },
                 )
 
-            sv.activate_users(uow, users_getted)
+            sv.alter_visible_users(uow, users_getted)
 
             return JSONResponse(
                 status_code=HTTPStatus.OK,
@@ -272,7 +260,7 @@ async def get(
 
 
 @router.get('/deactivates')
-async def get_with_deactivates(
+async def get_deactivates(
     message_error: str = 'Não foi possível pegar os usuários',
     current_user: User = Depends(
         get_current_user_with_permission(Permissions.table)
@@ -281,7 +269,7 @@ async def get_with_deactivates(
 ):
     return JSONResponse(
         status_code=HTTPStatus.OK,
-        content=jsonable_encoder(sv.get_with_deactivates(uow)),
+        content=jsonable_encoder(sv.get_deactivates(uow)),
     )
 
 

@@ -6,6 +6,7 @@ from uuid import UUID
 from sqlalchemy import and_
 
 from app.auth.entities import Auth
+from app.user.entities import User
 from ports.repository import AbstractRepository
 
 
@@ -32,7 +33,7 @@ class AuthRepository(AbstractAuthRepository):
 
     def get_by_token(self, token: str) -> Optional[Auth]:
         return (
-            self.session.query(Auth).filter(Auth.access_token == token).first()
+            self.session.query(Auth).filter(and_(Auth.access_token == token, User.is_active == True)).first()
         )
 
     def remove(self, token: str) -> Optional[Auth]:

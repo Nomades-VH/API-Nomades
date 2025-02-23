@@ -60,8 +60,8 @@ async def add(
     uow: AbstractUow, credentials: Credentials, ip_user: str
 ) -> Auth:
     with uow:
-        user = sv.get_user_by_email(
-            uow, credentials.email
+        user = sv.get_active_user_by_email(
+            uow, str(credentials.email)
         ) or sv.get_user_by_username(uow, credentials.username)
 
         # O ms a mais, vem da verificação de senha

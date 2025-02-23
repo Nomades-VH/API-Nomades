@@ -9,13 +9,13 @@ from ports.repository import AbstractRepository
 
 
 class AbstractUserRepository(AbstractRepository[User], ABC):
-    def get_by_email(self, email: str) -> Optional[User]:
+    def get_actives_by_email(self, email: str) -> Optional[User]:
         pass
 
     def get_by_username(self, username: str) -> Optional[User]:
         pass
 
-    def iter_include_inactive(self) -> List[User]:
+    def iter_only_activates(self) -> List[User]:
         ...
 
     def iter_only_deactivates(self) -> List[User]:
@@ -43,15 +43,15 @@ class UserRepository(AbstractUserRepository):
         )
 
     def iter(self) -> Iterator[User]:
-        return self.session.query(User).filter(User.is_active).all()
-
-    def iter_include_inactive(self) -> List[User]:
         return self.session.query(User).all()
+
+    def iter_only_activates(self) -> List[User]:
+        return self.session.query(User).filter(User.is_active == True).all()
 
     def iter_only_deactivates(self) -> List[User]:
         return self.session.query(User).filter(User.is_active == False).all()
 
-    def get_by_email(self, email: str) -> Optional[User]:
+    def get_actives_by_email(self, email: str) -> Optional[User]:
         return (
             self.session.query(User)
             .filter(and_(User.email == email, User.is_active))

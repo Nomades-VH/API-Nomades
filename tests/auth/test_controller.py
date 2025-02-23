@@ -11,7 +11,7 @@ class TestAuth:
     def test_login(self, client: TestClient):
         user = user_valid()
         response = client.post(url, json=user)
-        assert response.status_code == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.CREATED
 
     def test_login_wrong_password(self, client: TestClient):
         user = user_valid()
@@ -23,7 +23,7 @@ class TestAuth:
     def test_logout(self, client: TestClient):
         user = user_valid()
         response = client.post(url, json=user)
-        assert response.status_code == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.CREATED
         response = client.post(
             url + '/logout',
             headers={

@@ -12,7 +12,7 @@ def get_authorization(client: TestClient):
     data = {'email': email_root, 'password': password_root}
 
     response = client.post('/auth', json=data)
-    if response.status_code == 200:
+    if response.status_code == 201:
         return {'Authorization': 'Bearer ' + response.json()['access_token']}
 
 

@@ -17,9 +17,9 @@ def get_by_id(uow: AbstractUow, user_id: UUID) -> Optional[User]:
         return uow.user.get(user_id)
 
 
-def get_user_by_email(uow: AbstractUow, email: str) -> Optional[User]:
+def get_active_user_by_email(uow: AbstractUow, email: str) -> Optional[User]:
     with uow:
-        return uow.user.get_by_email(email)
+        return uow.user.get_actives_by_email(email)
 
 
 def get_user_by_username(uow: AbstractUow, username: str) -> Optional[User]:
@@ -34,7 +34,7 @@ def create_new_user(uow: AbstractUow, user: User):
 
 
 def verify_if_user_exists(uow: AbstractUow, user: User):
-    user_created = get_user_by_email(uow, user.email)
+    user_created = get_active_user_by_email(uow, user.email)
     if user_created:
         if user_created.email == user.email:
             return True
@@ -70,9 +70,9 @@ def delete(uow: AbstractUow, user_id: UUID):
         uow.user.remove(user_id)
 
 
-def activate_users(uow: AbstractUow, users):
+def alter_visible_users(uow: AbstractUow, users):
     for user in users:
-        user.is_active = True
+        user.is_active = False if user.is_active else True
         update_user(uow, user)
 
 
@@ -83,7 +83,7 @@ def get(uow: AbstractUow):
 
 def get_with_deactivates(uow: AbstractUow):
     with uow:
-        return uow.user.iter_include_inactive()
+        return uow.user.iter_only_activates()
 
 
 def get_deactivates(uow: AbstractUow):

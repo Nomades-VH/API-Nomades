@@ -7,7 +7,7 @@ from loguru import logger
 from app.auth.hasher import hash_password
 from app.uow import SqlAlchemyUow
 from app.user.entities import User
-from app.user.services import get_user_by_email
+from app.user.services import get_active_user_by_email
 from general_enum.hubs import Hubs
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
@@ -24,7 +24,7 @@ def _create_tables():
 
 
 def _create_root(uow: AbstractUow):
-    root_user = get_user_by_email(uow, environ.get('ROOT_USER_EMAIL'))
+    root_user = get_active_user_by_email(uow, environ.get('ROOT_USER_EMAIL'))
 
     if not root_user:
         with uow:
@@ -42,7 +42,7 @@ def _create_root(uow: AbstractUow):
 
 
 def _create_student(uow: AbstractUow):
-    student_user = get_user_by_email(uow, environ.get('STUDENT_USER_EMAIL'))
+    student_user = get_active_user_by_email(uow, environ.get('STUDENT_USER_EMAIL'))
 
     if not student_user:
         with uow:
@@ -61,7 +61,7 @@ def _create_student(uow: AbstractUow):
 
 
 def _create_table_user(uow: AbstractUow):
-    table_user = get_user_by_email(uow, environ.get('TABLE_USER_EMAIL'))
+    table_user = get_active_user_by_email(uow, environ.get('TABLE_USER_EMAIL'))
 
     if not table_user:
         with uow:
