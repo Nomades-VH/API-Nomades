@@ -57,3 +57,13 @@ class Band(BaseModel):
             created_for=user.id,
             updated_for=user.id,
         )
+
+class BandsName(BaseModel):
+    id: UUID
+    name: str
+
+    def to_entity(self) -> BandEntity:
+        return BandEntity(
+            gub=self.gub,
+            name=self.name,
+        )

@@ -35,6 +35,22 @@ async def get(
 ) -> Response:
     ...
 
+@router.get('/get_name_bands')
+async def get_name_bands(
+    message_error: str = 'Não foram encontradas faixas.',
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+) -> Response:
+    bands = sv.get(uow)
+    if not bands:
+        return JSONResponse(
+            status_code=HTTPStatus.NOT_FOUND,
+            content={'message': message_error},
+        )
+
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content=jsonable_encoder(bands)
+    )
 
 @router.get('/me')
 async def get_my_band(

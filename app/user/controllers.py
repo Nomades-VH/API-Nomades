@@ -1,11 +1,9 @@
 from http import HTTPStatus
-from io import BytesIO
 from pathlib import Path
 from typing import Optional
 from uuid import UUID
 
-from click import confirm
-from fastapi import (APIRouter, Depends, File, Form, HTTPException, Request,
+from fastapi import (APIRouter, Depends, File, Form, Request,
                      UploadFile)
 from fastapi.encoders import jsonable_encoder
 from pydantic import EmailStr
@@ -13,14 +11,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
 from app.auth.schemas import Credentials
-from app.auth.services import get_current_user_with_permission
+from app.auth.services import get_current_user_with_permission, get_optional_token
 from app.uow import SqlAlchemyUow
 from app.user import services as sv
 from app.user.entities import User
 from app.user.exceptions import UserException
 from app.user.models import User as ModelUser
 from app.utils.controllers.delete_controller import delete_controller
-from app.utils.controllers.get_by_controller import get_by_controller
 from app.utils.controllers.get_controller import get_controller
 from general_enum.hubs import Hubs
 from general_enum.permissions import Permissions
@@ -34,11 +31,12 @@ router = APIRouter(prefix='/user')
 async def create_user(
     request: Request,
     username: str = Form(...),
+    bio: str = Form(...),
     email: EmailStr = Form(...),
     password: str = Form(...),
     confirm_password: str = Form(...),
     permission: int = Form(...),
-    hub: str = Form(...),
+    hub: Hubs = Form(...),
     fk_band: Optional[UUID] = Form(None),
     profile: UploadFile = File(...),
     uow: AbstractUow = Depends(SqlAlchemyUow),
@@ -53,7 +51,8 @@ async def create_user(
 
     user = ModelUser(
         credentials=credentials,
-        permission=permission,
+        bio=bio,
+        permission=Permissions(permission),
         hub=hub,
         fk_band=fk_band,
     )
@@ -86,6 +85,21 @@ async def create_user(
         return JSONResponse(
             status_code=HTTPStatus.CONFLICT,
             content={'message': jsonable_encoder(error.message)},
+        )
+
+
+@router.get('/black-bands')
+async def get_black_bands(uow: AbstractUow = Depends(SqlAlchemyUow)):
+    try:
+        black_bands = sv.get_black_bands(uow=uow)
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=jsonable_encoder(black_bands),
+        )
+    except SQLAlchemyError:
+        return JSONResponse(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            content={'message': 'Erro interno do servidor.'},
         )
 
 
@@ -258,6 +272,25 @@ async def get(
 ):
     ...
 
+@router.get('/permissions')
+async def get_permissions(request: Request, uow: AbstractUow = Depends(SqlAlchemyUow)):
+    current_user = get_optional_token(request, uow)
+
+    if not current_user or current_user.permission < Permissions.root:
+        student_permissions = {
+            p.name: p.value for p in Permissions if p.value < Permissions.professor.value
+        }
+
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=jsonable_encoder(student_permissions),
+        )
+
+    return JSONResponse(
+        status_code=HTTPStatus.OK,
+        content=jsonable_encoder(Permissions.__members__),
+    )
+
 
 @router.get('/deactivates')
 async def get_deactivates(
@@ -273,7 +306,6 @@ async def get_deactivates(
     )
 
 
-# TODO: Create Delete Method
 @router.delete('/{uuid}')
 @delete_controller(sv)
 async def delete_user(

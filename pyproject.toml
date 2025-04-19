@@ -26,6 +26,7 @@ taskipy = "^1.14.0"
 blue = "^0.9.1"
 isort = "^5.13.2"
 pytest-cov = "^6.0.0"
+alembic = "^1.14.1"
 
 
 [build-system]
@@ -39,20 +40,20 @@ apply-lint = "blue app bootstrap general_enum ports && isort app bootstrap gener
 apply-lint-test = "blue tests && isort tests"
 migration = "alembic upgrade head"
 
-pre_run-dev = "docker compose -f infra/docker-compose.yml up -d pgbouncer && task migration"
+pre_run-dev = "docker compose up -d pgbouncer && task migration"
 #run-dev = "poetry run python main.py"
 run-dev = "python3 main.py"
 
-pre_run = "docker compose -f infra/docker-compose.yml up -d pgbouncer && alembic upgrade head"
-run = "docker compose -f infra/docker-compose.yml up -d nomades"
+pre_run = "docker compose up -d pgbouncer && alembic upgrade head"
+run = "docker compose up -d nomades"
 
-pre_run-watch = "docker compose -f infra/docker-compose.yml up -d pgbouncer && alembic upgrade head"
-run-watch = "docker compose -f infra/docker-compose.yml up nomades"
+pre_run-watch = "docker compose up -d pgbouncer && alembic upgrade head"
+run-watch = "docker compose up nomades"
 
-stop = "docker compose -f infra/docker-compose.yml down"
-database = "docker compose -f infra/docker-compose.yml up psql"
+stop = "docker compose down"
+database = "docker compose up psql"
 
 
-pre_test = "docker compose -f infra/docker-compose.yml up -d psql_test"
+pre_test = "docker compose up -d psql_test"
 test = "pytest tests -s -x -vv --cov=app"
-post_test = "coverage html && docker compose -f infra/docker-compose.yml stop psql_test"
+post_test = "coverage html && docker compose stop psql_test"

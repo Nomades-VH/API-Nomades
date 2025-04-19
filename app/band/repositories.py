@@ -33,6 +33,9 @@ class AbstractBandRepository(AbstractRepository[Band], ABC):
     def remove_by_name(self, name: str) -> Optional[Band]:
         pass
 
+    def get_bands_names(self) -> Optional[List[Band]]:
+        ...
+
 
 class BandRepository(AbstractBandRepository):
     def get(self, band_id: UUID):
@@ -65,3 +68,9 @@ class BandRepository(AbstractBandRepository):
     # TODO: Create a method to remove band with name
     def remove_by_name(self, name: str) -> Optional[Band]:
         pass
+
+    def get_bands_names(self) -> Optional[List[Band]]:
+        return self.session.query(Band).with_entities(
+            Band.id,
+            Band.name,
+        ).all()

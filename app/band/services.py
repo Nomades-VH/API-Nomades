@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 
 from app.band.entities import Band
 from app.band.entities import Band as BandEntity
-from app.band.models import Band as BandModel
+from app.band.models import Band as BandModel, BandsName
 from app.kibon_donjak.services import get_by_id as get_kibon_donjak_by_id
 from app.kick.services import get_by_id as get_kick_by_id
 from app.poomsae.services import get_by_id as get_poomsae_by_id
@@ -38,6 +38,11 @@ def get_by_gub(uow: AbstractUow, gub: int) -> Optional[BandEntity]:
 def get_by_name(uow: AbstractUow, name: str) -> Optional[BandEntity]:
     with uow:
         return uow.band.get_by_name(name)
+
+def get_bands_names(uow: AbstractUow) -> List[BandsName]:
+    with uow:
+        return uow.band.get_bands_name()
+
 
 
 def get_minors_band(uow: AbstractUow, gub: int) -> Optional[List[BandModel]]:

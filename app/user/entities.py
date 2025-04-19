@@ -13,6 +13,7 @@ from ports.entity import Entity
 class User(Entity):
     __tablename__ = 'users'  # Nome da tabela
     username: str = Column(String, unique=False, nullable=False)
+    bio: str = Column(String, unique=False, nullable=True)
     email: str = Column(String, unique=True, nullable=False)
     password: str = Column(String, unique=False, nullable=False)
     permission: Permissions = Column(Enum(Permissions), nullable=False)
@@ -27,6 +28,7 @@ class User(Entity):
 
     band = relationship('Band', back_populates='users')
     tokens = relationship('Auth', back_populates='user', uselist=False)
+
 
     @classmethod
     def to_dict(cls, user: 'User') -> dict:
@@ -53,7 +55,6 @@ class User(Entity):
         )
 
 
-#
 # @dataclass
 # class Exame(Entity):
 #     fk_user: UUID

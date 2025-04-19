@@ -1,7 +1,8 @@
 from enum import Enum
+import sqlalchemy as sa
 
 
-class Permissions(Enum):
+class Permissions(int, Enum):
     root = 9
     president = 8
     vice_president = 7
@@ -9,4 +10,5 @@ class Permissions(Enum):
     communicator = 5
     counselor = 4
     table = 3
-    student = 2
+    professor = 2
+    student = 1

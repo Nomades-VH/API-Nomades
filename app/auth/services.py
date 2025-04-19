@@ -179,6 +179,12 @@ def get_current_user_with_permission(permission: Permissions):
 
     return _dependency
 
+def get_optional_token(request: Request, uow: AbstractUow):
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        return get_current_user(request.client.host, uow, auth_header.replace("Bearer ", "", 1).strip())
+    return None
+
 
 @crontab('*/1 * * * *')
 async def run_auto_revoke_token():

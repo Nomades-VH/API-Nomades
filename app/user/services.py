@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from app.auth.hasher import hash_password
 from app.auth.schemas import Credentials
 from app.user.entities import User
-from app.user.models import User as ModelUser
+from app.user.models import User as ModelUser, BlackBands
 from general_enum.permissions import Permissions
 from ports.uow import AbstractUow
 
@@ -16,6 +16,11 @@ def get_by_id(uow: AbstractUow, user_id: UUID) -> Optional[User]:
     with uow:
         return uow.user.get(user_id)
 
+def get_black_bands(uow: AbstractUow) -> Optional[List[BlackBands]]:
+    with uow:
+        users = uow.user.get_black_bands()
+
+    return users
 
 def get_active_user_by_email(uow: AbstractUow, email: str) -> Optional[User]:
     with uow:
@@ -99,7 +104,8 @@ def change_user(user: User | ModelUser) -> ModelUser | User:
                 email=user.email,
                 password=user.password,
             ),
-            permission=user.permission,
+            bio=user.bio,
+            permission=Permissions(user.permission),
             hub=user.hub,
             src_profile=user.src_profile,
             fk_band=user.fk_band,
@@ -107,8 +113,9 @@ def change_user(user: User | ModelUser) -> ModelUser | User:
     return User(
         username=user.credentials.username,
         email=user.credentials.email,
+        bio=user.bio,
         password=user.credentials.password,
-        permission=user.permission,
+        permission=Permissions(user.permission),
         hub=user.hub,
         src_profile=user.src_profile,
         fk_band=user.fk_band,
