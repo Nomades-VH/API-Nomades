@@ -74,6 +74,9 @@ def delete(uow: AbstractUow, user_id: UUID):
     with uow:
         uow.user.remove(user_id)
 
+def real_delete(uow: AbstractUow, user_id: UUID):
+    with uow:
+        uow.user.delete(user_id)
 
 def alter_visible_users(uow: AbstractUow, users):
     for user in users:
@@ -94,6 +97,8 @@ def get_with_deactivates(uow: AbstractUow):
 def get_deactivates(uow: AbstractUow):
     with uow:
         return uow.user.iter_only_deactivates()
+
+
 
 
 def change_user(user: User | ModelUser) -> ModelUser | User:

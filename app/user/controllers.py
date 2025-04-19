@@ -318,3 +318,34 @@ async def delete_user(
     ),
 ):
     ...
+
+@router.delete('/real-delete/{uuid}')
+async def delete_user(
+uuid: UUID,
+    message_success: str = 'Usuário deletado com sucesso.',
+    message_error: str = 'Não foi possível deletar o usuário.',
+    uow: AbstractUow = Depends(SqlAlchemyUow),
+    current_user: User = Depends(
+        get_current_user_with_permission(Permissions.table)
+    ),
+):
+    try:
+        with uow:
+            user = sv.get_by_id(uow, uuid)
+            if not user:
+                return JSONResponse(
+                    status_code=HTTPStatus.NOT_FOUND,
+                    content={'message': message_error},
+                )
+
+            sv.real_delete(uow, user)
+
+            return JSONResponse(
+                status_code=HTTPStatus.OK,
+                content={'message': message_success},
+            )
+    except SQLAlchemyError:
+        return JSONResponse(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            content={'message': 'Erro interno do servidor.'},
+        )

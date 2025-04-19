@@ -28,6 +28,9 @@ class AbstractUserRepository(AbstractRepository[User], ABC):
     def get_black_bands(self) -> List[User]:
         ...
 
+    def delete(self, uuid: UUID) -> None:
+        ...
+
 
 class UserRepository(AbstractUserRepository):
     def get(self, uuid: UUID) -> Optional[User]:
@@ -48,6 +51,9 @@ class UserRepository(AbstractUserRepository):
         self.session.query(User).filter(User.id == uuid).update(
             {'is_active': False}
         )
+
+    def delete(self, uuid: UUID) -> None:
+        self.session.query(User).filter(User.id == uuid).delete()
 
     def iter(self) -> Iterator[User]:
         return self.session.query(User).all()
