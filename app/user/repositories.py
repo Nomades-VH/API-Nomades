@@ -80,5 +80,5 @@ class UserRepository(AbstractUserRepository):
 
     def get_black_bands(self) -> List[User]:
         return (self.session.query(User)
-                .filter(and_(User.permission >= Permissions.professor, User.is_active, User.permission != Permissions.root))
+                .filter(and_(User.permission >= Permissions.professor, User.is_active == True, User.permission != Permissions.root))
                 .all())

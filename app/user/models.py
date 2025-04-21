@@ -18,6 +18,6 @@ class User(BaseModel):
 
 
 class BlackBands(BaseModel):
+    id: UUID
     name: str
     bio: str
-    src_profile: str

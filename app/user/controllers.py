@@ -16,7 +16,7 @@ from app.uow import SqlAlchemyUow
 from app.user import services as sv
 from app.user.entities import User
 from app.user.exceptions import UserException
-from app.user.models import User as ModelUser
+from app.user.models import User as ModelUser, BlackBands
 from app.utils.controllers.delete_controller import delete_controller
 from app.utils.controllers.get_controller import get_controller
 from general_enum.hubs import Hubs
@@ -91,7 +91,16 @@ async def create_user(
 @router.get('/black-bands')
 async def get_black_bands(uow: AbstractUow = Depends(SqlAlchemyUow)):
     try:
-        black_bands = sv.get_black_bands(uow=uow)
+        users = sv.get_black_bands(uow=uow)
+
+        black_bands = []
+        for user in users:
+            black_bands.append(BlackBands(
+                id=user.id,
+                name=user.username,
+                bio=user.bio,
+            ))
+
         return JSONResponse(
             status_code=HTTPStatus.OK,
             content=jsonable_encoder(black_bands),
@@ -216,6 +225,29 @@ async def get_profile(
             content={'message': 'Erro interno do servidor.'},
         )
 
+@router.get('/profile/{uuid}')
+async def get_profile_with_id(uuid: UUID, uow: AbstractUow = Depends(SqlAlchemyUow)):
+    try:
+        current_user = sv.get_by_id(uow, uuid)
+
+        if not current_user.src_profile:
+            return Response(status_code=HTTPStatus.NOT_FOUND)
+        image = Path(current_user.src_profile)
+
+        if not image.exists() or not image.is_file():
+            return Response(status_code=HTTPStatus.NOT_FOUND)
+        return StreamingResponse(
+            file_iterator(image),
+            media_type='image/jpeg',
+            status_code=HTTPStatus.OK,
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            content={'message': 'Erro interno do servidor.'},
+        )
+
 
 @router.post('/activate')
 async def activate_users(
@@ -276,15 +308,18 @@ async def get(
 async def get_permissions(request: Request, uow: AbstractUow = Depends(SqlAlchemyUow)):
     current_user = get_optional_token(request, uow)
 
-    if not current_user or current_user.permission < Permissions.root:
-        student_permissions = {
-            p.name: p.value for p in Permissions if p.value < Permissions.professor.value
-        }
-
+    if not current_user:
         return JSONResponse(
             status_code=HTTPStatus.OK,
-            content=jsonable_encoder(student_permissions),
+            content=jsonable_encoder({Permissions.student.name: Permissions.student.value}),
         )
+
+    if current_user.permission.value < Permissions.root.value:
+        return JSONResponse(
+            status_code=HTTPStatus.OK,
+            content=jsonable_encoder({
+            p.name: p.value for p in Permissions if p.value <= current_user.permission.value
+        }))
 
     return JSONResponse(
         status_code=HTTPStatus.OK,
