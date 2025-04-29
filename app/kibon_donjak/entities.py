@@ -10,7 +10,7 @@ from ports.entity import Entity
 
 class KibonDonjak(Entity):
     __tablename__ = 'kibon_donjaks'
-    name: Mapped[str] = Column(String(50), unique=True, nullable=False)
+    name: Mapped[str] = Column(String(150), unique=True, nullable=False)
     description: Mapped[str] = Column(String(600), nullable=False)
 
     bands: Mapped['Band'] = relationship(
