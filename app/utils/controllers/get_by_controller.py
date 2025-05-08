@@ -56,8 +56,7 @@ def get_by_controller(get_service, entity_name: str):
                 minors_bands = sv_band.get_minors_band(uow, band.gub)
 
                 if func_module_name == ModuleType.BAND.value:
-                    band_by_id = sv_band.get_by_id(uow, param)
-                    if band_by_id and band_by_id in minors_bands:
+                    if any(b.id == band.id for b in minors_bands):
                         return JSONResponse(
                             status_code=HTTPStatus.OK,
                             content=jsonable_encoder(band),

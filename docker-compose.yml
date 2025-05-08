@@ -8,7 +8,7 @@ services:
     networks:
       - nm-network
     volumes:
-      - ./infra/pgdata:/var/lib/postgresql/data
+      - ./daemon.json:/etc/docker/daemon.json
 
   psql_test:
     container_name: "postgres_test"
@@ -39,6 +39,8 @@ services:
       - nm-network
     depends_on:
       - psql
+    volumes:
+      - ./daemon.json:/etc/docker/daemon.json
 
   nomades:
     container_name: "nomades"
@@ -63,7 +65,7 @@ services:
       - nm-network
     restart: always
     volumes:
-      - ./:/usr/src/app/
+      - ./daemon.json:/etc/docker/daemon.json
 
 networks:
   nm-network:
