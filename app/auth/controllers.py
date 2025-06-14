@@ -25,15 +25,23 @@ async def login(
     credentials: Credentials,
     uow: AbstractUow = Depends(SqlAlchemyUow),
 ):
-    token = await sv.add(uow, credentials, request.client.host)
+    try:
+        token = await sv.add(uow, credentials, request.client.host)
 
-    return JSONResponse(
-        status_code=HTTPStatus.CREATED,
-        content={
-            'access_token': token.access_token,
-            'token_type': 'bearer',
-        },
-    )
+        return JSONResponse(
+            status_code=HTTPStatus.CREATED,
+            content={
+                'access_token': token.access_token,
+                'token_type': 'bearer',
+            },
+        )
+    except InvalidCredentials as error:
+        return JSONResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            content={
+                'message': f'{error}'
+            }
+        )
 
 
 @router.get('/')

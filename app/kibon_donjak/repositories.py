@@ -52,6 +52,6 @@ class KibonDonjakRepository(AbstractKibonDonjakRepository):
     def iter(self) -> List[KibonDonjak]:
         return (
             self.session.query(KibonDonjak)
-            .order_by(KibonDonjak.created_at)
+            .order_by(KibonDonjak.name)
             .all()
         )

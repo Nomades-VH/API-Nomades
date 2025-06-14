@@ -63,7 +63,7 @@ async def add(
         user = sv.get_active_user_by_email(
             uow, str(credentials.email)
         ) or sv.get_user_by_username(uow, credentials.username)
-
+        
         # O ms a mais, vem da verificação de senha
         if not user or not verify_password(
             credentials.password, user.password
@@ -79,7 +79,7 @@ async def add(
             ip_user_auth = payload.get('sub').split(_SEPARATE_TOKEN)[1]
 
             if ip_user_auth != ip_user:
-                raise InvalidCredentials()
+                raise InvalidCredentials('Dispositivo não reconhecido.')
 
             return token
 
